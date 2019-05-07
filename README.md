@@ -1,2 +1,2 @@
 # labs-document-manager
-Document manager
+Document manager.
