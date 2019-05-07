@@ -1,0 +1,17 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br">
+<head>
+	<partial name="_Header.cshtml" />
+	
+	<title>@(ViewBag.Title ?? "Gerenciador de Documentos")</title>
+
+	@RenderSection("Styles", false)
+</head>
+<body>
+	@RenderBody()
+
+	<partial name="_Footer.cshtml" />
+
+	@RenderSection("Scripts", false)
+</body>
+</html>

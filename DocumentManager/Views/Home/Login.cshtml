@@ -1,0 +1,30 @@
+﻿@{
+	Layout = "_LayoutExternal";
+}
+<form method="post" action="./">
+	<div style="max-width: 400px; margin: 5% auto; padding: 15px;">
+		<div class="panel @(ViewBag.Message != null ? "panel-danger" : "panel-default")">
+			<div class="panel-heading">
+				<div class="text-center">
+					<img alt="Logo" src="~/images/logo-header.png" />
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label for="login">Usuário</label>
+					<input name="login" type="text" id="login" class="form-control text-uppercase" spellcheck="false" />
+				</div>
+				<div class="form-group">
+					<label for="senha">Senha</label>
+					<input name="senha" type="password" id="senha" class="form-control" />
+				</div>
+				@if (ViewBag.Message != null) {
+				<div id="lblMessage" class="alert alert-danger no-margin-bottom">@ViewBag.Message</div>
+				}
+			</div>
+			<div class="panel-footer">
+				<input type="submit" value="Login" class="btn btn-primary btn-lg btn-block" />
+			</div>
+		</div>
+	</div>
+</form>
