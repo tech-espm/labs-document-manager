@@ -3,14 +3,64 @@ using DocumentManager.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using DocumentManager.Attributes;
+using System.Text;
+using DocumentManager.Exceptions;
+using System.Data.SqlClient;
 
 namespace DocumentManager.Controllers {
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 	public class BaseController : Controller {
+		protected User LoggedUser;
 
-		public string AppData => AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
+		protected ContentResult ErrorResult(string message) {
+			ContentResult result = Content($"{{\"ExceptionMessage\":\"{(message ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n").Replace('\0', ' ')}\"}}", "application/json", Encoding.UTF8);
+			result.StatusCode = 299;
+			return result;
+		}
 
-		public string AppDataFilePath(string folder, int id, string extension) => System.IO.Path.Combine(AppData, folder, id + "." + extension);
+		protected ContentResult ErrorResult(Exception ex) {
+			if (ex is ValidationException)
+				return ErrorResult(ex.Message);
+			if (ex is SqlException)
+				return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} na base de dados: {ex.Message}");
+			return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} no servidor: {ex.Message}");
+		}
+
+		public override void OnActionExecuting(ActionExecutingContext context) {
+			LoggedUser = Models.User.GetFromClient(HttpContext);
+			ViewBag.LoggedUser = LoggedUser;
+
+			ControllerActionDescriptor actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
+			object[] attributes = actionDescriptor.MethodInfo.GetCustomAttributes(typeof(AccessControlAttribute), true);
+			Feature requestedFeature = Feature.None;
+			bool apiCall = false;
+			if (attributes != null && attributes.Length > 0) {
+				AccessControlAttribute accessControl = attributes[0] as AccessControlAttribute;
+				if (accessControl.Anonymous) {
+					base.OnActionExecuting(context);
+					return;
+				}
+				requestedFeature = accessControl.RequestedFeature;
+				apiCall = accessControl.ApiCall;
+			}
+
+			if (LoggedUser == null || !LoggedUser.HasFeature(requestedFeature)) {
+				if (apiCall)
+					context.Result = ErrorResult("Sem permissão");
+				else if (LoggedUser != null)
+					context.Result = View("~/Views/Home/NoPermission.cshtml");
+				else if (string.IsNullOrWhiteSpace(Request.Path) || Request.Path == "/")
+					context.Result = View("~/Views/Home/Login.cshtml");
+				else
+					context.Result = Redirect("/Home/Login/?r=" + Uri.EscapeDataString(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString.ToUriComponent()));
+				return;
+			}
+
+			base.OnActionExecuting(context);
+		}
 
 		public IActionResult Error(string message) => new ContentResult() {
 			Content = message,

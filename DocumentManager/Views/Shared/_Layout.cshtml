@@ -3,7 +3,7 @@
 <head>
 	<partial name="_Header.cshtml" />
 	
-	<title>@(ViewBag.Title ?? "Gerenciador de Documentos")</title>
+	<title>@(ViewBag.Title != null ? ViewBag.Title + " - Gerenciador de Documentos" : "Gerenciador de Documentos")</title>
 
 	@RenderSection("Styles", false)
 </head>
