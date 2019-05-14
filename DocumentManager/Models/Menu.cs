@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Web;
 using System.Drawing;
 using System.IO;
 using System.Text;
+using MySql.Data.MySqlClient;
 
 namespace DocumentManager.Models {
 	public class Menu {
@@ -38,10 +38,10 @@ namespace DocumentManager.Models {
 			int[] features = new int[(int)Feature.Max];
 
 			if (profileId != Profile.ADMIN_ID) {
-				using (SqlConnection conn = Sql.OpenConnection()) {
-					using (SqlCommand cmd = new SqlCommand($"SELECT FeatureId FROM tbProfileFeature WHERE ProfileId = @profileId ORDER BY FeatureId ASC", conn)) {
-						cmd.Parameters.AddWithValue("@profileId", profileId);
-						using (SqlDataReader reader = cmd.ExecuteReader()) {
+				using (MySqlConnection conn = Sql.OpenConnection()) {
+					using (MySqlCommand cmd = new MySqlCommand($"SELECT feature_id FROM profile_feature WHERE profile_id = @profile_id ORDER BY feature_id ASC", conn)) {
+						cmd.Parameters.AddWithValue("@profile_id", profileId);
+						using (MySqlDataReader reader = cmd.ExecuteReader()) {
 							while (reader.Read() && featureCount < (int)Feature.Max)
 								features[featureCount++] = reader.GetInt32(0);
 						}

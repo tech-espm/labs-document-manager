@@ -1,9 +1,9 @@
 ﻿using DocumentManager.Exceptions;
 using DocumentManager.Utils;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Text;
 using System.Web;
 
@@ -48,17 +48,20 @@ namespace DocumentManager.Models {
 
 			int id;
 
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlTransaction tran = conn.BeginTransaction()) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlTransaction tran = conn.BeginTransaction()) {
 					try {
-						using (SqlCommand cmd = new SqlCommand("INSERT INTO tbProfile (Name) OUTPUT INSERTED.Id VALUES (@name)", conn, tran)) {
+						using (MySqlCommand cmd = new MySqlCommand("INSERT INTO profile (name) VALUES (@name)", conn, tran)) {
 							cmd.Parameters.AddWithValue("@name", name);
+							cmd.ExecuteNonQuery();
+						}
+						using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn, tran)) {
 							id = (int)cmd.ExecuteScalar();
 						}
 						if (features != null && features.Length > 0) {
-							using (SqlCommand cmd = new SqlCommand("INSERT INTO tbProfileFeature (ProfileId, FeatureId) VALUES (@id, @featureId)", conn, tran)) {
-								cmd.Parameters.AddWithValue("@id", id);
-								cmd.Parameters.Add("@featureId", SqlDbType.Int);
+							using (MySqlCommand cmd = new MySqlCommand("INSERT INTO profile_feature (profile_id, feature_id) VALUES (@profile_id, @feature_id)", conn, tran)) {
+								cmd.Parameters.AddWithValue("@profile_id", id);
+								cmd.Parameters.Add("@feature_id", MySqlDbType.Int32);
 								for (int i = 0; i < features.Length; i++) {
 									cmd.Parameters[1].Value = features[i];
 									cmd.ExecuteNonQuery();
@@ -78,9 +81,9 @@ namespace DocumentManager.Models {
 
 		public static IEnumerable<Profile> GetAll() {
 			List<Profile> profiles = new List<Profile>();
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("SELECT Id, Name FROM tbProfile ORDER BY Name ASC", conn)) {
-					using (SqlDataReader reader = cmd.ExecuteReader()) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name FROM profile ORDER BY name ASC", conn)) {
+					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							profiles.Add(new Profile(reader.GetInt32(0), reader.GetString(1)));
 					}
@@ -91,19 +94,19 @@ namespace DocumentManager.Models {
 
 		public static Profile GetById(int id, bool full) {
 			Profile profile = null;
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("SELECT Id, Name FROM tbProfile WHERE Id = @id", conn)) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name FROM profile WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", id);
-					using (SqlDataReader reader = cmd.ExecuteReader()) {
+					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						if (reader.Read())
 							profile = new Profile(reader.GetInt32(0), reader.GetString(1));
 					}
 				}
 				if (full && profile != null) {
-					using (SqlCommand cmd = new SqlCommand("SELECT FeatureId FROM tbProfileFeature WHERE ProfileId = @id ORDER BY FeatureId ASC", conn)) {
-						cmd.Parameters.AddWithValue("@id", id);
+					using (MySqlCommand cmd = new MySqlCommand("SELECT feature_id FROM profile_feature WHERE profile_id = @profile_id ORDER BY feature_id ASC", conn)) {
+						cmd.Parameters.AddWithValue("@profile_id", id);
 						profile.Features = new HashSet<int>();
-						using (SqlDataReader reader = cmd.ExecuteReader()) {
+						using (MySqlDataReader reader = cmd.ExecuteReader()) {
 							while (reader.Read())
 								profile.Features.Add(reader.GetInt32(0));
 						}
@@ -135,10 +138,10 @@ namespace DocumentManager.Models {
 					Lock.EnterWriteLock();
 					if (!PermissionsByProfile.TryGetValue(profileId, out list)) {
 						List<int> features = new List<int>();
-						using (SqlConnection conn = Sql.OpenConnection()) {
-							using (SqlCommand cmd = new SqlCommand("SELECT FeatureId FROM tbProfileFeature WHERE ProfileId = @profileId ORDER BY FeatureId ASC", conn)) {
-								cmd.Parameters.AddWithValue("@profileId", profileId);
-								using (SqlDataReader reader = cmd.ExecuteReader()) {
+						using (MySqlConnection conn = Sql.OpenConnection()) {
+							using (MySqlCommand cmd = new MySqlCommand("SELECT feature_id FROM profile_feature WHERE profile_id = @profile_id ORDER BY feature_id ASC", conn)) {
+								cmd.Parameters.AddWithValue("@profile_id", profileId);
+								using (MySqlDataReader reader = cmd.ExecuteReader()) {
 									while (reader.Read())
 										features.Add(reader.GetInt32(0));
 								}
@@ -171,23 +174,23 @@ namespace DocumentManager.Models {
 
 			Validate(name, features);
 
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlTransaction tran = conn.BeginTransaction()) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlTransaction tran = conn.BeginTransaction()) {
 					try {
-						using (SqlCommand cmd = new SqlCommand("UPDATE tbProfile SET Name = @name WHERE Id = @id", conn, tran)) {
+						using (MySqlCommand cmd = new MySqlCommand("UPDATE profile SET name = @name WHERE id = @id", conn, tran)) {
 							cmd.Parameters.AddWithValue("@name", name);
 							cmd.Parameters.AddWithValue("@id", Id);
 							cmd.ExecuteNonQuery();
 							Name = name;
 						}
-						using (SqlCommand cmd = new SqlCommand("DELETE FROM tbProfileFeature WHERE ProfileId = @id", conn, tran)) {
-							cmd.Parameters.AddWithValue("@id", Id);
+						using (MySqlCommand cmd = new MySqlCommand("DELETE FROM profile_feature WHERE profile_id = @profile_id", conn, tran)) {
+							cmd.Parameters.AddWithValue("@profile_id", Id);
 							cmd.ExecuteNonQuery();
 						}
 						if (features != null && features.Length > 0) {
-							using (SqlCommand cmd = new SqlCommand("INSERT INTO tbProfileFeature (ProfileId, FeatureId) VALUES (@id, @featureId)", conn, tran)) {
-								cmd.Parameters.AddWithValue("@id", Id);
-								cmd.Parameters.Add("@featureId", SqlDbType.Int);
+							using (MySqlCommand cmd = new MySqlCommand("INSERT INTO profile_feature (profile_id, feature_id) VALUES (@profile_id, @feature_id)", conn, tran)) {
+								cmd.Parameters.AddWithValue("@profile_id", Id);
+								cmd.Parameters.Add("@feature_id", MySqlDbType.Int32);
 								for (int i = 0; i < features.Length; i++) {
 									cmd.Parameters[1].Value = features[i];
 									cmd.ExecuteNonQuery();
@@ -210,8 +213,8 @@ namespace DocumentManager.Models {
 		public void Delete() {
 			if (Id == ADMIN_ID)
 				throw new ValidationException("Não é permitido excluir o perfil \"ADMINISTRADOR\"!");
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("DELETE FROM tbProfile WHERE Id = @id", conn)) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("DELETE FROM profile WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", Id);
 					cmd.ExecuteNonQuery();
 				}

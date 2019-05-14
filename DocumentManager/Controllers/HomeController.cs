@@ -36,6 +36,14 @@ namespace DocumentManager.Controllers {
 			return View();
 		}
 
+		[HttpGet]
+		[AccessControl(true)]
+		public IActionResult Logout() {
+			if (LoggedUser != null)
+				LoggedUser.Logout(HttpContext);
+			return Redirect("/");
+		}
+
 		public IActionResult NoPermission() {
 			return View();
 		}

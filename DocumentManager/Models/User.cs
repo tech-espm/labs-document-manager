@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Web;
 using System.Drawing;
 using System.IO;
@@ -10,6 +9,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using DocumentManager.Exceptions;
+using MySql.Data.MySqlClient;
 
 namespace DocumentManager.Models {
 	public class User {
@@ -105,10 +105,10 @@ namespace DocumentManager.Models {
 			int id, profileId, pictureVersion;
 			bool active;
 			string fullName, hash;
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("SELECT Id, FullName, Password, ProfileId, PictureVersion, Active FROM tbUser WHERE UserName = @userName", conn)) {
-					cmd.Parameters.AddWithValue("@userName", userName);
-					using (SqlDataReader reader = cmd.ExecuteReader()) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, full_name, password, profile_id, picture_version, active FROM user WHERE user_name = @user_name", conn)) {
+					cmd.Parameters.AddWithValue("@user_name", userName);
+					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						if (!reader.Read())
 							return null;
 						id = reader.GetInt32(0);
@@ -124,9 +124,9 @@ namespace DocumentManager.Models {
 					byte[] buffer = Guid.NewGuid().ToByteArray();
 					long tokenLow = BitConverter.ToInt64(buffer, 0);
 					long tokenHigh = BitConverter.ToInt64(buffer, 8);
-					using (SqlCommand cmd = new SqlCommand("UPDATE tbUser SET TokenLow = @tokenLow, TokenHigh = @tokenHigh WHERE Id = @id", conn)) {
-						cmd.Parameters.AddWithValue("@tokenLow", tokenLow);
-						cmd.Parameters.AddWithValue("@tokenHigh", tokenHigh);
+					using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET token_low = @token_low, token_high = @token_high WHERE id = @id", conn)) {
+						cmd.Parameters.AddWithValue("@token_low", tokenLow);
+						cmd.Parameters.AddWithValue("@token_high", tokenHigh);
 						cmd.Parameters.AddWithValue("@id", id);
 						cmd.ExecuteNonQuery();
 					}
@@ -141,7 +141,7 @@ namespace DocumentManager.Models {
 		public static User GetFromClient(HttpContext context) {
 			string cookie = context.Request.Cookies["user"];
 
-			if (!string.IsNullOrEmpty(cookie) ||
+			if (string.IsNullOrEmpty(cookie) ||
 				!Deserialize(cookie, out int id, out long tokenLow, out long tokenHigh) ||
 				id <= 0 ||
 				tokenLow == 0 ||
@@ -157,10 +157,10 @@ namespace DocumentManager.Models {
 			}
 
 			if (user == null) {
-				using (SqlConnection conn = Sql.OpenConnection()) {
-					using (SqlCommand cmd = new SqlCommand("SELECT UserName, FullName, ProfileId, PictureVersion, TokenLow, TokenHigh FROM tbUser WHERE Id = @id AND Active = 1", conn)) {
+				using (MySqlConnection conn = Sql.OpenConnection()) {
+					using (MySqlCommand cmd = new MySqlCommand("SELECT user_name, full_name, profile_id, picture_version, token_low, token_high FROM user WHERE id = @id AND active = 1", conn)) {
 						cmd.Parameters.AddWithValue("@id", id);
-						using (SqlDataReader reader = cmd.ExecuteReader()) {
+						using (MySqlDataReader reader = cmd.ExecuteReader()) {
 							if (!reader.Read() ||
 								reader.GetInt64(4) != tokenLow ||
 								reader.GetInt64(5) != tokenHigh)
@@ -234,20 +234,23 @@ namespace DocumentManager.Models {
 
 			int id;
 
-			using (SqlConnection conn = Sql.OpenConnection()) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
 				if (profileId != Profile.ADMIN_ID) {
-					using (SqlCommand cmd = new SqlCommand("SELECT TOP 1 1 FROM tbProfile WHERE Id = @profileId", conn)) {
-						cmd.Parameters.AddWithValue("@profileId", profileId);
+					using (MySqlCommand cmd = new MySqlCommand("SELECT 1 FROM profile WHERE id = @profile_id LIMIT 1", conn)) {
+						cmd.Parameters.AddWithValue("@profile_id", profileId);
 						object o = cmd.ExecuteScalar();
 						if (o == null || o == DBNull.Value)
 							throw new ValidationException("Perfil não encontrado!");
 					}
 				}
-				using (SqlCommand cmd = new SqlCommand("INSERT INTO tbUser (UserName, FullName, Password, ProfileId, PictureVersion, Active, TokenLow, TokenHigh) OUTPUT INSERTED.Id VALUES (@userName, @fullName, @password, @profileId, 0, 1, 0, 0)", conn)) {
-					cmd.Parameters.AddWithValue("@userName", userName);
-					cmd.Parameters.AddWithValue("@fullName", fullName);
+				using (MySqlCommand cmd = new MySqlCommand("INSERT INTO user (user_name, full_name, password, profile_id, picture_version, active, token_low, token_high) VALUES (@user_name, @full_name, @password, @profile_id, 0, 1, 0, 0)", conn)) {
+					cmd.Parameters.AddWithValue("@user_name", userName);
+					cmd.Parameters.AddWithValue("@full_name", fullName);
 					cmd.Parameters.AddWithValue("@password", DefaultPassword);
-					cmd.Parameters.AddWithValue("@profileId", profileId);
+					cmd.Parameters.AddWithValue("@profile_id", profileId);
+					cmd.ExecuteNonQuery();
+				}
+				using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn)) {
 					id = (int)cmd.ExecuteScalar();
 				}
 			}
@@ -257,9 +260,9 @@ namespace DocumentManager.Models {
 
 		public static IEnumerable<User> GetAllWithProfileName() {
 			List<User> users = new List<User>();
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("SELECT U.Id, U.UserName, U.FullName, U.ProfileId, P.Name, U.Active, U.PictureVersion FROM tbUser U LEFT JOIN tbProfile P ON P.Id = U.ProfileId ORDER BY P.Name ASC, U.UserName ASC", conn)) {
-					using (SqlDataReader reader = cmd.ExecuteReader()) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT u.id, u.user_name, u.full_name, u.profile_id, p.name, u.active, u.picture_version FROM user u LEFT JOIN profile ON p.id = u.profile_id ORDER BY p.name ASC, u.user_name ASC", conn)) {
+					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							users.Add(new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(6), reader.GetBoolean(5), 0, 0) {
 								ProfileName = (reader.IsDBNull(4) ? "SEM PERFIL" : reader.GetString(4))
@@ -273,8 +276,8 @@ namespace DocumentManager.Models {
 		public void Activate(int id) {
 			if (Id == id)
 				throw new ValidationException("Um usuário não pode ativar a si próprio!");
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("UPDATE tbUser SET Active = 1, TokenLow = 0, TokenHigh = 0 WHERE Id = @id", conn)) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET active = 1, token_low = 0, token_high = 0 WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", id);
 					cmd.ExecuteNonQuery();
 				}
@@ -290,8 +293,8 @@ namespace DocumentManager.Models {
 		public void Deactivate(int id) {
 			if (Id == id)
 				throw new ValidationException("Um usuário não pode desativar a si próprio!");
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("UPDATE tbUser SET Active = 0, TokenLow = 0, TokenHigh = 0 WHERE Id = @id", conn)) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET active = 0, token_low = 0, token_high = 0 WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", id);
 					cmd.ExecuteNonQuery();
 				}
@@ -307,8 +310,8 @@ namespace DocumentManager.Models {
 		public void ResetPassword(int id) {
 			if (Id == id)
 				throw new ValidationException("Um usuário não pode redefinir sua própria senha!");
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("UPDATE tbUser SET Password = @password, TokenLow = 0, TokenHigh = 0 WHERE Id = @id", conn)) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET password = @password, token_low = 0, token_high = 0 WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@password", DefaultPassword);
 					cmd.Parameters.AddWithValue("@id", id);
 					cmd.ExecuteNonQuery();
@@ -325,15 +328,15 @@ namespace DocumentManager.Models {
 		public void SetProfile(int id, int profileId) {
 			if (Id == id)
 				throw new ValidationException("Um usuário não pode definir seu próprio perfil!");
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("SELECT TOP 1 1 FROM tbProfile WHERE Id = @profileId", conn)) {
-					cmd.Parameters.AddWithValue("@profileId", profileId);
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT 1 FROM profile WHERE id = @profile_id LIMIT 1", conn)) {
+					cmd.Parameters.AddWithValue("@profile_id", profileId);
 					object o = cmd.ExecuteScalar();
 					if (o == null || o == DBNull.Value)
 						throw new ValidationException("Perfil não encontrado!");
 				}
-				using (SqlCommand cmd = new SqlCommand("UPDATE tbUser SET ProfileId = @profileId, TokenLow = 0, TokenHigh = 0 WHERE Id = @id", conn)) {
-					cmd.Parameters.AddWithValue("@profileId", profileId);
+				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET profile_id = @profile_id, token_low = 0, token_high = 0 WHERE id = @id", conn)) {
+					cmd.Parameters.AddWithValue("@profile_id", profileId);
 					cmd.Parameters.AddWithValue("@id", id);
 					cmd.ExecuteNonQuery();
 				}
@@ -447,10 +450,10 @@ namespace DocumentManager.Models {
 				if (newPass2 == null) newPass2 = "";
 				if (pass.Length == 0 || newPass1.Length == 0 || newPass2.Length == 0 || newPass1 != newPass2)
 					throw new ValidationException("Senha inválida!");
-				using (SqlConnection conn = Sql.OpenConnection()) {
-					using (SqlCommand cmd = new SqlCommand("SELECT Password FROM tbUser WHERE Id = @id", conn)) {
+				using (MySqlConnection conn = Sql.OpenConnection()) {
+					using (MySqlCommand cmd = new MySqlCommand("SELECT password FROM user WHERE id = @id", conn)) {
 						cmd.Parameters.AddWithValue("@id", Id);
-						using (SqlDataReader reader = cmd.ExecuteReader()) {
+						using (MySqlDataReader reader = cmd.ExecuteReader()) {
 							if (!reader.Read() || !PasswordHash.ValidatePassword(pass, reader.GetString(0)))
 								throw new ValidationException("Senha atual não confere!");
 						}
@@ -458,16 +461,16 @@ namespace DocumentManager.Models {
 
 					SaveNewPicture(picture);
 
-					using (SqlCommand cmd = new SqlCommand("UPDATE tbUser SET FullName = @fullName, Password = @password, PictureVersion = @pictureVersion, TokenLow = @tokenLow, TokenHigh = @tokenHigh WHERE Id = @id", conn)) {
+					using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET full_name = @full_name, password = @password, picture_version = @picture_version, token_low = @token_low, token_high = @token_high WHERE id = @id", conn)) {
 						//https://msdn.microsoft.com/en-us/library/97af8hh4(v=vs.110).aspx
 						byte[] buffer = Guid.NewGuid().ToByteArray();
 						long tokenLow = BitConverter.ToInt64(buffer, 0);
 						long tokenHigh = BitConverter.ToInt64(buffer, 8);
-						cmd.Parameters.AddWithValue("@fullName", fullName);
+						cmd.Parameters.AddWithValue("@full_name", fullName);
 						cmd.Parameters.AddWithValue("@password", PasswordHash.CreateHash(newPass1));
-						cmd.Parameters.AddWithValue("@pictureVersion", PictureVersion);
-						cmd.Parameters.AddWithValue("@tokenLow", tokenLow);
-						cmd.Parameters.AddWithValue("@tokenHigh", tokenLow);
+						cmd.Parameters.AddWithValue("@picture_version", PictureVersion);
+						cmd.Parameters.AddWithValue("@token_low", tokenLow);
+						cmd.Parameters.AddWithValue("@token_high", tokenLow);
 						cmd.Parameters.AddWithValue("@id", Id);
 						cmd.ExecuteNonQuery();
 						FullName = fullName;
@@ -476,13 +479,13 @@ namespace DocumentManager.Models {
 					}
 				}
 			} else {
-				using (SqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlConnection conn = Sql.OpenConnection()) {
 
 					SaveNewPicture(picture);
 
-					using (SqlCommand cmd = new SqlCommand("UPDATE tbUser SET FullName = @fullName, PictureVersion = @pictureVersion WHERE Id = @id", conn)) {
-						cmd.Parameters.AddWithValue("@fullName", fullName);
-						cmd.Parameters.AddWithValue("@pictureVersion", PictureVersion);
+					using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET full_name = @full_name, picture_version = @picture_version WHERE id = @id", conn)) {
+						cmd.Parameters.AddWithValue("@full_name", fullName);
+						cmd.Parameters.AddWithValue("@picture_version", PictureVersion);
 						cmd.Parameters.AddWithValue("@id", Id);
 						cmd.ExecuteNonQuery();
 						FullName = fullName;
@@ -493,8 +496,8 @@ namespace DocumentManager.Models {
 		}
 
 		public void Logout(HttpContext context) {
-			using (SqlConnection conn = Sql.OpenConnection()) {
-				using (SqlCommand cmd = new SqlCommand("UPDATE tbUser SET TokenLow = 0, TokenHigh = 0 WHERE Id = @id", conn)) {
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET token_low = 0, token_high = 0 WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", Id);
 					cmd.ExecuteNonQuery();
 				}
