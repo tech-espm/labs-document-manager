@@ -218,11 +218,11 @@ namespace DocumentManager.Models {
 			}
 		}
 
-		private static void Validate(string userName, string fullName) {
+		private static void Validate(ref string userName, ref string fullName) {
 			if (string.IsNullOrWhiteSpace(userName) || userName.IndexOf('=') >= 0)
-				throw new ValidationException("Usuário inválido!");
+				throw new ValidationException("Login inválido!");
 			if ((userName = userName.Trim().ToLower()).Length > 32)
-				throw new ValidationException("Usuário muito longo!");
+				throw new ValidationException("Login muito longo!");
 			if (string.IsNullOrWhiteSpace(fullName) || fullName.IndexOf('=') >= 0)
 				throw new ValidationException("Nome completo inválido!");
 			if ((fullName = fullName.Trim().ToUpper()).Length > 64)
@@ -230,7 +230,7 @@ namespace DocumentManager.Models {
 		}
 
 		public static User Create(string userName, string fullName, int profileId) {
-			Validate(userName, fullName);
+			Validate(ref userName, ref fullName);
 
 			int id;
 
@@ -258,10 +258,10 @@ namespace DocumentManager.Models {
 			return new User(id, userName, fullName, profileId, 0, true, 0, 0);
 		}
 
-		public static IEnumerable<User> GetAllWithProfileName() {
+		public static List<User> GetAllWithProfileName() {
 			List<User> users = new List<User>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT u.id, u.user_name, u.full_name, u.profile_id, p.name, u.active, u.picture_version FROM user u LEFT JOIN profile ON p.id = u.profile_id ORDER BY p.name ASC, u.user_name ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT u.id, u.user_name, u.full_name, u.profile_id, p.name, u.active, u.picture_version FROM user u LEFT JOIN profile p ON p.id = u.profile_id ORDER BY p.name ASC, u.user_name ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							users.Add(new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(6), reader.GetBoolean(5), 0, 0) {
@@ -442,7 +442,7 @@ namespace DocumentManager.Models {
 		}
 
 		public void EditProfile(HttpContext context, string fullName, string picture, string pass, string newPass1, string newPass2) {
-			Validate(UserName, fullName);
+			Validate(ref UserName, ref fullName);
 
 			if ((pass != null && pass.Length != 0) || (newPass1 != null && newPass1.Length != 0) || (newPass2 != null && newPass2.Length != 0)) {
 				if (pass == null) pass = "";

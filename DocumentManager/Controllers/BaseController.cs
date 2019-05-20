@@ -31,10 +31,10 @@ namespace DocumentManager.Controllers {
 			return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} no servidor: {ex.Message}");
 		}
 
-		protected ActionResult ErrorResult(Exception ex, string articlePlusItemName, string value) {
+		protected ActionResult ErrorResult(Exception ex, string articlePlusItemName, string value, string fieldName = null) {
 			MySqlException myex = ex as MySqlException;
 			if (myex != null && myex.Number == 1062)
-				return ErrorResult($"Já existe {articlePlusItemName} com o nome \"{(value ?? "").ToUpper()}\" \uD83D\uDE22");
+				return ErrorResult($"Já existe {articlePlusItemName} com o {(fieldName ?? "nome")} \"{(value ?? "").ToUpper()}\" \uD83D\uDE22");
 			return ErrorResult(ex);
 		}
 

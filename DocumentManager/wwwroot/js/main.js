@@ -1354,7 +1354,7 @@ window.Notification = {
 	isVisible: false,
 	wait: function (msg, basePath) {
 		var div = document.createElement("div");
-		div.innerHTML = "<img alt=\"Aguarde\" src=\"" + (basePath || "") + "Images/loading-grey-t.gif\"> " + (msg || "Por favor, aguarde...");
+		div.innerHTML = "<img alt=\"Aguarde\" src=\"" + (basePath || "") + "/images/loading-grey-t.gif\"> " + (msg || "Por favor, aguarde...");
 		return Notification.show(div, "default", -1);
 	},
 	success: function (message, important) {

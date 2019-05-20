@@ -23,7 +23,7 @@ CREATE TABLE profile_feature (
 
 CREATE TABLE user (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	user_name VARCHAR(32) NOT NULL,
+	user_name VARCHAR(64) NOT NULL,
 	full_name VARCHAR(64) NOT NULL,
 	password VARCHAR(100) NOT NULL,
 	profile_id INT NOT NULL,

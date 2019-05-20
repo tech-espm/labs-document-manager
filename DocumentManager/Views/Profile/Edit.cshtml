@@ -40,7 +40,7 @@
 					<span class="label label-default">Id @Model.Id</span>
 				</div>
 				}
-				<div id="divName" class="form-group">
+				<div class="form-group">
 					<label for="name">Nome</label>
 					<input id="name" name="name" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name)" />
 				</div>
@@ -174,7 +174,7 @@
 						if (response.success) {
 							resetForm(form);
 							checkAll(false);
-							Notification.success("Perfil criado com sucesso! \uD83D\uDE04", true);
+							Notification.success("Perfil criado com sucesso! \uD83D\uDE04");
 						} else {
 							Notification.error(response.value, true);
 						}
@@ -184,7 +184,7 @@
 					<text>
 					JsonWebApi.post("@Url.Action("Update")", features, function (response) {
 						if (response.success)
-							Notification.success("Perfil alterado com sucesso! \uD83D\uDE04", true);
+							Notification.success("Perfil alterado com sucesso! \uD83D\uDE04");
 						else
 							Notification.error(response.value, true);
 					}, "id", "@Model.Id", "name", name);

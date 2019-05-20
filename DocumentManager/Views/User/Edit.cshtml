@@ -1,0 +1,89 @@
+﻿@{
+	ViewBag.Title = "Criar Usuário";
+}
+
+<form class="row" action="." method="post" id="form">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-heading clearfix">
+				<div class="pull-left">
+					Informações Básicas do Usuário
+				</div>
+				@if (Model != null && ViewBag.ProfileDelete == true) {
+					<div class="pull-right">
+						<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>Excluir</button>
+					</div>
+				}
+			</div>
+			<div class="panel-body no-bottom">
+				<div class="form-group">
+					<label for="userName">Login</label>
+					<input id="userName" name="userName" maxlength="64" class="form-control lower" type="email" spellcheck="false" />
+				</div>
+				<div class="form-group">
+					<label for="fullName">Nome Completo</label>
+					<input id="fullName" name="fullName" maxlength="64" class="form-control upper" type="text" spellcheck="false" />
+				</div>
+				<div class="form-group">
+					<label for="profileId">Perfil</label>
+					<select id="profileId" name="profileId" class="form-control" size="1">
+						<option value="" selected="selected">SELECIONE...</option>
+						@foreach (Profile profile in Profile.GetAll()) {
+						<option value="@profile.Id">@profile.Name</option>
+						}
+					</select>
+					<script type="text/javascript">
+						//<![CDATA[
+						"use strict";
+						prepareCbSearch(document.getElementById("profileId"));
+						//]]>
+					</script>
+				</div>
+			</div>
+			<div class="panel-footer">
+				<input value="Criar Usuário" class="btn btn-primary btn-lg btn-block" type="submit" />
+			</div>
+		</div>
+	</div>
+</form>
+
+@section Scripts {
+	<script type="text/javascript">
+		//<![CDATA[
+		"use strict";
+
+		$("#form").validate({
+			rules: {
+				userName: {
+					maxlength: 64,
+					required: true,
+					email: true
+				},
+				fullName: {
+					maxlength: 64,
+					required: true,
+				},
+				profileId: {
+					required: true
+				}
+			},
+			submitHandler: function (form) {
+				if (JsonWebApi.active)
+					return;
+
+				Notification.wait();
+
+				JsonWebApi.post("@Url.Action("Create")", null, function (response) {
+					if (response.success) {
+						resetForm(form);
+						Notification.success("Usuário criado com sucesso! \uD83D\uDE04");
+					} else {
+						Notification.error(response.value, true);
+					}
+				}, "userName", _("userName").value, "fullName", _("fullName").value, "profileId", _("profileId").value);
+			}
+		});
+
+		//]]>
+	</script>
+}
