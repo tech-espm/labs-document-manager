@@ -29,10 +29,10 @@ namespace DocumentManager.Models {
 			return list;
 		}
 
-		private static void Validate(string name, int[] features) {
+		private static void Validate(ref string name, int[] features) {
 			if (string.IsNullOrWhiteSpace(name))
 				throw new ValidationException("Nome inválido!");
-			if ((name = name.Trim().ToUpper()).Length > 128)
+			if ((name = name.Trim().ToUpper()).Length > 64)
 				throw new ValidationException("Nome muito longo!");
 
 			if (features != null) {
@@ -44,7 +44,7 @@ namespace DocumentManager.Models {
 		}
 
 		public static Profile Create(string name, int[] features) {
-			Validate(name, features);
+			Validate(ref name, features);
 
 			int id;
 
@@ -56,7 +56,7 @@ namespace DocumentManager.Models {
 							cmd.ExecuteNonQuery();
 						}
 						using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn, tran)) {
-							id = (int)cmd.ExecuteScalar();
+							id = (int)(ulong)cmd.ExecuteScalar();
 						}
 						if (features != null && features.Length > 0) {
 							using (MySqlCommand cmd = new MySqlCommand("INSERT INTO profile_feature (profile_id, feature_id) VALUES (@profile_id, @feature_id)", conn, tran)) {
@@ -79,7 +79,7 @@ namespace DocumentManager.Models {
 			return new Profile(id, name);
 		}
 
-		public static IEnumerable<Profile> GetAll() {
+		public static List<Profile> GetAll() {
 			List<Profile> profiles = new List<Profile>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name FROM profile ORDER BY name ASC", conn)) {
@@ -172,7 +172,7 @@ namespace DocumentManager.Models {
 			if (Id == ADMIN_ID)
 				throw new ValidationException("Não é permitido editar o perfil \"ADMINISTRADOR\"!");
 
-			Validate(name, features);
+			Validate(ref name, features);
 
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlTransaction tran = conn.BeginTransaction()) {

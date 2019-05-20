@@ -30,10 +30,6 @@
 	<div id="sidebar" class="sidebar" role="navigation">
 		<div id="navbar-collapse" class="sidebar-nav navbar-collapse collapse">
 			<ul class="nav" id="side-menu">
-				@{
-					bool found = false;
-					string url = "";
-				}
 				<li class="sidebar-spacer"></li>
 				<li>
 					<a href="~/" class="active"><i class="fa fa-dashboard fa-fw"></i>Dashboard</a>
@@ -42,6 +38,12 @@
 				<li class="sidebar-spacer"></li>
 
 				@{
+					bool found = false;
+					string url = Context.Request.Path;
+					if (url.EndsWith("/Edit")) {
+						url = url.Substring(0, url.Length - 4) + "Manage";
+					}
+
 					User loggedUser = ViewBag.LoggedUser;
 					List<Menu> profilesMenu = Menu.GetCachedMenusByProfileId(loggedUser.ProfileId);
 					int profilesMenuCount = (profilesMenu == null ? 0 : profilesMenu.Count);
@@ -64,13 +66,13 @@
 						if (menu.Spacer) {
 							<li class="sidebar-spacer"></li>
 						} else {
-							<li @((selectedSub >= 0) ? "class=\"active\"" : "")>
-								<a href="#"><i class="<%=menu.IconClass %>"></i>@menu.Text<span class="fa arrow"></span></a>
+							<li @Html.Raw((selectedSub >= 0) ? "class=\"active\"" : "")>
+								<a href="#"><i class="@menu.IconClass"></i>@menu.Text<span class="fa arrow"></span></a>
 								<ul class="nav nav-second-level collapse@((selectedSub >= 0) ? " in" : "")">
 									@for (int j = 0; j < subMenusCount; j++) {
 										Menu sub = subMenus[j];
 										<li>
-											<a href="@sub.Link" @sub.ExtraAttributes @((selectedSub == j) ? "class=\"active\"" : "")><i class="@sub.IconClass"></i>@sub.Text</a>
+											<a href="@sub.Link" @sub.ExtraAttributes @Html.Raw((selectedSub == j) ? "class=\"active\"" : "")><i class="@sub.IconClass"></i>@sub.Text</a>
 										</li>
 									}
 								</ul>

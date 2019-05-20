@@ -411,3 +411,11 @@ i.fa-nomargin {
 	.custom-map-button:hover {
 		background: #f4f4f4;
 	}
+
+label.error {
+	color: #f00;
+}
+
+.clickable {
+	cursor: pointer;
+}

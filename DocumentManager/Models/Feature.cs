@@ -13,10 +13,20 @@ namespace DocumentManager.Models {
 		DocumentEdit = 3,
 		DocumentDelete = 4,
 
-		// There are no features for profiles and users because only
-		// administrators can work with them!
-
 		Min = 1,
-		Max = 4
+		Max = 4,
+
+		// These features cannot be assigned to regular profiles, only
+		// administrators can work with them! That's why their values
+		// are outside the valid range.
+		UserCreate = -1,
+		UserList = -2,
+		UserEdit = -3,
+		UserDelete = -4,
+
+		ProfileCreate = -5,
+		ProfileList = -6,
+		ProfileEdit = -7,
+		ProfileDelete = -8
 	}
 }

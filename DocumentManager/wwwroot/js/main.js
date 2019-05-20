@@ -725,6 +725,21 @@ window.trim = (function () {
 window.trimValue = function (input) {
 	return trim(_(input).value);
 };
+window.resetForm = function (f) {
+	var $form = $(f), i, validator;
+	if (!$form || !$form.length)
+		return;
+	for (i = $form.length - 1; i >= 0; i--)
+		$form[i].reset();
+	$form.find("label.error").remove();
+	$form.find(".error").removeClass("error");
+	$form.find(".valid").removeClass("valid");
+	validator = $form.validate();
+	if (validator) {
+		validator.resetForm();
+		validator.formSubmitted = false;
+	}
+};
 window.createItem = function (parent, icon, className, text, badge, clickHandler, name0, value0) {
 	var i, btn = document.createElement("button"), c = (className || "btn-outline btn-default");
 	btn.setAttribute("type", "button");

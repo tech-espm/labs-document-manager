@@ -8,25 +8,40 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using DocumentManager.Attributes;
 using System.Text;
 using DocumentManager.Exceptions;
-using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace DocumentManager.Controllers {
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 	public class BaseController : Controller {
 		protected User LoggedUser;
 
-		protected ContentResult ErrorResult(string message) {
+		protected ActionResult VoidResult() => new StatusCodeResult(204);
+
+		protected ActionResult ErrorResult(string message) {
 			ContentResult result = Content($"{{\"ExceptionMessage\":\"{(message ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n").Replace('\0', ' ')}\"}}", "application/json", Encoding.UTF8);
 			result.StatusCode = 299;
 			return result;
 		}
 
-		protected ContentResult ErrorResult(Exception ex) {
+		protected ActionResult ErrorResult(Exception ex) {
 			if (ex is ValidationException)
 				return ErrorResult(ex.Message);
-			if (ex is SqlException)
+			if (ex is MySqlException)
 				return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} na base de dados: {ex.Message}");
 			return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} no servidor: {ex.Message}");
+		}
+
+		protected ActionResult ErrorResult(Exception ex, string articlePlusItemName, string value) {
+			MySqlException myex = ex as MySqlException;
+			if (myex != null && myex.Number == 1062)
+				return ErrorResult($"Já existe {articlePlusItemName} com o nome \"{(value ?? "").ToUpper()}\" \uD83D\uDE22");
+			return ErrorResult(ex);
+		}
+
+		protected ActionResult ItemNotFound(string articlePlusItemName, string title) {
+			ViewBag.Title = title;
+			ViewBag.ItemName = articlePlusItemName;
+			return View("_NotFound");
 		}
 
 		public override void OnActionExecuting(ActionExecutingContext context) {
@@ -62,7 +77,7 @@ namespace DocumentManager.Controllers {
 			base.OnActionExecuting(context);
 		}
 
-		public IActionResult Error(string message) => new ContentResult() {
+		public ActionResult Error(string message) => new ContentResult() {
 			Content = message,
 			ContentType = "text/plain",
 			StatusCode = 500

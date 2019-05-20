@@ -251,7 +251,7 @@ namespace DocumentManager.Models {
 					cmd.ExecuteNonQuery();
 				}
 				using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn)) {
-					id = (int)cmd.ExecuteScalar();
+					id = (int)(ulong)cmd.ExecuteScalar();
 				}
 			}
 

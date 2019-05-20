@@ -75,12 +75,12 @@ namespace DocumentManager.Models {
 			// administrators can work with them!
 			if (profileId == Profile.ADMIN_ID) {
 				menus.Add(new Menu("#", "fa fa-users fa-fw", "Perfis", new List<Menu>() {
-					new Menu("Profile/Create", "fa fa-plus fa-fw", "Criar"),
-					new Menu("Profile/Manage", "fa fa-tasks fa-fw", "Gerenciar")
+					new Menu("/Profile/Create", "fa fa-plus fa-fw", "Criar"),
+					new Menu("/Profile/Manage", "fa fa-tasks fa-fw", "Gerenciar")
 				}));
 				menus.Add(new Menu("#", "fa fa-user fa-fw", "Usuários", new List<Menu>() {
-					new Menu("User/Create", "fa fa-plus fa-fw", "Criar"),
-					new Menu("User/Manage", "fa fa-tasks fa-fw", "Gerenciar")
+					new Menu("/User/Create", "fa fa-plus fa-fw", "Criar"),
+					new Menu("/User/Manage", "fa fa-tasks fa-fw", "Gerenciar")
 				}));
 
 				menus.Add(new Menu());
