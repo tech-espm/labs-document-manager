@@ -52,5 +52,12 @@ namespace DocumentManager.Controllers {
 		public IActionResult Error() {
 			return View();
 		}
+
+		[AccessControl(true)]
+		public IActionResult Validate(string ticket) {
+			// @@@ This is just a placeholder
+			CASLogin.ValidateTicket(ticket);
+			return RedirectToAction("Login");
+		}
 	}
 }
