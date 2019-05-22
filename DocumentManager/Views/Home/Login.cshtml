@@ -1,12 +1,22 @@
 ﻿@{
 	Layout = "_LayoutExternal";
 }
+
+@section Styles {
+	<style type="text/css">
+		.panel-heading img {
+			width: 100%;
+			max-width: 300px;
+		}
+	</style>
+}
+
 <form method="post" action="~/Home/Login">
 	<div style="max-width: 400px; margin: 5% auto; padding: 15px;">
 		<div class="panel @(ViewBag.Message != null ? "panel-danger" : "panel-default")">
 			<div class="panel-heading">
 				<div class="text-center">
-					<img alt="Logo" src="~/images/logo-header.png" />
+					<img alt="Logo" src="~/images/logo-main.png" />
 				</div>
 			</div>
 			<div class="panel-body">
@@ -19,7 +29,7 @@
 					<input name="password" type="password" id="password" class="form-control" />
 				</div>
 				@if (ViewBag.Message != null) {
-				<div id="lblMessage" class="alert alert-danger no-margin-bottom">@ViewBag.Message</div>
+					<div id="lblMessage" class="alert alert-danger no-margin-bottom">@ViewBag.Message</div>
 				}
 			</div>
 			<div class="panel-footer">
