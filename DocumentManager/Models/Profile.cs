@@ -21,6 +21,11 @@ namespace DocumentManager.Models {
 		public static List<KeyValuePair<int, string>> GetAllFeatures() {
 			List<KeyValuePair<int, string>> list = new List<KeyValuePair<int, string>>((int)Feature.Max + 1);
 
+			list.Add(new KeyValuePair<int, string>((int)Feature.CourseCreate, "Cursos: Criação"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.CourseList, "Cursos: Listagem"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.CourseEdit, "Cursos: Edição"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.CourseDelete, "Cursos: Exclusão"));
+
 			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentCreate, "Documentos: Criação"));
 			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentList, "Documentos: Listagem"));
 			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentEdit, "Documentos: Edição"));

@@ -1,6 +1,6 @@
-﻿@model List<Profile>
+﻿@model List<Course>
 @{
-	ViewBag.Title = "Gerenciar Perfis";
+	ViewBag.Title = "Gerenciar Cursos";
 }
 
 <div class="row">
@@ -22,7 +22,8 @@
 			order: [[0, "asc"]],
 			columns: [
 				{ title: "Nome", "class": "col-max", render: encode, data: "name" },
-				@if (ViewBag.ProfileEdit == true) {
+				{ title: "Apelido", "class": "col-min", render: encode, data: "shortName" },
+				@if (ViewBag.CourseEdit == true) {
 				<text>
 				{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return "<a target=\"_blank\" title=\"Editar\" href=\"@(Url.Action("Edit"))?id=" + row.id + "\" class=\"btn btn-outline btn-primary\"><i class=\"fa fa-nomargin fa-edit\"></i></a>"; } },
 				</text>
@@ -34,7 +35,7 @@
 			],
 			data: @Json.Serialize(Model),
 			deferRender: true,
-			export: { title: "Perfis" }
+			export: { title: "Cursos" }
 		});
 		prepareDataTableMain();
 

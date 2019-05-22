@@ -5,16 +5,20 @@ namespace DocumentManager.Models {
 	public enum Feature {
 		None = 0, // Special, only used to validate the token
 
-		// The features must be in ascending order and must be in
-		// the same order they appear on NavBar.ascx (to speed up the
-		// lookup process)
+		// The features must be in ascending order to speed
+		// up the lookup process
 		DocumentCreate = 1,
 		DocumentList = 2,
 		DocumentEdit = 3,
 		DocumentDelete = 4,
 
+		CourseCreate = 5,
+		CourseList = 6,
+		CourseEdit = 7,
+		CourseDelete = 8,
+
 		Min = 1,
-		Max = 4,
+		Max = 8,
 
 		// These features cannot be assigned to regular profiles, only
 		// administrators can work with them! That's why their values

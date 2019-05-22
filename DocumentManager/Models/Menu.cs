@@ -53,15 +53,28 @@ namespace DocumentManager.Models {
 
 			sub = null;
 
+			#region Courses
+			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseCreate));
+			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseList));
+			if (create || list) {
+				sub = new List<Menu>();
+				if (create)
+					sub.Add(new Menu("/Course/Create", "fa fa-plus fa-fw", "Criar"));
+				if (list)
+					sub.Add(new Menu("/Course/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
+				menus.Add(new Menu("#", "fa fa-university fa-fw", "Cursos", sub));
+			}
+			#endregion
+
 			#region Documents
 			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentCreate));
 			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentList));
 			if (create || list) {
 				sub = new List<Menu>();
 				if (create)
-					sub.Add(new Menu("Document/Create", "fa fa-plus fa-fw", "Criar"));
+					sub.Add(new Menu("/Document/Create", "fa fa-plus fa-fw", "Criar"));
 				if (list)
-					sub.Add(new Menu("Documents/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
+					sub.Add(new Menu("/Document/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
 				menus.Add(new Menu("#", "fa fa-file-text-o fa-fw", "Documentos", sub));
 			}
 			#endregion

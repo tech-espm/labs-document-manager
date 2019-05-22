@@ -99,9 +99,9 @@
 
 				Notification.wait();
 
-				JsonWebApi.get("@Url.Action("Delete", "Profile")", function (response) {
+				JsonWebApi.get("@Url.Action("Delete")", function (response) {
 					if (response.success)
-						window.location.href = "@Url.Action("Manage", "Profile")";
+						window.location.href = "@Url.Action("Manage")";
 					else
 						Notification.error(response.value, true);
 				}, "id", "@(Model == null ? 0 : Model.Id)");

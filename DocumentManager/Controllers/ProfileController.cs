@@ -42,11 +42,11 @@ namespace DocumentManager.Controllers {
 		[AccessControl(Feature.ProfileEdit, true)]
 		public IActionResult Update(int id, string name, [FromBody]int[] features) {
 			try {
-				Profile p = Profile.GetById(id, false);
-				if (p == null)
+				Profile profile = Profile.GetById(id, false);
+				if (profile == null)
 					return ErrorResult("Perfil não encontrado!");
-				p.Update(name, features);
-				return Json(p);
+				profile.Update(name, features);
+				return Json(profile);
 			} catch (Exception ex) {
 				return ErrorResult(ex, "um perfil", name);
 			}
@@ -56,10 +56,10 @@ namespace DocumentManager.Controllers {
 		[AccessControl(Feature.ProfileDelete, true)]
 		public IActionResult Delete(int id) {
 			try {
-				Profile p = Profile.GetById(id, false);
-				if (p == null)
+				Profile profile = Profile.GetById(id, false);
+				if (profile == null)
 					return ErrorResult("Perfil não encontrado!");
-				p.Delete();
+				profile.Delete();
 				return VoidResult();
 			} catch (Exception ex) {
 				return ErrorResult(ex);
