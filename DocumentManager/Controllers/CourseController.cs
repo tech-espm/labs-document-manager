@@ -34,7 +34,7 @@ namespace DocumentManager.Controllers {
 			try {
 				return Json(Course.Create(name, shortName));
 			} catch (Exception ex) {
-				return ErrorResult(ex, "um curso", name);
+				return ErrorResult(ex, "o", "um", "curso", name);
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace DocumentManager.Controllers {
 				course.Update(name, shortName);
 				return Json(course);
 			} catch (Exception ex) {
-				return ErrorResult(ex, "um curso", name);
+				return ErrorResult(ex, "o", "um", "curso", name);
 			}
 		}
 

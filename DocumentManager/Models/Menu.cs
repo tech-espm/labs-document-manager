@@ -66,6 +66,37 @@ namespace DocumentManager.Models {
 			}
 			#endregion
 
+			#region Partition Types
+			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.PartitionTypeCreate));
+			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.PartitionTypeList));
+			if (create || list) {
+				sub = new List<Menu>();
+				if (create)
+					sub.Add(new Menu("/PartitionType/Create", "fa fa-plus fa-fw", "Criar"));
+				if (list)
+					sub.Add(new Menu("/PartitionType/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
+				menus.Add(new Menu("#", "fa fa-tags fa-fw", "Tipos de Partição", sub));
+			}
+			#endregion
+
+			#region Document Types
+			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentTypeCreate));
+			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentTypeList));
+			if (create || list) {
+				sub = new List<Menu>();
+				if (create)
+					sub.Add(new Menu("/DocumentType/Create", "fa fa-plus fa-fw", "Criar"));
+				if (list)
+					sub.Add(new Menu("/DocumentType/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
+				menus.Add(new Menu("#", "fa fa-tag fa-fw", "Tipos de Documento", sub));
+			}
+			#endregion
+
+			if (sub != null) {
+				menus.Add(new Menu());
+				sub = null;
+			}
+
 			#region Documents
 			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentCreate));
 			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentList));

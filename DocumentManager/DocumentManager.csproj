@@ -25,6 +25,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\DocumentType\Edit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\DocumentType\Manage.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\PartitionType\Edit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\PartitionType\Manage.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Course\Edit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

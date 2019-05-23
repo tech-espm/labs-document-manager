@@ -47,3 +47,15 @@ CREATE TABLE course (
 	short_name VARCHAR(16) NOT NULL,
 	UNIQUE KEY course_name_un (name)
 );
+
+CREATE TABLE partition_type (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(64) NOT NULL,
+	UNIQUE KEY partition_type_name_un (name)
+);
+
+CREATE TABLE document_type (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(64) NOT NULL,
+	UNIQUE KEY document_type_name_un (name)
+);

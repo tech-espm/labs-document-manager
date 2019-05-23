@@ -17,8 +17,18 @@ namespace DocumentManager.Models {
 		CourseEdit = 7,
 		CourseDelete = 8,
 
+		PartitionTypeCreate = 9,
+		PartitionTypeList = 10,
+		PartitionTypeEdit = 11,
+		PartitionTypeDelete = 12,
+
+		DocumentTypeCreate = 13,
+		DocumentTypeList = 14,
+		DocumentTypeEdit = 15,
+		DocumentTypeDelete = 16,
+
 		Min = 1,
-		Max = 8,
+		Max = 16,
 
 		// These features cannot be assigned to regular profiles, only
 		// administrators can work with them! That's why their values

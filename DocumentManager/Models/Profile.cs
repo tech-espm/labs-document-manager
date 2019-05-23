@@ -26,6 +26,16 @@ namespace DocumentManager.Models {
 			list.Add(new KeyValuePair<int, string>((int)Feature.CourseEdit, "Cursos: Edição"));
 			list.Add(new KeyValuePair<int, string>((int)Feature.CourseDelete, "Cursos: Exclusão"));
 
+			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeCreate, "Tipos de Partição: Criação"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeList, "Tipos de Partição: Listagem"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeEdit, "Tipos de Partição: Edição"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeDelete, "Tipos de Partição: Exclusão"));
+
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeCreate, "Tipos de Curso: Criação"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeList, "Tipos de Curso: Listagem"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeEdit, "Tipos de Curso: Edição"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeDelete, "Tipos de Curso: Exclusão"));
+
 			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentCreate, "Documentos: Criação"));
 			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentList, "Documentos: Listagem"));
 			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentEdit, "Documentos: Edição"));

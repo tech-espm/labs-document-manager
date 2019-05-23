@@ -31,10 +31,14 @@ namespace DocumentManager.Controllers {
 			return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} no servidor: {ex.Message}");
 		}
 
-		protected ActionResult ErrorResult(Exception ex, string articlePlusItemName, string value, string fieldName = null) {
+		protected ActionResult ErrorResult(Exception ex, string definiteArticle, string undefiniteArticle, string itemName, string value, string articlePlusFieldName = null) {
 			MySqlException myex = ex as MySqlException;
-			if (myex != null && myex.Number == 1062)
-				return ErrorResult($"Já existe {articlePlusItemName} com o {(fieldName ?? "nome")} \"{(value ?? "").ToUpper()}\" \uD83D\uDE22");
+			if (myex != null) {
+				if (myex.Number == 1062)
+					return ErrorResult($"Já existe {undefiniteArticle} {itemName} com {(articlePlusFieldName ?? "o nome")} \"{(value ?? "").ToUpper()}\" \uD83D\uDE22");
+				else if (myex.Number == 1451)
+					return ErrorResult($"{definiteArticle.ToUpper()} {itemName} \"{(value ?? "").ToUpper()}\" possui dependências e não pode ser excluíd{definiteArticle} \uD83D\uDE22");
+			}
 			return ErrorResult(ex);
 		}
 

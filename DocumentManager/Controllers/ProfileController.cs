@@ -34,7 +34,7 @@ namespace DocumentManager.Controllers {
 			try {
 				return Json(Profile.Create(name, features));
 			} catch (Exception ex) {
-				return ErrorResult(ex, "um perfil", name);
+				return ErrorResult(ex, "o", "um", "perfil", name);
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace DocumentManager.Controllers {
 				profile.Update(name, features);
 				return Json(profile);
 			} catch (Exception ex) {
-				return ErrorResult(ex, "um perfil", name);
+				return ErrorResult(ex, "o", "um", "perfil", name);
 			}
 		}
 

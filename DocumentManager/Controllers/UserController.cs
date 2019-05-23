@@ -25,7 +25,7 @@ namespace DocumentManager.Controllers {
 			try {
 				return Json(Models.User.Create(userName, fullName, profileId));
 			} catch (Exception ex) {
-				return ErrorResult(ex, "um usuário", userName, "login");
+				return ErrorResult(ex, "o", "um", "usuário", userName, "o login");
 			}
 		}
 
