@@ -36,7 +36,6 @@ namespace DocumentManager.Controllers {
 			return View();
 		}
 
-		[HttpGet]
 		[AccessControl(true)]
 		public IActionResult Logout() {
 			if (LoggedUser != null)
@@ -46,6 +45,21 @@ namespace DocumentManager.Controllers {
 
 		public IActionResult NoPermission() {
 			return View();
+		}
+
+		public IActionResult Profile() {
+			return View();
+		}
+
+		[HttpPost]
+		[AccessControl(Feature.None, true)]
+		public IActionResult EditProfile(string fullName, [FromBody]string picture, string password, string newPassword, string newPassword2) {
+			try {
+				LoggedUser.EditProfile(HttpContext, fullName, picture, password, newPassword, newPassword2);
+				return VoidResult();
+			} catch (Exception ex) {
+				return ErrorResult(ex);
+			}
 		}
 
 		[AccessControl(true)]

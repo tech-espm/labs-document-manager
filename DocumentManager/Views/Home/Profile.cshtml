@@ -1,0 +1,153 @@
+﻿@model User
+@{
+	ViewBag.Title = "Meu Perfil";
+}
+
+<form class="row" action="." method="post" id="form">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-heading clearfix">
+				<div class="pull-left">
+					Editar Perfil
+				</div>
+			</div>
+			<div class="panel-body no-bottom">
+				<div class="form-group">
+					<label for="fullName">Nome Completo</label>
+					<input id="fullName" name="fullName" maxlength="64" class="form-control upper" type="text" spellcheck="false" value="@ViewBag.LoggedUser.FullName" />
+				</div>
+				<div class="form-group">
+					<label for="picture">Nova foto de perfil <small>(Até 1 MiB, de preferência quadrada)</small></label>
+					<input id="picture" name="picture" class="form-control" type="file" accept="image/jpeg" />
+				</div>
+				<div class="divider-body"></div>
+				<p>Para alterar a senha atual, preencha todos os campos abaixo</p>
+				<div id="currentPass" class="form-group">
+					<label for="password">Senha Atual</label>
+					<input id="password" name="password" maxlength="20" class="form-control upper" type="password" />
+				</div>
+				<div class="form-group">
+					<label for="newPassword">Nova Senha</label>
+					<input id="newPassword" name="newPassword" maxlength="20" class="form-control upper" type="password" />
+				</div>
+				<div class="form-group">
+					<label for="newPassword2">Confirme Nova Senha</label>
+					<input id="newPassword2" name="newPassword2" maxlength="20" class="form-control upper" type="password" />
+				</div>
+			</div>
+			<div class="panel-footer">
+				<input value="Salvar Alterações" class="btn btn-primary btn-lg btn-block" type="submit" />
+			</div>
+		</div>
+	</div>
+</form>
+
+@section Scripts {
+	<script type="text/javascript">
+		//<![CDATA[
+		"use strict";
+
+		// Special methods for files :)
+		$.validator.addMethod("advancedFileSupport", function (value, element, param) {
+			return (window.File && window.FileReader && window.FormData);
+		}, $.validator.format("O browser não suporta tratamento avançado de arquivos (você deve utilizar o Firefox 13+ ou Google Chrome 21+)"));
+
+		$.validator.addMethod("maxFileLengthKiB", function (value, element, param) {
+			if (!element.files)
+				return false;
+			return (!value.length || !element.files.length || !element.files[0] || element.files[0].size <= (param << 10));
+		}, $.validator.format("O arquivo deve ter no máximo {0} KiB"));
+
+		$.validator.addMethod("fileExtension", function (value, element, param) {
+			if (!element.files)
+				return false;
+			// Do not use str.endsWith() because a few browsers don't support it...
+			return (!value.length || !element.files.length || !element.files[0] || endsWith(element.files[0].name.toLowerCase(), param));
+		}, $.validator.format("O arquivo deve ter a extensão {0}"));
+
+		var isSavingProfile = false;
+
+		$("#form").validate({
+			rules: {
+				fullName: {
+					minlength: 3,
+					maxlength: 64,
+					required: true
+				},
+				picture: {
+					advancedFileSupport: true,
+					maxFileLengthKiB: 1024,
+					fileExtension: ".jpg"
+				},
+				password: {
+					required: function () {
+						return !!(_("newPassword").value) || !!(_("newPassword2").value);
+					},
+					maxlength: 20,
+				},
+				newPassword: {
+					required: function () {
+						return !!(_("password").value) || !!(_("newPassword2").value);
+					},
+					minlength: 4,
+					maxlength: 20
+				},
+				newPassword2: {
+					required: function () {
+						return !!(_("password").value) || !!(_("newPassword").value);
+					},
+					minlength: 4,
+					maxlength: 20,
+					equalTo: "#newPassword"
+				}
+			},
+			submitHandler: function (form) {
+				if (JsonWebApi.active || isSavingProfile)
+					return;
+
+				var fullName = _("fullName").value,
+					password = _("password").value,
+					newPassword = _("newPassword").value,
+					newPassword2 = _("newPassword2").value,
+					picture = _("picture"),
+					file = (picture.files && picture.files[0]), lastStep, reader;
+
+				Notification.wait();
+
+				isSavingProfile = true;
+
+				lastStep = function (picture) {
+					JsonWebApi.post("@Url.Action("EditProfile")", picture, function (response) {
+						isSavingProfile = false;
+
+						if (response.success) {
+							_("password").value = "";
+							_("newPassword").value = "";
+							_("newPassword2").value = "";
+							_("picture").value = "";
+							Notification.success("Perfil alterado com sucesso! \uD83D\uDE04");
+						} else {
+							Notification.error(response.value, true);
+						}
+					}, "fullName", fullName, "password", password, "newPassword", newPassword, "newPassword2", newPassword2);
+				};
+
+				if (file) {
+					reader = new FileReader();
+					reader.onload = function () {
+						lastStep(reader.result);
+					};
+					reader.onerror = function (error) {
+						isSavingProfile = false;
+						Notification.error("Ocorreu um erro ao ler o arquivo da foto: " + error);
+					};
+					reader.readAsDataURL(file);
+				} else {
+					lastStep(null);
+				}
+			}
+		});
+
+		//]]>
+	</script>
+}

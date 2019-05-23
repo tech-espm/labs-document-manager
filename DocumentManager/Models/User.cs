@@ -26,7 +26,6 @@ namespace DocumentManager.Models {
 		private const int ProfileHash = unchecked((int)0x92A43546);
 		private const int IdHash = unchecked((int)0xE3340833);
 
-		// PASSWORD LENGTH MUST BE <= 20!!
 		public int Id;
 		public string UserName, FullName;
 		public int ProfileId, PictureVersion;
@@ -219,14 +218,18 @@ namespace DocumentManager.Models {
 		}
 
 		private static void Validate(ref string userName, ref string fullName) {
-			if (string.IsNullOrWhiteSpace(userName) || userName.IndexOf('=') >= 0)
+			if (string.IsNullOrWhiteSpace(userName) || userName.IndexOf('=') >= 0 || userName.IndexOf('@') <= 0)
 				throw new ValidationException("Login inválido!");
-			if ((userName = userName.Trim().ToLower()).Length > 32)
+			if ((userName = userName.Trim().ToLower()).Length > 64)
 				throw new ValidationException("Login muito longo!");
+			if (userName.Length < 10)
+				throw new ValidationException("Login muito curto!");
 			if (string.IsNullOrWhiteSpace(fullName) || fullName.IndexOf('=') >= 0)
 				throw new ValidationException("Nome completo inválido!");
 			if ((fullName = fullName.Trim().ToUpper()).Length > 64)
 				throw new ValidationException("Nome completo muito longo!");
+			if (fullName.Length < 3)
+				throw new ValidationException("Nome completo muito curto!");
 		}
 
 		public static User Create(string userName, string fullName, int profileId) {
@@ -441,21 +444,21 @@ namespace DocumentManager.Models {
 			}
 		}
 
-		public void EditProfile(HttpContext context, string fullName, string picture, string pass, string newPass1, string newPass2) {
+		public void EditProfile(HttpContext context, string fullName, string picture, string password, string newPassword, string newPassword2) {
 			Validate(ref UserName, ref fullName);
 
-			if ((pass != null && pass.Length != 0) || (newPass1 != null && newPass1.Length != 0) || (newPass2 != null && newPass2.Length != 0)) {
-				if (pass == null) pass = "";
-				if (newPass1 == null) newPass1 = "";
-				if (newPass2 == null) newPass2 = "";
-				if (pass.Length == 0 || newPass1.Length == 0 || newPass2.Length == 0 || newPass1 != newPass2)
+			if ((password != null && password.Length != 0) || (newPassword != null && newPassword.Length != 0) || (newPassword2 != null && newPassword2.Length != 0)) {
+				if (password == null) password = "";
+				if (newPassword == null) newPassword = "";
+				if (newPassword2 == null) newPassword2 = "";
+				if (password.Length == 0 || newPassword.Length == 0 || newPassword2.Length == 0 || newPassword != newPassword2 || newPassword.Length > 20)
 					throw new ValidationException("Senha inválida!");
 				using (MySqlConnection conn = Sql.OpenConnection()) {
 					using (MySqlCommand cmd = new MySqlCommand("SELECT password FROM user WHERE id = @id", conn)) {
 						cmd.Parameters.AddWithValue("@id", Id);
 						using (MySqlDataReader reader = cmd.ExecuteReader()) {
-							if (!reader.Read() || !PasswordHash.ValidatePassword(pass, reader.GetString(0)))
-								throw new ValidationException("Senha atual não confere!");
+							if (!reader.Read() || !PasswordHash.ValidatePassword(password, reader.GetString(0)))
+								throw new ValidationException("Senha atual não confere \uD83D\uDE22");
 						}
 					}
 
@@ -467,10 +470,10 @@ namespace DocumentManager.Models {
 						long tokenLow = BitConverter.ToInt64(buffer, 0);
 						long tokenHigh = BitConverter.ToInt64(buffer, 8);
 						cmd.Parameters.AddWithValue("@full_name", fullName);
-						cmd.Parameters.AddWithValue("@password", PasswordHash.CreateHash(newPass1));
+						cmd.Parameters.AddWithValue("@password", PasswordHash.CreateHash(newPassword));
 						cmd.Parameters.AddWithValue("@picture_version", PictureVersion);
 						cmd.Parameters.AddWithValue("@token_low", tokenLow);
-						cmd.Parameters.AddWithValue("@token_high", tokenLow);
+						cmd.Parameters.AddWithValue("@token_high", tokenHigh);
 						cmd.Parameters.AddWithValue("@id", Id);
 						cmd.ExecuteNonQuery();
 						FullName = fullName;

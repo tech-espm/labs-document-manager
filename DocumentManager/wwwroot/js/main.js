@@ -725,6 +725,19 @@ window.trim = (function () {
 window.trimValue = function (input) {
 	return trim(_(input).value);
 };
+window.endsWith = function (str, end) {
+	// Try to simulate the actual behavior of endsWith()
+	if (str === "")
+		return (end === "");
+	if (!str)
+		return false;
+	if (end === "")
+		return true;
+	if (!end || end.length > str.length)
+		return false;
+	var i = str.lastIndexOf(end);
+	return (i >= 0 && i === (str.length - end.length));
+};
 window.resetForm = function (f) {
 	var $form = $(f), i, validator;
 	if (!$form || !$form.length)
@@ -1058,12 +1071,11 @@ window.Validation = {
 					}
 				}
 
-				if (bodyObject != undefined) {
-					xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
+				xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
+				if (bodyObject !== undefined)
 					xhr.send(JSON.stringify(bodyObject));
-				} else {
+				else
 					xhr.send();
-				}
 
 				if (async)
 					return true;

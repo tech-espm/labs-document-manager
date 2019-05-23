@@ -55,11 +55,13 @@
 		$("#form").validate({
 			rules: {
 				userName: {
+					minlength: 10,
 					maxlength: 64,
 					required: true,
 					email: true
 				},
 				fullName: {
+					minlength: 3,
 					maxlength: 64,
 					required: true,
 				},

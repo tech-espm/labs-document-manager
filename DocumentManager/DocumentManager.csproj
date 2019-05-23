@@ -31,6 +31,9 @@
     <Content Update="Views\DocumentType\Manage.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Home\Profile.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\PartitionType\Edit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
