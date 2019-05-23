@@ -98,7 +98,7 @@
 				@foreach (User user in Model) {
 					<text>
 				[
-					"<img class=\"profile-img\" alt=\"Perfil\" src=\"/images/user.png\" width=\"40\" height=\"40\" />" + encode("@user.UserName"),
+					"<img class=\"profile-img\" alt=\"Perfil\" src=\"/User/Picture?id=@(user.Id)&v=@(user.PictureVersion)\" width=\"40\" height=\"40\" />" + encode("@user.UserName"),
 					"@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.FullName))",
 					"<button id=\"btnProfile@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changeProfile(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.ProfileName))") + "</button>",
 					"@Html.Raw(user.Active ? "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-danger\\\" onclick=\\\"activateUser(0, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-times\\\"></i> Desativar</button>" : "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-success\\\" onclick=\\\"activateUser(1, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-check\\\"></i> Ativar</button>") <button type=\"button\" class=\"btn btn-outline btn-primary\" onclick=\"resetPassword('@user.UserName', @user.Id)\"><i class=\"fa fa-refresh\"></i>Redefinir senha</button>"

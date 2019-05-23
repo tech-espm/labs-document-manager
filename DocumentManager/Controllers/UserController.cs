@@ -40,6 +40,15 @@ namespace DocumentManager.Controllers {
 			}
 		}
 
+		[HttpGet, HttpHead]
+		public IActionResult Picture(int id, int v) {
+			try {
+				return Models.User.Picture(HttpContext, id);
+			} catch (Exception ex) {
+				return ErrorResult(ex);
+			}
+		}
+
 		[HttpGet]
 		[AccessControl(Feature.UserEdit, true)]
 		public IActionResult Activate(int id) {

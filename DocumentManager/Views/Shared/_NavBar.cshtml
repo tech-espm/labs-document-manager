@@ -13,7 +13,7 @@
 	<ul class="nav navbar-top-links navbar-right">
 		<li class="dropdown">
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
-				<img class="profile-img" alt="Perfil" src="~/images/user.png" width="40" height="40" />@(ViewBag.LoggedUser.FullName) <i class="fa fa-caret-down"></i>
+				<img class="profile-img" alt="Perfil" src="~/User/Picture?id=@(ViewBag.LoggedUser.Id)&v=@(ViewBag.LoggedUser.PictureVersion)" width="40" height="40" />@(ViewBag.LoggedUser.FullName) <i class="fa fa-caret-down"></i>
 			</a>
 			<ul class="dropdown-menu dropdown-user">
 				<li>

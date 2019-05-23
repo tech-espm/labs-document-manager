@@ -10,6 +10,7 @@ using System.Threading;
 using Microsoft.AspNetCore.Http;
 using DocumentManager.Exceptions;
 using MySql.Data.MySqlClient;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DocumentManager.Models {
 	public class User {
@@ -274,6 +275,37 @@ namespace DocumentManager.Models {
 				}
 			}
 			return users;
+		}
+
+		public static IActionResult Picture(HttpContext context, int id) {
+			string file = Storage.UserProfilePicture(id);
+			string mime = "image/jpeg";
+			if (!File.Exists(file)) {
+				file = Path.Combine(Storage.WWWRoot, "images", "user.png");
+				mime = "image/png";
+			}
+
+			Microsoft.Net.Http.Headers.EntityTagHeaderValue etag = Storage.GenerateFullETag(file, out DateTime lastModified);
+
+			Microsoft.AspNetCore.Http.Headers.RequestHeaders requestHeaders = context.Request.GetTypedHeaders();
+			Microsoft.AspNetCore.Http.Headers.ResponseHeaders responseHeaders = context.Response.GetTypedHeaders();
+
+			if ((requestHeaders.IfNoneMatch != null && requestHeaders.IfNoneMatch.Contains(etag)) ||
+				(requestHeaders.IfModifiedSince != null && requestHeaders.IfModifiedSince >= lastModified)) {
+				responseHeaders.CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue();
+				return new StatusCodeResult(StatusCodes.Status304NotModified);
+			}
+
+			responseHeaders.CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue() {
+				Public = true,
+				NoCache = false,
+				NoStore = false,
+				MaxAge = TimeSpan.FromDays(30)
+			};
+			responseHeaders.ETag = etag;
+			responseHeaders.LastModified = lastModified;
+
+			return new FileContentResult(File.ReadAllBytes(file), mime);
 		}
 
 		public void Activate(int id) {

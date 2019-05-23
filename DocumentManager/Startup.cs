@@ -44,6 +44,7 @@ namespace DocumentManager {
 					template: "{controller=Home}/{action=Index}");
 			});
 
+			AppDomain.CurrentDomain.SetData("WWWRootDirectory", System.IO.Path.Combine(env.ContentRootPath, "wwwroot"));
 			AppDomain.CurrentDomain.SetData("DataDirectory", System.IO.Path.Combine(env.ContentRootPath, "App_Data"));
 		}
 	}
