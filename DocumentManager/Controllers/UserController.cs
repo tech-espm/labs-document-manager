@@ -21,9 +21,9 @@ namespace DocumentManager.Controllers {
 
 		[HttpPost]
 		[AccessControl(Feature.UserCreate, true)]
-		public IActionResult Create(string userName, string fullName, int profileId) {
+		public IActionResult Create(string userName, string fullName, int profileId, int languageId) {
 			try {
-				return Json(Models.User.Create(userName, fullName, profileId));
+				return Json(Models.User.Create(userName, fullName, profileId, languageId));
 			} catch (Exception ex) {
 				return ErrorResult(ex, "o", "um", "usuário", userName, "o login");
 			}

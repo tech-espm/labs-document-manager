@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using DocumentManager.Models;
 using DocumentManager.Attributes;
+using DocumentManager.Localization;
 
 namespace DocumentManager.Controllers {
 	public class HomeController : BaseController {
@@ -27,11 +28,11 @@ namespace DocumentManager.Controllers {
 			try {
 				LoggedUser = Models.User.Login(HttpContext, userName, password);
 				if (LoggedUser == null)
-					ViewBag.Message = "Usuário ou senha inválidos!";
+					ViewBag.Message = Str.UserOrPasswordIsInvalid;
 				else
 					return Redirect("/");
 			} catch (Exception ex) {
-				ViewBag.Message = "Erro ao efetuar o login \uD83D\uDE22 - " + ex.Message;
+				ViewBag.Message = Str.AnErrorOccurredDuringTheLoginProcess + ex.Message;
 			}
 			return View();
 		}
@@ -53,9 +54,9 @@ namespace DocumentManager.Controllers {
 
 		[HttpPost]
 		[AccessControl(Feature.None, true)]
-		public IActionResult EditProfile(string fullName, [FromBody]string picture, string password, string newPassword, string newPassword2) {
+		public IActionResult EditProfile(string fullName, [FromBody]string picture, int languageId, string password, string newPassword, string newPassword2) {
 			try {
-				LoggedUser.EditProfile(HttpContext, fullName, picture, password, newPassword, newPassword2);
+				LoggedUser.EditProfile(HttpContext, fullName, picture, languageId, password, newPassword, newPassword2);
 				return VoidResult();
 			} catch (Exception ex) {
 				return ErrorResult(ex);

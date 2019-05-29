@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using DocumentManager.Models;
 using DocumentManager.Attributes;
+using DocumentManager.Localization;
 
 namespace DocumentManager.Controllers {
 	public class CourseController : BaseController {
@@ -25,30 +26,30 @@ namespace DocumentManager.Controllers {
 		public IActionResult Edit(int id) {
 			Course course = Course.GetById(id);
 			ViewBag.CourseDelete = LoggedUser.HasFeature(Feature.CourseDelete);
-			return (course == null ? ItemNotFound("o curso", "Editar Curso") : View(course));
+			return (course == null ? ItemNotFound(Str.theCourse, Str.EditCourse) : View(course));
 		}
 
 		[HttpPost]
 		[AccessControl(Feature.CourseCreate, true)]
-		public IActionResult Create(string name, string shortName) {
+		public IActionResult Create(string nameEn, string namePtBr, string shortNameEn, string shortNamePtBr) {
 			try {
-				return Json(Course.Create(name, shortName));
+				return Json(Course.Create(nameEn, namePtBr, shortNameEn, shortNamePtBr));
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "curso", name);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.course, $"{nameEn} / {namePtBr}");
 			}
 		}
 
 		[HttpPost]
 		[AccessControl(Feature.CourseEdit, true)]
-		public IActionResult Update(int id, string name, string shortName) {
+		public IActionResult Update(int id, string nameEn, string namePtBr, string shortNameEn, string shortNamePtBr) {
 			try {
 				Course course = Course.GetById(id);
 				if (course == null)
-					return ErrorResult("Curso não encontrado!");
-				course.Update(name, shortName);
+					return ErrorResult(Str.CourseNotFound);
+				course.Update(nameEn, namePtBr, shortNameEn, shortNamePtBr);
 				return Json(course);
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "curso", name);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.course, $"{nameEn} / {namePtBr}");
 			}
 		}
 
@@ -58,7 +59,7 @@ namespace DocumentManager.Controllers {
 			try {
 				Course course = Course.GetById(id);
 				if (course == null)
-					return ErrorResult("Curso não encontrado!");
+					return ErrorResult(Str.CourseNotFound);
 				course.Delete();
 				return VoidResult();
 			} catch (Exception ex) {

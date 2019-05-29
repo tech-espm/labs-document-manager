@@ -9,6 +9,7 @@ using DocumentManager.Attributes;
 using System.Text;
 using DocumentManager.Exceptions;
 using MySql.Data.MySqlClient;
+using DocumentManager.Localization;
 
 namespace DocumentManager.Controllers {
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -26,18 +27,30 @@ namespace DocumentManager.Controllers {
 		protected ActionResult ErrorResult(Exception ex) {
 			if (ex is ValidationException)
 				return ErrorResult(ex.Message);
-			if (ex is MySqlException)
-				return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} na base de dados: {ex.Message}");
-			return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} no servidor: {ex.Message}");
+			if (Str.CurrentLanguage == Str.LanguageEn) {
+				if (ex is MySqlException)
+					return ErrorResult($"Database error 0x{ex.HResult.ToString("X8")}: {ex.Message}");
+				return ErrorResult($"Server error 0x{ex.HResult.ToString("X8")}: {ex.Message}");
+			} else {
+				if (ex is MySqlException)
+					return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} na base de dados: {ex.Message}");
+				return ErrorResult($"Ocorreu o erro 0x{ex.HResult.ToString("X8")} no servidor: {ex.Message}");
+			}
 		}
 
-		protected ActionResult ErrorResult(Exception ex, string definiteArticle, string undefiniteArticle, string itemName, string value, string articlePlusFieldName = null) {
-			MySqlException myex = ex as MySqlException;
-			if (myex != null) {
-				if (myex.Number == 1062)
-					return ErrorResult($"Já existe {undefiniteArticle} {itemName} com {(articlePlusFieldName ?? "o nome")} \"{(value ?? "").ToUpper()}\" \uD83D\uDE22");
-				else if (myex.Number == 1451)
-					return ErrorResult($"{definiteArticle.ToUpper()} {itemName} \"{(value ?? "").ToUpper()}\" possui dependências e não pode ser excluíd{definiteArticle} \uD83D\uDE22");
+		protected ActionResult ErrorResult(Exception ex, string upperCaseDefiniteArticle, string undefiniteArticle, string itemName, string value, string fieldName = null) {
+			if (ex is MySqlException myex) {
+				if (Str.CurrentLanguage == Str.LanguageEn) {
+					if (myex.Number == 1062)
+						return ErrorResult($"There is already {undefiniteArticle} {itemName} with {(fieldName ?? "name")} \"{(value ?? "").ToUpper()}\" \uD83D\uDE22");
+					else if (myex.Number == 1451)
+						return ErrorResult($"{upperCaseDefiniteArticle} {itemName} \"{(value ?? "").ToUpper()}\" has dependencies, so it cannot be delete \uD83D\uDE22");
+				} else {
+					if (myex.Number == 1062)
+						return ErrorResult($"Já existe {undefiniteArticle} {itemName} com {(fieldName ?? "nome")} \"{(value ?? "").ToUpper()}\" \uD83D\uDE22");
+					else if (myex.Number == 1451)
+						return ErrorResult($"{upperCaseDefiniteArticle} {itemName} \"{(value ?? "").ToUpper()}\" possui dependências e não pode ser excluíd{upperCaseDefiniteArticle.ToLower()} \uD83D\uDE22");
+				}
 			}
 			return ErrorResult(ex);
 		}
@@ -51,6 +64,8 @@ namespace DocumentManager.Controllers {
 		public override void OnActionExecuting(ActionExecutingContext context) {
 			LoggedUser = Models.User.GetFromClient(HttpContext);
 			ViewBag.LoggedUser = LoggedUser;
+
+			Str.SetCurrentLanguage(LoggedUser == null ? Str.LanguagePtBr : LoggedUser.LanguageId);
 
 			ControllerActionDescriptor actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
 			object[] attributes = actionDescriptor.MethodInfo.GetCustomAttributes(typeof(AccessControlAttribute), true);
@@ -68,7 +83,7 @@ namespace DocumentManager.Controllers {
 
 			if (LoggedUser == null || !LoggedUser.HasFeature(requestedFeature)) {
 				if (apiCall)
-					context.Result = ErrorResult("Sem permissão");
+					context.Result = ErrorResult(Str.NoPermission);
 				else if (LoggedUser != null)
 					context.Result = View("~/Views/Home/NoPermission.cshtml");
 				else if (string.IsNullOrWhiteSpace(Request.Path) || Request.Path == "/")

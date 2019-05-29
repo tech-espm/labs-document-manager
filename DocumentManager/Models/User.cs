@@ -29,7 +29,7 @@ namespace DocumentManager.Models {
 
 		public int Id;
 		public string UserName, FullName;
-		public int ProfileId, PictureVersion;
+		public int ProfileId, LanguageId, PictureVersion;
 		public bool Active;
 		public string ProfileName;
 		public long TokenLow, TokenHigh;
@@ -102,11 +102,11 @@ namespace DocumentManager.Models {
 		}
 
 		public static User Login(HttpContext context, string userName, string password) {
-			int id, profileId, pictureVersion;
+			int id, profileId, languageId, pictureVersion;
 			bool active;
 			string fullName, hash;
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, full_name, password, profile_id, picture_version, active FROM user WHERE user_name = @user_name", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, full_name, password, profile_id, language_id, picture_version, active FROM user WHERE user_name = @user_name", conn)) {
 					cmd.Parameters.AddWithValue("@user_name", userName);
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						if (!reader.Read())
@@ -115,8 +115,9 @@ namespace DocumentManager.Models {
 						fullName = reader.GetString(1);
 						hash = reader.GetString(2);
 						profileId = reader.GetInt32(3);
-						pictureVersion = reader.GetInt32(4);
-						active = reader.GetBoolean(5);
+						languageId = reader.GetInt32(4);
+						pictureVersion = reader.GetInt32(5);
+						active = reader.GetBoolean(6);
 					}
 				}
 				if (active && PasswordHash.ValidatePassword(password, hash)) {
@@ -130,7 +131,7 @@ namespace DocumentManager.Models {
 						cmd.Parameters.AddWithValue("@id", id);
 						cmd.ExecuteNonQuery();
 					}
-					User user = new User(id, userName, fullName, profileId, pictureVersion, active, tokenLow, tokenHigh);
+					User user = new User(id, userName, fullName, profileId, languageId, pictureVersion, active, tokenLow, tokenHigh);
 					user.SendToClient(context);
 					return user;
 				}
@@ -158,14 +159,14 @@ namespace DocumentManager.Models {
 
 			if (user == null) {
 				using (MySqlConnection conn = Sql.OpenConnection()) {
-					using (MySqlCommand cmd = new MySqlCommand("SELECT user_name, full_name, profile_id, picture_version, token_low, token_high FROM user WHERE id = @id AND active = 1", conn)) {
+					using (MySqlCommand cmd = new MySqlCommand("SELECT user_name, full_name, profile_id, language_id, picture_version, token_low, token_high FROM user WHERE id = @id AND active = 1", conn)) {
 						cmd.Parameters.AddWithValue("@id", id);
 						using (MySqlDataReader reader = cmd.ExecuteReader()) {
 							if (!reader.Read() ||
-								reader.GetInt64(4) != tokenLow ||
-								reader.GetInt64(5) != tokenHigh)
+								reader.GetInt64(5) != tokenLow ||
+								reader.GetInt64(6) != tokenHigh)
 								return null;
-							user = new User(id, reader.GetString(0), reader.GetString(1), reader.GetInt32(2), reader.GetInt32(3), true, tokenLow, tokenHigh);
+							user = new User(id, reader.GetString(0), reader.GetString(1), reader.GetInt32(2), reader.GetInt32(3), reader.GetInt32(4), true, tokenLow, tokenHigh);
 						}
 					}
 				}
@@ -219,12 +220,14 @@ namespace DocumentManager.Models {
 		}
 
 		private static void Validate(ref string userName, ref string fullName) {
-			if (string.IsNullOrWhiteSpace(userName) || userName.IndexOf('=') >= 0 || userName.IndexOf('@') <= 0)
-				throw new ValidationException("Login inválido!");
-			if ((userName = userName.Trim().ToLower()).Length > 64)
-				throw new ValidationException("Login muito longo!");
-			if (userName.Length < 10)
-				throw new ValidationException("Login muito curto!");
+			if (userName != "admin") {
+				if (string.IsNullOrWhiteSpace(userName) || userName.IndexOf('=') >= 0 || userName.IndexOf('@') <= 0)
+					throw new ValidationException("Login inválido!");
+				if ((userName = userName.Trim().ToLower()).Length > 64)
+					throw new ValidationException("Login muito longo!");
+				if (userName.Length < 10)
+					throw new ValidationException("Login muito curto!");
+			}
 			if (string.IsNullOrWhiteSpace(fullName) || fullName.IndexOf('=') >= 0)
 				throw new ValidationException("Nome completo inválido!");
 			if ((fullName = fullName.Trim().ToUpper()).Length > 64)
@@ -233,7 +236,7 @@ namespace DocumentManager.Models {
 				throw new ValidationException("Nome completo muito curto!");
 		}
 
-		public static User Create(string userName, string fullName, int profileId) {
+		public static User Create(string userName, string fullName, int profileId, int languageId) {
 			Validate(ref userName, ref fullName);
 
 			int id;
@@ -247,11 +250,12 @@ namespace DocumentManager.Models {
 							throw new ValidationException("Perfil não encontrado!");
 					}
 				}
-				using (MySqlCommand cmd = new MySqlCommand("INSERT INTO user (user_name, full_name, password, profile_id, picture_version, active, token_low, token_high) VALUES (@user_name, @full_name, @password, @profile_id, 0, 1, 0, 0)", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("INSERT INTO user (user_name, full_name, password, profile_id, language_id, picture_version, active, token_low, token_high) VALUES (@user_name, @full_name, @password, @profile_id, @language_id, 0, 1, 0, 0)", conn)) {
 					cmd.Parameters.AddWithValue("@user_name", userName);
 					cmd.Parameters.AddWithValue("@full_name", fullName);
 					cmd.Parameters.AddWithValue("@password", DefaultPassword);
 					cmd.Parameters.AddWithValue("@profile_id", profileId);
+					cmd.Parameters.AddWithValue("@language_id", languageId);
 					cmd.ExecuteNonQuery();
 				}
 				using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn)) {
@@ -259,17 +263,17 @@ namespace DocumentManager.Models {
 				}
 			}
 
-			return new User(id, userName, fullName, profileId, 0, true, 0, 0);
+			return new User(id, userName, fullName, profileId, languageId, 0, true, 0, 0);
 		}
 
 		public static List<User> GetAllWithProfileName() {
 			List<User> users = new List<User>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT u.id, u.user_name, u.full_name, u.profile_id, p.name, u.active, u.picture_version FROM user u LEFT JOIN profile p ON p.id = u.profile_id ORDER BY p.name ASC, u.user_name ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT u.id, u.user_name, u.full_name, u.profile_id, u.language_id, p.name, u.active, u.picture_version FROM user u LEFT JOIN profile p ON p.id = u.profile_id ORDER BY p.name ASC, u.user_name ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
-							users.Add(new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(6), reader.GetBoolean(5), 0, 0) {
-								ProfileName = (reader.IsDBNull(4) ? "SEM PERFIL" : reader.GetString(4))
+							users.Add(new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(4), reader.GetInt32(7), reader.GetBoolean(6), 0, 0) {
+								ProfileName = (reader.IsDBNull(4) ? "SEM PERFIL" : reader.GetString(5))
 							});
 					}
 				}
@@ -388,11 +392,12 @@ namespace DocumentManager.Models {
 			//for JSON
 		}
 
-		private User(int id, string userName, string fullName, int profileId, int pictureVersion, bool active, long tokenLow, long tokenHigh) {
+		private User(int id, string userName, string fullName, int profileId, int languageId, int pictureVersion, bool active, long tokenLow, long tokenHigh) {
 			Id = id;
 			UserName = userName;
 			FullName = fullName;
 			ProfileId = profileId;
+			LanguageId = languageId;
 			PictureVersion = pictureVersion;
 			Active = active;
 			TokenLow = tokenLow;
@@ -476,7 +481,7 @@ namespace DocumentManager.Models {
 			}
 		}
 
-		public void EditProfile(HttpContext context, string fullName, string picture, string password, string newPassword, string newPassword2) {
+		public void EditProfile(HttpContext context, string fullName, string picture, int languageId, string password, string newPassword, string newPassword2) {
 			Validate(ref UserName, ref fullName);
 
 			if ((password != null && password.Length != 0) || (newPassword != null && newPassword.Length != 0) || (newPassword2 != null && newPassword2.Length != 0)) {
@@ -496,19 +501,21 @@ namespace DocumentManager.Models {
 
 					SaveNewPicture(picture);
 
-					using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET full_name = @full_name, password = @password, picture_version = @picture_version, token_low = @token_low, token_high = @token_high WHERE id = @id", conn)) {
+					using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET full_name = @full_name, password = @password, language_id = @language_id, picture_version = @picture_version, token_low = @token_low, token_high = @token_high WHERE id = @id", conn)) {
 						//https://msdn.microsoft.com/en-us/library/97af8hh4(v=vs.110).aspx
 						byte[] buffer = Guid.NewGuid().ToByteArray();
 						long tokenLow = BitConverter.ToInt64(buffer, 0);
 						long tokenHigh = BitConverter.ToInt64(buffer, 8);
 						cmd.Parameters.AddWithValue("@full_name", fullName);
 						cmd.Parameters.AddWithValue("@password", PasswordHash.CreateHash(newPassword));
+						cmd.Parameters.AddWithValue("@language_id", languageId);
 						cmd.Parameters.AddWithValue("@picture_version", PictureVersion);
 						cmd.Parameters.AddWithValue("@token_low", tokenLow);
 						cmd.Parameters.AddWithValue("@token_high", tokenHigh);
 						cmd.Parameters.AddWithValue("@id", Id);
 						cmd.ExecuteNonQuery();
 						FullName = fullName;
+						LanguageId = languageId;
 						TokenLow = tokenLow;
 						TokenHigh = tokenHigh;
 					}
@@ -518,12 +525,14 @@ namespace DocumentManager.Models {
 
 					SaveNewPicture(picture);
 
-					using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET full_name = @full_name, picture_version = @picture_version WHERE id = @id", conn)) {
+					using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET full_name = @full_name, language_id = @language_id, picture_version = @picture_version WHERE id = @id", conn)) {
 						cmd.Parameters.AddWithValue("@full_name", fullName);
+						cmd.Parameters.AddWithValue("@language_id", languageId);
 						cmd.Parameters.AddWithValue("@picture_version", PictureVersion);
 						cmd.Parameters.AddWithValue("@id", Id);
 						cmd.ExecuteNonQuery();
 						FullName = fullName;
+						LanguageId = languageId;
 					}
 				}
 			}

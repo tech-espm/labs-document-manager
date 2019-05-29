@@ -1,6 +1,6 @@
 ﻿@model User
 @{
-	ViewBag.Title = "Meu Perfil";
+	ViewBag.Title = Str.MyProfile;
 }
 
 <form class="row" action="." method="post" id="form">
@@ -8,35 +8,42 @@
 		<div class="panel panel-default">
 			<div class="panel-heading clearfix">
 				<div class="pull-left">
-					Editar Perfil
+					@Str.EditProfile
 				</div>
 			</div>
 			<div class="panel-body no-bottom">
 				<div class="form-group">
-					<label for="fullName">Nome Completo</label>
+					<label for="fullName">@Str.FullName</label>
 					<input id="fullName" name="fullName" maxlength="64" class="form-control upper" type="text" spellcheck="false" value="@ViewBag.LoggedUser.FullName" />
 				</div>
 				<div class="form-group">
-					<label for="picture">Nova foto de perfil <small>(Até 1 MiB, de preferência quadrada)</small></label>
+					<label for="languageId">@Str.Language</label>
+					<select id="languageId" name="languageId" size="1" class="form-control upper" type="text">
+						<option value="@Str.LanguageEn" selected="@(ViewBag.LoggedUser.LanguageId == Str.LanguageEn)">@Str.English</option>
+						<option value="@Str.LanguagePtBr" selected="@(ViewBag.LoggedUser.LanguageId == Str.LanguagePtBr)">@Str.Portuguese</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="picture">@Str.NewProfileImage <small>(@Str.UpTo1MiB)</small></label>
 					<input id="picture" name="picture" class="form-control" type="file" accept="image/jpeg" />
 				</div>
 				<div class="divider-body"></div>
-				<p>Para alterar a senha atual, preencha todos os campos abaixo</p>
+				<p>@Str.InOrderToChangeCurrentPassword</p>
 				<div id="currentPass" class="form-group">
-					<label for="password">Senha Atual</label>
+					<label for="password">@Str.CurrentPassword</label>
 					<input id="password" name="password" maxlength="20" class="form-control upper" type="password" />
 				</div>
 				<div class="form-group">
-					<label for="newPassword">Nova Senha</label>
+					<label for="newPassword">@Str.NewPassword</label>
 					<input id="newPassword" name="newPassword" maxlength="20" class="form-control upper" type="password" />
 				</div>
 				<div class="form-group">
-					<label for="newPassword2">Confirme Nova Senha</label>
+					<label for="newPassword2">@Str.ConfirmNewPassword</label>
 					<input id="newPassword2" name="newPassword2" maxlength="20" class="form-control upper" type="password" />
 				</div>
 			</div>
 			<div class="panel-footer">
-				<input value="Salvar Alterações" class="btn btn-primary btn-lg btn-block" type="submit" />
+				<input value="@Str.SaveChanges" class="btn btn-primary btn-lg btn-block" type="submit" />
 			</div>
 		</div>
 	</div>
@@ -50,20 +57,20 @@
 		// Special methods for files :)
 		$.validator.addMethod("advancedFileSupport", function (value, element, param) {
 			return (window.File && window.FileReader && window.FormData);
-		}, $.validator.format("O browser não suporta tratamento avançado de arquivos (você deve utilizar o Firefox 13+ ou Google Chrome 21+)"));
+		}, $.validator.format("@Str.YourBrowserDoesNotSupportAdvancedFileHandling"));
 
 		$.validator.addMethod("maxFileLengthKiB", function (value, element, param) {
 			if (!element.files)
 				return false;
 			return (!value.length || !element.files.length || !element.files[0] || element.files[0].size <= (param << 10));
-		}, $.validator.format("O arquivo deve ter no máximo {0} KiB"));
+		}, $.validator.format("@Str.TheFileSizeMustBeAtMost"));
 
 		$.validator.addMethod("fileExtension", function (value, element, param) {
 			if (!element.files)
 				return false;
 			// Do not use str.endsWith() because a few browsers don't support it...
 			return (!value.length || !element.files.length || !element.files[0] || endsWith(element.files[0].name.toLowerCase(), param));
-		}, $.validator.format("O arquivo deve ter a extensão {0}"));
+		}, $.validator.format("@Str.TheFileExtensionMustBe"));
 
 		var isSavingProfile = false;
 
@@ -72,6 +79,9 @@
 				fullName: {
 					minlength: 3,
 					maxlength: 64,
+					required: true
+				},
+				languageId: {
 					required: true
 				},
 				picture: {
@@ -106,6 +116,7 @@
 					return;
 
 				var fullName = _("fullName").value,
+					languageId = parseInt(_("languageId").value),
 					password = _("password").value,
 					newPassword = _("newPassword").value,
 					newPassword2 = _("newPassword2").value,
@@ -125,11 +136,11 @@
 							_("newPassword").value = "";
 							_("newPassword2").value = "";
 							_("picture").value = "";
-							Notification.success("Perfil alterado com sucesso! \uD83D\uDE04");
+							Notification.success("@Html.Raw(Str.ProfileSuccessfullyChanged)");
 						} else {
 							Notification.error(response.value, true);
 						}
-					}, "fullName", fullName, "password", password, "newPassword", newPassword, "newPassword2", newPassword2);
+					}, "fullName", fullName, "languageId", languageId, "password", password, "newPassword", newPassword, "newPassword2", newPassword2);
 				};
 
 				if (file) {
@@ -139,7 +150,7 @@
 					};
 					reader.onerror = function (error) {
 						isSavingProfile = false;
-						Notification.error("Ocorreu um erro ao ler o arquivo da foto: " + error);
+						Notification.error("@Str.AnErrorOccurredWhileReadingTheImage" + error);
 					};
 					reader.readAsDataURL(file);
 				} else {

@@ -1,21 +1,21 @@
 ﻿@model Course
 @{
-	ViewBag.Title = (Model == null ? "Criar Curso" : "Editar Curso");
+	ViewBag.Title = (Model == null ? Str.CreateCourse : Str.EditCourse);
 }
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalDelete">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">Oops...</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Oops</h4>
 			</div>
 			<div class="modal-body">
-				<p class="no-margin-bottom">Tem certeza que deseja excluir o curso? Essa operação <b>NÃO</b> pode ser desfeita!</p>
+				<p class="no-margin-bottom">@Str.DoYouReallyWantToDeleteTheCourse @Str.ThisOperationCannotBeUndone</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" onclick="deleteItem(true)"><i class="fa fa-check"></i>Excluir</button>
-				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>Cancelar</button>
+				<button type="button" class="btn btn-danger" onclick="deleteItem(true)"><i class="fa fa-check"></i>@Str.Delete</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
 			</div>
 		</div>
 	</div>
@@ -26,11 +26,11 @@
 		<div class="panel panel-default">
 			<div class="panel-heading clearfix">
 				<div class="pull-left">
-					Informações Básicas do Curso
+					@Str.CoursesBasicInformation
 				</div>
 				@if (Model != null && ViewBag.CourseDelete == true) {
 					<div class="pull-right">
-						<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>Excluir</button>
+						<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
 					</div>
 				}
 			</div>
@@ -40,17 +40,37 @@
 						<span class="label label-default">Id @Model.Id</span>
 					</div>
 				}
-				<div class="form-group">
-					<label for="name">Nome</label>
-					<input id="name" name="name" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name)" />
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="nameEn">@Str.Name (@Str.English)</label>
+							<input id="nameEn" name="nameEn" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name.ValueEn)" />
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="namePtBr">@Str.Name (@Str.Portuguese)</label>
+							<input id="namePtBr" name="namePtBr" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name.ValuePtBr)" />
+						</div>
+					</div>
 				</div>
-				<div class="form-group">
-					<label for="shortName">Apelido</label>
-					<input id="shortName" name="shortName" maxlength="16" class="form-control upper" type="text" spellcheck="false" value="@(Model == null ? "" : Model.ShortName)" />
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="shortNameEn">@Str.ShortName (@Str.English)</label>
+							<input id="shortNameEn" name="shortNameEn" maxlength="16" class="form-control upper" type="text" spellcheck="false" value="@(Model == null ? "" : Model.ShortName.ValueEn)" />
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="shortNamePtBr">@Str.ShortName (@Str.Portuguese)</label>
+							<input id="shortNamePtBr" name="shortNamePtBr" maxlength="16" class="form-control upper" type="text" spellcheck="false" value="@(Model == null ? "" : Model.ShortName.ValuePtBr)" />
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="panel-footer">
-				<input value="@(Model == null ? "Criar Curso" : "Salvar Alterações")" class="btn btn-primary btn-lg btn-block" type="submit" />
+				<input value="@(Model == null ? Str.CreateCourse : Str.SaveChanges)" class="btn btn-primary btn-lg btn-block" type="submit" />
 			</div>
 		</div>
 	</div>
@@ -88,11 +108,19 @@
 
 		$("#form").validate({
 			rules: {
-				name: {
+				nameEn: {
 					maxlength: 64,
 					required: true
 				},
-				shortName: {
+				namePtBr: {
+					maxlength: 64,
+					required: true
+				},
+				shortNameEn: {
+					maxlength: 16,
+					required: true
+				},
+				shortNamePtBr: {
 					maxlength: 16,
 					required: true
 				}
@@ -101,7 +129,8 @@
 				if (JsonWebApi.active)
 					return;
 
-				var name = _("name").value, shortName = _("shortName").value;
+				var nameEn = _("nameEn").value, shortNameEn = _("shortNameEn").value,
+					namePtBr = _("namePtBr").value, shortNamePtBr = _("shortNamePtBr").value;
 
 				Notification.wait();
 
@@ -110,20 +139,20 @@
 					JsonWebApi.post("@Url.Action("Create")", null, function (response) {
 						if (response.success) {
 							resetForm(form);
-							Notification.success("Curso criado com sucesso! \uD83D\uDE04");
+							Notification.success("@Html.Raw(Str.CourseSuccessfullyCreated)");
 						} else {
 							Notification.error(response.value, true);
 						}
-					}, "name", name, "shortName", shortName);
+					}, "nameEn", nameEn, "namePtBr", namePtBr, "shortNameEn", shortNameEn, "shortNamePtBr", shortNamePtBr);
 					</text>
 				} else {
 					<text>
 					JsonWebApi.post("@Url.Action("Update")", null, function (response) {
 						if (response.success)
-							Notification.success("Curso alterado com sucesso! \uD83D\uDE04");
+							Notification.success("@Html.Raw(Str.CourseSuccessfullyChanged)");
 						else
 							Notification.error(response.value, true);
-					}, "id", "@Model.Id", "name", name, "shortName", shortName);
+					}, "id", "@Model.Id", "nameEn", nameEn, "namePtBr", namePtBr, "shortNameEn", shortNameEn, "shortNamePtBr", shortNamePtBr);
 					</text>
 				}
 			}
