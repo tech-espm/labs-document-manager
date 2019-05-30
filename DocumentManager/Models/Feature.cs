@@ -7,10 +7,11 @@ namespace DocumentManager.Models {
 
 		// The features must be in ascending order to speed
 		// up the lookup process
-		DocumentCreate = 1,
-		DocumentList = 2,
-		DocumentEdit = 3,
-		DocumentDelete = 4,
+
+		UnityCreate = 1,
+		UnityList = 2,
+		UnityEdit = 3,
+		UnityDelete = 4,
 
 		CourseCreate = 5,
 		CourseList = 6,
@@ -27,8 +28,13 @@ namespace DocumentManager.Models {
 		DocumentTypeEdit = 15,
 		DocumentTypeDelete = 16,
 
+		DocumentCreate = 17,
+		DocumentList = 18,
+		DocumentEdit = 19,
+		DocumentDelete = 20,
+
 		Min = 1,
-		Max = 16,
+		Max = 20,
 
 		// These features cannot be assigned to regular profiles, only
 		// administrators can work with them! That's why their values

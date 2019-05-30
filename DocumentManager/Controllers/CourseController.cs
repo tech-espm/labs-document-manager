@@ -56,14 +56,15 @@ namespace DocumentManager.Controllers {
 		[HttpGet]
 		[AccessControl(Feature.CourseDelete, true)]
 		public IActionResult Delete(int id) {
+			Course course = null;
 			try {
-				Course course = Course.GetById(id);
+				course = Course.GetById(id);
 				if (course == null)
 					return ErrorResult(Str.CourseNotFound);
 				course.Delete();
 				return VoidResult();
 			} catch (Exception ex) {
-				return ErrorResult(ex);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.course, course?.Name.ToString());
 			}
 		}
 	}

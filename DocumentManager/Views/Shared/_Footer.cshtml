@@ -1,6 +1,11 @@
-﻿<script type="text/javascript" src="~/lib/jquery-mask/js/jquery-mask-1.0.0.min.js"></script>
+﻿@{
+	User loggedUser = ViewBag.LoggedUser;
+}
+<script type="text/javascript" src="~/lib/jquery-mask/js/jquery-mask-1.0.0.min.js"></script>
 <script type="text/javascript" src="~/lib/jquery-validate/js/jquery-validate-1.0.0.min.js"></script>
+@if (loggedUser == null || loggedUser.LanguageId != Str.LanguageEn) {
 <script type="text/javascript" src="~/lib/jquery-validate/js/messages_pt_BR.min.js"></script>
+}
 <script type="text/javascript" src="~/lib/bootstrap/js/bootstrap-1.0.0.min.js"></script>
 <script type="text/javascript" src="~/lib/bootstrap-datepicker/js/bootstrap-datepicker-1.0.3.min.js"></script>
 <script type="text/javascript" src="~/lib/data-tables/js/data-tables-1.0.6.min.js"></script>

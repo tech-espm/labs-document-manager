@@ -7,10 +7,11 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using MySql.Data.MySqlClient;
+using DocumentManager.Localization;
 
 namespace DocumentManager.Models {
 	public class Menu {
-		private static readonly Dictionary<int, List<Menu>> MenusByProfile = new Dictionary<int, List<Menu>>(16);
+		private static readonly Dictionary<int, Dictionary<int, List<Menu>>> MenusByProfileIdAndLanguageId = new Dictionary<int, Dictionary<int, List<Menu>>>(16);
 		private static readonly CommonReadRareWriteLock Lock = new CommonReadRareWriteLock();
 
 		public readonly string Link, IconClass, Text, ExtraAttributes;
@@ -32,129 +33,158 @@ namespace DocumentManager.Models {
 			return false;
 		}
 
-		private static List<Menu> GenerateMenu(int profileId) {
-			List<Menu> menus = new List<Menu>(), sub;
-			int featureCount = 0;
-			int[] features = new int[(int)Feature.Max];
+		private static List<Menu> GenerateMenu(int profileId, int languageId) {
+			int oldLanguage = Str.CurrentLanguage;
+			if (oldLanguage != languageId)
+				Str.SetCurrentLanguage(languageId);
 
-			if (profileId != Profile.ADMIN_ID) {
-				using (MySqlConnection conn = Sql.OpenConnection()) {
-					using (MySqlCommand cmd = new MySqlCommand($"SELECT feature_id FROM profile_feature WHERE profile_id = @profile_id ORDER BY feature_id ASC", conn)) {
-						cmd.Parameters.AddWithValue("@profile_id", profileId);
-						using (MySqlDataReader reader = cmd.ExecuteReader()) {
-							while (reader.Read() && featureCount < (int)Feature.Max)
-								features[featureCount++] = reader.GetInt32(0);
+			try {
+				List<Menu> menus = new List<Menu>(), sub;
+				int featureCount = 0;
+				int[] features = new int[(int)Feature.Max];
+
+				if (profileId != Profile.ADMIN_ID) {
+					using (MySqlConnection conn = Sql.OpenConnection()) {
+						using (MySqlCommand cmd = new MySqlCommand($"SELECT feature_id FROM profile_feature WHERE profile_id = @profile_id ORDER BY feature_id ASC", conn)) {
+							cmd.Parameters.AddWithValue("@profile_id", profileId);
+							using (MySqlDataReader reader = cmd.ExecuteReader()) {
+								while (reader.Read() && featureCount < (int)Feature.Max)
+									features[featureCount++] = reader.GetInt32(0);
+							}
 						}
 					}
 				}
-			}
 
-			bool create, list;
+				bool create, list;
 
-			sub = null;
-
-			#region Courses
-			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseCreate));
-			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseList));
-			if (create || list) {
-				sub = new List<Menu>();
-				if (create)
-					sub.Add(new Menu("/Course/Create", "fa fa-plus fa-fw", "Criar"));
-				if (list)
-					sub.Add(new Menu("/Course/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
-				menus.Add(new Menu("#", "fa fa-university fa-fw", "Cursos", sub));
-			}
-			#endregion
-
-			#region Partition Types
-			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.PartitionTypeCreate));
-			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.PartitionTypeList));
-			if (create || list) {
-				sub = new List<Menu>();
-				if (create)
-					sub.Add(new Menu("/PartitionType/Create", "fa fa-plus fa-fw", "Criar"));
-				if (list)
-					sub.Add(new Menu("/PartitionType/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
-				menus.Add(new Menu("#", "fa fa-tags fa-fw", "Tipos de Partição", sub));
-			}
-			#endregion
-
-			#region Document Types
-			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentTypeCreate));
-			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentTypeList));
-			if (create || list) {
-				sub = new List<Menu>();
-				if (create)
-					sub.Add(new Menu("/DocumentType/Create", "fa fa-plus fa-fw", "Criar"));
-				if (list)
-					sub.Add(new Menu("/DocumentType/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
-				menus.Add(new Menu("#", "fa fa-tag fa-fw", "Tipos de Documento", sub));
-			}
-			#endregion
-
-			if (sub != null) {
-				menus.Add(new Menu());
 				sub = null;
+
+				#region Units
+				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseCreate));
+				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseList));
+				if (create || list) {
+					sub = new List<Menu>();
+					if (create)
+						sub.Add(new Menu("/Unity/Create", "fa fa-plus fa-fw", Str.Create));
+					if (list)
+						sub.Add(new Menu("/Unity/Manage", "fa fa-tasks fa-fw", Str.Manage));
+					menus.Add(new Menu("#", "fa fa-university fa-fw", Str.Units, sub));
+				}
+				#endregion
+
+				#region Courses
+				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseCreate));
+				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseList));
+				if (create || list) {
+					sub = new List<Menu>();
+					if (create)
+						sub.Add(new Menu("/Course/Create", "fa fa-plus fa-fw", Str.Create));
+					if (list)
+						sub.Add(new Menu("/Course/Manage", "fa fa-tasks fa-fw", Str.Manage));
+					menus.Add(new Menu("#", "fa fa-graduation-cap fa-fw", Str.Courses, sub));
+				}
+				#endregion
+
+				#region Partition Types
+				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.PartitionTypeCreate));
+				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.PartitionTypeList));
+				if (create || list) {
+					sub = new List<Menu>();
+					if (create)
+						sub.Add(new Menu("/PartitionType/Create", "fa fa-plus fa-fw", Str.Create));
+					if (list)
+						sub.Add(new Menu("/PartitionType/Manage", "fa fa-tasks fa-fw", Str.Manage));
+					menus.Add(new Menu("#", "fa fa-tags fa-fw", Str.PartitionTypes, sub));
+				}
+				#endregion
+
+				#region Document Types
+				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentTypeCreate));
+				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentTypeList));
+				if (create || list) {
+					sub = new List<Menu>();
+					if (create)
+						sub.Add(new Menu("/DocumentType/Create", "fa fa-plus fa-fw", Str.Create));
+					if (list)
+						sub.Add(new Menu("/DocumentType/Manage", "fa fa-tasks fa-fw", Str.Manage));
+					menus.Add(new Menu("#", "fa fa-tag fa-fw", Str.DocumentTypes, sub));
+				}
+				#endregion
+
+				if (sub != null) {
+					menus.Add(new Menu());
+					sub = null;
+				}
+
+				#region Documents
+				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentCreate));
+				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentList));
+				if (create || list) {
+					sub = new List<Menu>();
+					if (create)
+						sub.Add(new Menu("/Document/Create", "fa fa-plus fa-fw", Str.Create));
+					if (list)
+						sub.Add(new Menu("/Document/Manage", "fa fa-tasks fa-fw", Str.Manage));
+					menus.Add(new Menu("#", "fa fa-file-text-o fa-fw", Str.Documents, sub));
+				}
+				#endregion
+
+				if (sub != null) {
+					menus.Add(new Menu());
+					sub = null;
+				}
+
+				// There are no features for profiles and users because only
+				// administrators can work with them!
+				if (profileId == Profile.ADMIN_ID) {
+					menus.Add(new Menu("#", "fa fa-users fa-fw", Str.Profiles, new List<Menu>() {
+						new Menu("/Profile/Create", "fa fa-plus fa-fw", Str.Create),
+						new Menu("/Profile/Manage", "fa fa-tasks fa-fw", Str.Manage)
+					}));
+					menus.Add(new Menu("#", "fa fa-user fa-fw", Str.Users, new List<Menu>() {
+						new Menu("/User/Create", "fa fa-plus fa-fw", Str.Create),
+						new Menu("/User/Manage", "fa fa-tasks fa-fw", Str.Manage)
+					}));
+
+					menus.Add(new Menu());
+				}
+
+				return menus;
+			} finally {
+				if (oldLanguage != languageId)
+					Str.SetCurrentLanguage(oldLanguage);
 			}
-
-			#region Documents
-			create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentCreate));
-			list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentList));
-			if (create || list) {
-				sub = new List<Menu>();
-				if (create)
-					sub.Add(new Menu("/Document/Create", "fa fa-plus fa-fw", "Criar"));
-				if (list)
-					sub.Add(new Menu("/Document/Manage", "fa fa-tasks fa-fw", "Gerenciar"));
-				menus.Add(new Menu("#", "fa fa-file-text-o fa-fw", "Documentos", sub));
-			}
-			#endregion
-
-			if (sub != null) {
-				menus.Add(new Menu());
-				sub = null;
-			}
-
-			// There are no features for profiles and users because only
-			// administrators can work with them!
-			if (profileId == Profile.ADMIN_ID) {
-				menus.Add(new Menu("#", "fa fa-users fa-fw", "Perfis", new List<Menu>() {
-					new Menu("/Profile/Create", "fa fa-plus fa-fw", "Criar"),
-					new Menu("/Profile/Manage", "fa fa-tasks fa-fw", "Gerenciar")
-				}));
-				menus.Add(new Menu("#", "fa fa-user fa-fw", "Usuários", new List<Menu>() {
-					new Menu("/User/Create", "fa fa-plus fa-fw", "Criar"),
-					new Menu("/User/Manage", "fa fa-tasks fa-fw", "Gerenciar")
-				}));
-
-				menus.Add(new Menu());
-			}
-
-			return menus;
 		}
 
 		public static void PurgeCachedMenusByProfileId(int profileId) {
 			try {
 				Lock.EnterWriteLock();
-				MenusByProfile.Remove(profileId);
+				MenusByProfileIdAndLanguageId.Remove(profileId);
 			} finally {
 				Lock.ExitWriteLock();
 			}
 		}
 
-		public static List<Menu> GetCachedMenusByProfileId(int profileId) {
-			List<Menu> list;
+		public static List<Menu> GetCachedMenusByProfileIdAndLanguageId(int profileId, int languageId) {
+			Dictionary<int, List<Menu>> menusByLanguageId;
+			List<Menu> list = null;
 			try {
 				Lock.EnterReadLock();
-				MenusByProfile.TryGetValue(profileId, out list);
+				MenusByProfileIdAndLanguageId.TryGetValue(profileId, out menusByLanguageId);
+				if (menusByLanguageId != null)
+					menusByLanguageId.TryGetValue(languageId, out list);
 			} finally {
 				Lock.ExitReadLock();
 			}
 			if (list == null) {
 				try {
 					Lock.EnterWriteLock();
-					if (!MenusByProfile.TryGetValue(profileId, out list))
-						MenusByProfile[profileId] = (list = GenerateMenu(profileId));
+					if (!MenusByProfileIdAndLanguageId.TryGetValue(profileId, out menusByLanguageId)) {
+						menusByLanguageId = new Dictionary<int, List<Menu>>(16);
+						MenusByProfileIdAndLanguageId[profileId] = menusByLanguageId;
+					}
+					if (!menusByLanguageId.TryGetValue(languageId, out list))
+						menusByLanguageId[languageId] = (list = GenerateMenu(profileId, languageId));
 				} finally {
 					Lock.ExitWriteLock();
 				}

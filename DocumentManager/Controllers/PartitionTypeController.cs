@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using DocumentManager.Models;
 using DocumentManager.Attributes;
+using DocumentManager.Localization;
 
 namespace DocumentManager.Controllers {
 	public class PartitionTypeController : BaseController {
@@ -25,30 +26,30 @@ namespace DocumentManager.Controllers {
 		public IActionResult Edit(int id) {
 			PartitionType partitionType = PartitionType.GetById(id);
 			ViewBag.PartitionTypeDelete = LoggedUser.HasFeature(Feature.PartitionTypeDelete);
-			return (partitionType == null ? ItemNotFound("o tipo de partição", "Editar Tipo de Partição") : View(partitionType));
+			return (partitionType == null ? ItemNotFound(Str.thePartitionType, Str.EditPartitionType) : View(partitionType));
 		}
 
 		[HttpPost]
 		[AccessControl(Feature.PartitionTypeCreate, true)]
-		public IActionResult Create(string name) {
+		public IActionResult Create(string nameEn, string namePtBr) {
 			try {
-				return Json(PartitionType.Create(name));
+				return Json(PartitionType.Create(nameEn, namePtBr));
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "tipo de partição", name);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.partitionType, $"{nameEn} / {namePtBr}");
 			}
 		}
 
 		[HttpPost]
 		[AccessControl(Feature.PartitionTypeEdit, true)]
-		public IActionResult Update(int id, string name) {
+		public IActionResult Update(int id, string nameEn, string namePtBr) {
 			try {
 				PartitionType partitionType = PartitionType.GetById(id);
 				if (partitionType == null)
-					return ErrorResult("Tipo de partição não encontrado!");
-				partitionType.Update(name);
+					return ErrorResult(Str.PartitionTypeNotFound);
+				partitionType.Update(nameEn, namePtBr);
 				return Json(partitionType);
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "tipo de partição", name);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.partitionType, $"{nameEn} / {namePtBr}");
 			}
 		}
 
@@ -59,11 +60,11 @@ namespace DocumentManager.Controllers {
 			try {
 				partitionType = PartitionType.GetById(id);
 				if (partitionType == null)
-					return ErrorResult("Tipo de partição não encontrado!");
+					return ErrorResult(Str.PartitionTypeNotFound);
 				partitionType.Delete();
 				return VoidResult();
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "tipo de partição", partitionType?.Name);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.partitionType, partitionType?.Name.ToString());
 			}
 		}
 	}

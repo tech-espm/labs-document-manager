@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using DocumentManager.Models;
 using DocumentManager.Attributes;
+using DocumentManager.Localization;
 
 namespace DocumentManager.Controllers {
 	public class UserController : BaseController {
@@ -25,7 +26,7 @@ namespace DocumentManager.Controllers {
 			try {
 				return Json(Models.User.Create(userName, fullName, profileId, languageId));
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "usuário", userName, "o login");
+				return ErrorResult(ex, Str._o, Str._um_a, Str.user, userName, Str.theUserName);
 			}
 		}
 

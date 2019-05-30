@@ -1,4 +1,5 @@
 ﻿using DocumentManager.Exceptions;
+using DocumentManager.Localization;
 using DocumentManager.Utils;
 using MySql.Data.MySqlClient;
 using System;
@@ -12,23 +13,29 @@ namespace DocumentManager.Models {
 		public static readonly MemoryCache<DocumentType[]> CachedDocumentTypes = new MemoryCache<DocumentType[]>(CacheStorageRefresher);
 
 		public int Id;
-		public string Name;
+		public Str Name;
 
-		private static void Validate(ref string name) {
-			if (string.IsNullOrWhiteSpace(name))
-				throw new ValidationException("Nome inválido!");
-			if ((name = name.Trim().ToUpper()).Length > 64)
-				throw new ValidationException("Nome muito longo!");
+		private static void Validate(ref string nameEn, ref string namePtBr) {
+			if (string.IsNullOrWhiteSpace(nameEn))
+				throw new ValidationException(Str.InvalidName);
+			if ((nameEn = nameEn.Trim().ToUpper()).Length > 64)
+				throw new ValidationException(Str.NameTooLong);
+
+			if (string.IsNullOrWhiteSpace(namePtBr))
+				throw new ValidationException(Str.InvalidName);
+			if ((namePtBr = namePtBr.Trim().ToUpper()).Length > 64)
+				throw new ValidationException(Str.NameTooLong);
 		}
 
-		public static DocumentType Create(string name) {
-			Validate(ref name);
+		public static DocumentType Create(string nameEn, string namePtBr) {
+			Validate(ref nameEn, ref namePtBr);
 
 			int id;
 
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("INSERT INTO document_type (name) VALUES (@name)", conn)) {
-					cmd.Parameters.AddWithValue("@name", name);
+				using (MySqlCommand cmd = new MySqlCommand("INSERT INTO document_type (name_en, name_ptbr) VALUES (@name_en, @name_ptbr)", conn)) {
+					cmd.Parameters.AddWithValue("@name_en", nameEn);
+					cmd.Parameters.AddWithValue("@name_ptbr", namePtBr);
 					cmd.ExecuteNonQuery();
 				}
 				using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn)) {
@@ -38,16 +45,16 @@ namespace DocumentManager.Models {
 
 			CachedDocumentTypes.Refresh();
 
-			return new DocumentType(id, name);
+			return new DocumentType(id, new Str(nameEn, namePtBr));
 		}
 
 		private static DocumentType[] CacheStorageRefresher() {
 			List<DocumentType> documentTypes = new List<DocumentType>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name FROM document_type ORDER BY name ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM document_type ORDER BY name_en ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
-							documentTypes.Add(new DocumentType(reader.GetInt32(0), reader.GetString(1)));
+							documentTypes.Add(new DocumentType(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2))));
 					}
 				}
 			}
@@ -64,40 +71,39 @@ namespace DocumentManager.Models {
 		}
 
 		public static DocumentType GetById(int id) {
-			DocumentType documentType = null;
+			DocumentType course = null;
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name FROM document_type WHERE id = @id", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM document_type WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", id);
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						if (reader.Read())
-							documentType = new DocumentType(reader.GetInt32(0), reader.GetString(1));
+							course = new DocumentType(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)));
 					}
 				}
 			}
-			return documentType;
+			return course;
 		}
 
 		public DocumentType() {
 		}
 
-		private DocumentType(int id, string name) {
+		private DocumentType(int id, Str name) {
 			Id = id;
 			Name = name;
 		}
 
-		public override string ToString() {
-			return Name;
-		}
+		public override string ToString() => Name.ToString();
 
-		public void Update(string name) {
-			Validate(ref name);
+		public void Update(string nameEn, string namePtBr) {
+			Validate(ref nameEn, ref namePtBr);
 
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("UPDATE document_type SET name = @name WHERE id = @id", conn)) {
-					cmd.Parameters.AddWithValue("@name", name);
+				using (MySqlCommand cmd = new MySqlCommand("UPDATE document_type SET name_en = @name_en, name_ptbr = @name_ptbr WHERE id = @id", conn)) {
+					cmd.Parameters.AddWithValue("@name_en", nameEn);
+					cmd.Parameters.AddWithValue("@name_ptbr", namePtBr);
 					cmd.Parameters.AddWithValue("@id", Id);
 					cmd.ExecuteNonQuery();
-					Name = name;
+					Name = new Str(nameEn, namePtBr);
 				}
 			}
 

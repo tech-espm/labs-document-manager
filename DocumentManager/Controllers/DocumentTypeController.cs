@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using DocumentManager.Models;
 using DocumentManager.Attributes;
+using DocumentManager.Localization;
 
 namespace DocumentManager.Controllers {
 	public class DocumentTypeController : BaseController {
@@ -25,30 +26,30 @@ namespace DocumentManager.Controllers {
 		public IActionResult Edit(int id) {
 			DocumentType documentType = DocumentType.GetById(id);
 			ViewBag.DocumentTypeDelete = LoggedUser.HasFeature(Feature.DocumentTypeDelete);
-			return (documentType == null ? ItemNotFound("o tipo de documento", "Editar Tipo de Documento") : View(documentType));
+			return (documentType == null ? ItemNotFound(Str.theDocumentType, Str.EditDocumentType) : View(documentType));
 		}
 
 		[HttpPost]
 		[AccessControl(Feature.DocumentTypeCreate, true)]
-		public IActionResult Create(string name) {
+		public IActionResult Create(string nameEn, string namePtBr) {
 			try {
-				return Json(DocumentType.Create(name));
+				return Json(DocumentType.Create(nameEn, namePtBr));
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "tipo de documento", name);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.documentType, $"{nameEn} / {namePtBr}");
 			}
 		}
 
 		[HttpPost]
 		[AccessControl(Feature.DocumentTypeEdit, true)]
-		public IActionResult Update(int id, string name) {
+		public IActionResult Update(int id, string nameEn, string namePtBr) {
 			try {
 				DocumentType documentType = DocumentType.GetById(id);
 				if (documentType == null)
-					return ErrorResult("Tipo de documento não encontrado!");
-				documentType.Update(name);
+					return ErrorResult(Str.DocumentTypeNotFound);
+				documentType.Update(nameEn, namePtBr);
 				return Json(documentType);
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "tipo de documento", name);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.documentType, $"{nameEn} / {namePtBr}");
 			}
 		}
 
@@ -59,11 +60,11 @@ namespace DocumentManager.Controllers {
 			try {
 				documentType = DocumentType.GetById(id);
 				if (documentType == null)
-					return ErrorResult("Tipo de documento não encontrado!");
+					return ErrorResult(Str.DocumentTypeNotFound);
 				documentType.Delete();
 				return VoidResult();
 			} catch (Exception ex) {
-				return ErrorResult(ex, "o", "um", "tipo de documento", documentType?.Name);
+				return ErrorResult(ex, Str._O, Str._um_a, Str.documentType, documentType?.Name.ToString());
 			}
 		}
 	}

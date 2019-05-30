@@ -1,4 +1,5 @@
 ﻿using DocumentManager.Exceptions;
+using DocumentManager.Localization;
 using DocumentManager.Utils;
 using MySql.Data.MySqlClient;
 using System;
@@ -15,59 +16,70 @@ namespace DocumentManager.Models {
 		public const int ADMIN_ID = 1;
 
 		public int Id;
-		public string Name;
+		public Str Name;
 		public HashSet<int> Features;
 
 		public static List<KeyValuePair<int, string>> GetAllFeatures() {
 			List<KeyValuePair<int, string>> list = new List<KeyValuePair<int, string>>((int)Feature.Max + 1);
 
-			list.Add(new KeyValuePair<int, string>((int)Feature.CourseCreate, "Cursos: Criação"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.CourseList, "Cursos: Listagem"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.CourseEdit, "Cursos: Edição"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.CourseDelete, "Cursos: Exclusão"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.UnityCreate, $"{Str.Courses}: {Str.Creation}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.UnityList, $"{Str.Courses}: {Str.Listing}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.UnityEdit, $"{Str.Courses}: {Str.Edition}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.UnityDelete, $"{Str.Courses}: {Str.Deletion}"));
 
-			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeCreate, "Tipos de Partição: Criação"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeList, "Tipos de Partição: Listagem"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeEdit, "Tipos de Partição: Edição"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeDelete, "Tipos de Partição: Exclusão"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.CourseCreate, $"{Str.Courses}: {Str.Creation}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.CourseList, $"{Str.Courses}: {Str.Listing}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.CourseEdit, $"{Str.Courses}: {Str.Edition}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.CourseDelete, $"{Str.Courses}: {Str.Deletion}"));
 
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeCreate, "Tipos de Curso: Criação"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeList, "Tipos de Curso: Listagem"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeEdit, "Tipos de Curso: Edição"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeDelete, "Tipos de Curso: Exclusão"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeCreate, $"{Str.PartitionTypes}: {Str.Creation}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeList, $"{Str.PartitionTypes}: {Str.Listing}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeEdit, $"{Str.PartitionTypes}: {Str.Edition}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.PartitionTypeDelete, $"{Str.PartitionTypes}: {Str.Deletion}"));
 
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentCreate, "Documentos: Criação"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentList, "Documentos: Listagem"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentEdit, "Documentos: Edição"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentDelete, "Documentos: Exclusão"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeCreate, $"{Str.DocumentTypes}: {Str.Creation}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeList, $"{Str.DocumentTypes}: {Str.Listing}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeEdit, $"{Str.DocumentTypes}: {Str.Edition}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeDelete, $"{Str.DocumentTypes}: {Str.Deletion}"));
+
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentCreate, $"{Str.Documents}: {Str.Creation}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentList, $"{Str.Documents}: {Str.Listing}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentEdit, $"{Str.Documents}: {Str.Edition}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentDelete, $"{Str.Documents}: {Str.Deletion}"));
 
 			return list;
 		}
 
-		private static void Validate(ref string name, int[] features) {
-			if (string.IsNullOrWhiteSpace(name))
-				throw new ValidationException("Nome inválido!");
-			if ((name = name.Trim().ToUpper()).Length > 64)
-				throw new ValidationException("Nome muito longo!");
+		private static void Validate(ref string nameEn, ref string namePtBr, int[] features) {
+			if (string.IsNullOrWhiteSpace(nameEn))
+				throw new ValidationException(Str.InvalidName);
+			if ((nameEn = nameEn.Trim().ToUpper()).Length > 64)
+				throw new ValidationException(Str.NameTooLong);
+
+			if (string.IsNullOrWhiteSpace(namePtBr))
+				throw new ValidationException(Str.InvalidName);
+			if ((namePtBr = namePtBr.Trim().ToUpper()).Length > 64)
+				throw new ValidationException(Str.NameTooLong);
 
 			if (features != null) {
 				for (int i = features.Length - 1; i >= 0; i--) {
 					if (features[i] > (int)Feature.Max || features[i] < (int)Feature.Min)
-						throw new ValidationException("Permissão inválida!");
+						throw new ValidationException(Str.InvalidPermission);
 				}
 			}
 		}
 
-		public static Profile Create(string name, int[] features) {
-			Validate(ref name, features);
+		public static Profile Create(string nameEn, string namePtBr, int[] features) {
+			Validate(ref nameEn, ref namePtBr, features);
 
 			int id;
 
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlTransaction tran = conn.BeginTransaction()) {
 					try {
-						using (MySqlCommand cmd = new MySqlCommand("INSERT INTO profile (name) VALUES (@name)", conn, tran)) {
-							cmd.Parameters.AddWithValue("@name", name);
+						using (MySqlCommand cmd = new MySqlCommand("INSERT INTO profile (name_en, name_ptbr) VALUES (@name_en, @name_ptbr)", conn, tran)) {
+							cmd.Parameters.AddWithValue("@name_en", nameEn);
+							cmd.Parameters.AddWithValue("@name_ptbr", namePtBr);
 							cmd.ExecuteNonQuery();
 						}
 						using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn, tran)) {
@@ -91,16 +103,16 @@ namespace DocumentManager.Models {
 				}
 			}
 
-			return new Profile(id, name);
+			return new Profile(id, new Str(nameEn, namePtBr));
 		}
 
 		public static List<Profile> GetAll() {
 			List<Profile> profiles = new List<Profile>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name FROM profile ORDER BY name ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM profile ORDER BY name_en ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
-							profiles.Add(new Profile(reader.GetInt32(0), reader.GetString(1)));
+							profiles.Add(new Profile(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2))));
 					}
 				}
 			}
@@ -110,11 +122,11 @@ namespace DocumentManager.Models {
 		public static Profile GetById(int id, bool full) {
 			Profile profile = null;
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name FROM profile WHERE id = @id", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM profile WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", id);
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						if (reader.Read())
-							profile = new Profile(reader.GetInt32(0), reader.GetString(1));
+							profile = new Profile(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)));
 					}
 				}
 				if (full && profile != null) {
@@ -174,29 +186,28 @@ namespace DocumentManager.Models {
 		public Profile() {
 		}
 
-		private Profile(int id, string name) {
+		private Profile(int id, Str name) {
 			Id = id;
 			Name = name;
 		}
 
-		public override string ToString() {
-			return Name;
-		}
+		public override string ToString() => Name.ToString();
 
-		public void Update(string name, int[] features) {
+		public void Update(string nameEn, string namePtBr, int[] features) {
 			if (Id == ADMIN_ID)
-				throw new ValidationException("Não é permitido editar o perfil \"ADMINISTRADOR\"!");
+				throw new ValidationException(Str.EditingProfileNotAllowed);
 
-			Validate(ref name, features);
+			Validate(ref nameEn, ref namePtBr, features);
 
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlTransaction tran = conn.BeginTransaction()) {
 					try {
-						using (MySqlCommand cmd = new MySqlCommand("UPDATE profile SET name = @name WHERE id = @id", conn, tran)) {
-							cmd.Parameters.AddWithValue("@name", name);
+						using (MySqlCommand cmd = new MySqlCommand("UPDATE profile SET name_en = @name_en, name_ptbr = @name_ptbr WHERE id = @id", conn, tran)) {
+							cmd.Parameters.AddWithValue("@name_en", nameEn);
+							cmd.Parameters.AddWithValue("@name_ptbr", namePtBr);
 							cmd.Parameters.AddWithValue("@id", Id);
 							cmd.ExecuteNonQuery();
-							Name = name;
+							Name = new Str(nameEn, namePtBr);
 						}
 						using (MySqlCommand cmd = new MySqlCommand("DELETE FROM profile_feature WHERE profile_id = @profile_id", conn, tran)) {
 							cmd.Parameters.AddWithValue("@profile_id", Id);
@@ -227,7 +238,7 @@ namespace DocumentManager.Models {
 
 		public void Delete() {
 			if (Id == ADMIN_ID)
-				throw new ValidationException("Não é permitido excluir o perfil \"ADMINISTRADOR\"!");
+				throw new ValidationException(Str.DeletingProfileNotAllowed);
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand("DELETE FROM profile WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", Id);

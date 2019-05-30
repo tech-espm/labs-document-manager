@@ -680,32 +680,61 @@ window.prepareDataTableMain = (function () {
 		});
 	};
 })();
-window.months = ["/JAN/", "/FEV/", "/MAR/", "/ABR/", "/MAI/", "/JUN/", "/JUL/", "/AGO/", "/SET/", "/OUT/", "/NOV/", "/DEZ/"];
-window.monthsToInt = { JAN: 1, FEV: 2, MAR: 3, ABR: 4, MAI: 5, JUN: 6, JUL: 7, AGO: 8, SET: 9, OUT: 10, NOV: 11, DEZ: 12 };
-window.formatDateTime = function (utcTicks) {
-	//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
-	//Date has 2 versions for the methods: getXXX() and getUTCXXX()
-	//The constructor always takes the ticks since epoch at UTC
-	//
-	//The getTime() method returns the numeric value corresponding to the time for the specified date according to universal time.
-	//getTime() always uses UTC for time representation.For example, a client browser in one timezone, getTime() will be the same as a client browser in any other timezone.
-	var d = new Date(utcTicks);
-	return format2(d.getUTCDate()) + months[d.getUTCMonth()] + d.getUTCFullYear() + " às " + format2(d.getUTCHours()) + ":" + format2(d.getUTCMinutes());
-	//var tmp = (utcTicks / (64 * 64 * 32)) | 0;
-	//return format2(tmp & 31) + months[(tmp >>> 5) & 15] + (tmp >>> 9) + " às " + format2((tmp >>> 12) & 31) + ":" + format2((tmp >>> 6) & 63);
-};
-window.formatDate = function (utcTicks) {
-	//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
-	//Date has 2 versions for the methods: getXXX() and getUTCXXX()
-	//The constructor always takes the ticks since epoch at UTC
-	//
-	//The getTime() method returns the numeric value corresponding to the time for the specified date according to universal time.
-	//getTime() always uses UTC for time representation.For example, a client browser in one timezone, getTime() will be the same as a client browser in any other timezone.
-	var d = new Date(utcTicks);
-	return format2(d.getUTCDate()) + months[d.getUTCMonth()] + d.getUTCFullYear();
-	//var tmp = (utcTicks / (64 * 64 * 32)) | 0;
-	//return format2(tmp & 31) + months[(tmp >>> 5) & 15] + (tmp >>> 9);
-};
+if (window.currentLanguageId === 1) {
+	window.months = ["JAN/", "FEB/", "MAR/", "APR/", "MAY/", "JUN/", "JUL/", "AUG/", "SEP/", "OCT/", "NOV/", "DEC/"];
+	window.monthsToInt = { JAN: 1, FEB: 2, MAR: 3, APR: 4, MAY: 5, JUN: 6, JUL: 7, AUG: 8, SEP: 9, OCT: 10, NOV: 11, DEC: 12 };
+	window.formatDateTime = function (utcTicks) {
+		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+		//Date has 2 versions for the methods: getXXX() and getUTCXXX()
+		//The constructor always takes the ticks since epoch at UTC
+		//
+		//The getTime() method returns the numeric value corresponding to the time for the specified date according to universal time.
+		//getTime() always uses UTC for time representation.For example, a client browser in one timezone, getTime() will be the same as a client browser in any other timezone.
+		var d = new Date(utcTicks);
+		return months[d.getUTCMonth()] + format2(d.getUTCDate()) + "/" + d.getUTCFullYear() + " at " + format2(d.getUTCHours()) + ":" + format2(d.getUTCMinutes());
+		//var tmp = (utcTicks / (64 * 64 * 32)) | 0;
+		//return format2(tmp & 31) + months[(tmp >>> 5) & 15] + (tmp >>> 9) + " às " + format2((tmp >>> 12) & 31) + ":" + format2((tmp >>> 6) & 63);
+	};
+	window.formatDate = function (utcTicks) {
+		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+		//Date has 2 versions for the methods: getXXX() and getUTCXXX()
+		//The constructor always takes the ticks since epoch at UTC
+		//
+		//The getTime() method returns the numeric value corresponding to the time for the specified date according to universal time.
+		//getTime() always uses UTC for time representation.For example, a client browser in one timezone, getTime() will be the same as a client browser in any other timezone.
+		var d = new Date(utcTicks);
+		return months[d.getUTCMonth()] + format2(d.getUTCDate()) + "/" + d.getUTCFullYear();
+		//var tmp = (utcTicks / (64 * 64 * 32)) | 0;
+		//return format2(tmp & 31) + months[(tmp >>> 5) & 15] + (tmp >>> 9);
+	};
+} else {
+	window.months = ["/JAN/", "/FEV/", "/MAR/", "/ABR/", "/MAI/", "/JUN/", "/JUL/", "/AGO/", "/SET/", "/OUT/", "/NOV/", "/DEZ/"];
+	window.monthsToInt = { JAN: 1, FEV: 2, MAR: 3, ABR: 4, MAI: 5, JUN: 6, JUL: 7, AGO: 8, SET: 9, OUT: 10, NOV: 11, DEZ: 12 };
+	window.formatDateTime = function (utcTicks) {
+		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+		//Date has 2 versions for the methods: getXXX() and getUTCXXX()
+		//The constructor always takes the ticks since epoch at UTC
+		//
+		//The getTime() method returns the numeric value corresponding to the time for the specified date according to universal time.
+		//getTime() always uses UTC for time representation.For example, a client browser in one timezone, getTime() will be the same as a client browser in any other timezone.
+		var d = new Date(utcTicks);
+		return format2(d.getUTCDate()) + months[d.getUTCMonth()] + d.getUTCFullYear() + " às " + format2(d.getUTCHours()) + ":" + format2(d.getUTCMinutes());
+		//var tmp = (utcTicks / (64 * 64 * 32)) | 0;
+		//return format2(tmp & 31) + months[(tmp >>> 5) & 15] + (tmp >>> 9) + " às " + format2((tmp >>> 12) & 31) + ":" + format2((tmp >>> 6) & 63);
+	};
+	window.formatDate = function (utcTicks) {
+		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+		//Date has 2 versions for the methods: getXXX() and getUTCXXX()
+		//The constructor always takes the ticks since epoch at UTC
+		//
+		//The getTime() method returns the numeric value corresponding to the time for the specified date according to universal time.
+		//getTime() always uses UTC for time representation.For example, a client browser in one timezone, getTime() will be the same as a client browser in any other timezone.
+		var d = new Date(utcTicks);
+		return format2(d.getUTCDate()) + months[d.getUTCMonth()] + d.getUTCFullYear();
+		//var tmp = (utcTicks / (64 * 64 * 32)) | 0;
+		//return format2(tmp & 31) + months[(tmp >>> 5) & 15] + (tmp >>> 9);
+	};
+}
 window.parseNoNaN = function (str) {
 	var x = parseInt(trim(str));
 	return (isNaN(x) ? 0 : x);
@@ -902,20 +931,35 @@ window.Validation = {
 		var date = trimValue(input).toUpperCase(), day, month, year, literalMonth = false, i;
 		if (!(new RegExp("[0-9][0-9]?/[0-9][0-9]?/[0-9][0-9][0-9][0-9]")).test(date)) {
 			literalMonth = true;
-			if (!(new RegExp("[0-9][0-9]?/[A-Z][A-Z][A-Z]/[0-9][0-9][0-9][0-9]")).test(date))
-				return 0;
+			if (window.currentLanguageId === 1) {
+				if (!(new RegExp("[A-Z][A-Z][A-Z]/[0-9][0-9]?/[0-9][0-9][0-9][0-9]")).test(date))
+					return 0;
+			} else {
+				if (!(new RegExp("[0-9][0-9]?/[A-Z][A-Z][A-Z]/[0-9][0-9][0-9][0-9]")).test(date))
+					return 0;
+			}
 		}
 		date = date.split("/", 3);
-		if (literalMonth) {
-			date[1] = "/" + date[1] + "/";
-			date[1] = months.indexOf(date[1]);
-			if (date[1] < 0)
-				return 0;
-			date[1]++;
+		if (window.currentLanguageId === 1) {
+			if (literalMonth) {
+				date[0] = monthsToInt[date[0]];
+				if (!date[0])
+					return 0;
+			}
+			month = parseInt(date[0]);
+			day = parseInt(date[1]);
+		} else {
+			if (literalMonth) {
+				date[1] = monthsToInt[date[1]];
+				if (!date[1])
+					return 0;
+			}
+			day = parseInt(date[0]);
+			month = parseInt(date[1]);
 		}
 		if (date.length !== 3 ||
-			isNaN(day = parseInt(date[0])) ||
-			isNaN(month = parseInt(date[1])) ||
+			isNaN(day) ||
+			isNaN(month) ||
 			isNaN(year = parseInt(date[2])) ||
 			day <= 0 ||
 			day > 31 ||

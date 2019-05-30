@@ -42,7 +42,7 @@
 				}
 				<div class="form-group">
 					<label for="name">Nome</label>
-					<input id="name" name="name" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name)" />
+					<input id="name" name="name" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name.ToString())" />
 				</div>
 				<div class="panel panel-default">
 					<div class="panel-heading">Permissões</div>

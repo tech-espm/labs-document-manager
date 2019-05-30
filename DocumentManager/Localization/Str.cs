@@ -82,14 +82,17 @@ namespace DocumentManager.Localization {
 		public static string No => CurrentLanguage == LanguageEn ? "No" : "Não";
 		public static string Close => CurrentLanguage == LanguageEn ? "Close" : "Fechar";
 		public static string Cancel => CurrentLanguage == LanguageEn ? "Cancel" : "Cancelar";
+		public static string Create => CurrentLanguage == LanguageEn ? "Create" : "Criar";
+		public static string Manage => CurrentLanguage == LanguageEn ? "Manage" : "Gerenciar";
 		public static string Delete => CurrentLanguage == LanguageEn ? "Delete" : "Excluir";
 		public static string Edit => CurrentLanguage == LanguageEn ? "Edit" : "Editar";
 		public static string Error => CurrentLanguage == LanguageEn ? "Error" : "Erro";
 		public static string SomethingWentWrong => CurrentLanguage == LanguageEn ? "Something went wrong! 😢" : "Algo saiu muito errado! 😢";
 		public static string Dashboard => "Dashboard";
-		public static string User => CurrentLanguage == LanguageEn ? "User" : "Usuário";
+		public static string UserName => CurrentLanguage == LanguageEn ? "User Name" : "Login";
 		public static string Password => CurrentLanguage == LanguageEn ? "Password" : "Senha";
 		public static string Login => "Login";
+		public static string Logout => "Logout";
 		public static string NoPermission => CurrentLanguage == LanguageEn ? "No Permission" : "Sem Permissão";
 		public static string NoAccessPermission => CurrentLanguage == LanguageEn ? "No access permission 😢" : "Sem permissão de acesso 😢";
 		public static string MyProfile => CurrentLanguage == LanguageEn ? "My Profile" : "Meu Perfil";
@@ -109,9 +112,9 @@ namespace DocumentManager.Localization {
 		public static string AnErrorOccurredWhileReadingTheImage => CurrentLanguage == LanguageEn ? "An error occurred while reading the image: " : "Ocorreu um erro ao ler a foto: ";
 		public static string CreateCourse => CurrentLanguage == LanguageEn ? "Create Course" : "Criar Curso";
 		public static string EditCourse => CurrentLanguage == LanguageEn ? "Edit Course" : "Editar Curso";
+		public static string ManageCourses => CurrentLanguage == LanguageEn ? "Manage Courses" : "Gerenciar Cursos";
 		public static string DoYouReallyWantToDeleteTheCourse => CurrentLanguage == LanguageEn ? "Do you really want to delete the course?" : "Tem certeza que deseja excluir o curso?";
 		public static string ThisOperationCannotBeUndone => CurrentLanguage == LanguageEn ? "This operation cannot be undone!" : "Essa operação NÃO pode ser desfeita!";
-
 		public static string Course => CurrentLanguage == LanguageEn ? "Course" : "Curso";
 		public static string course => CurrentLanguage == LanguageEn ? "course" : "curso";
 		public static string theCourse => CurrentLanguage == LanguageEn ? "the course" : "o curso";
@@ -122,14 +125,54 @@ namespace DocumentManager.Localization {
 		public static string CourseSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Course successfully created! 😄" : "Curso criado com sucesso! 😄";
 		public static string CourseSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Course successfully changed! 😄" : "Curso alterado com sucesso! 😄";
 		public static string CourseNotFound => CurrentLanguage == LanguageEn ? "Course not found!" : "Curso não encontrado!";
-
 		public static string InvalidName => CurrentLanguage == LanguageEn ? "Invalid name!" : "Nome inválido!";
 		public static string InvalidShortName => CurrentLanguage == LanguageEn ? "Invalid short name!" : "Apelido inválido!";
 		public static string NameTooLong => CurrentLanguage == LanguageEn ? "Name too long!" : "Nome muito longo!";
 		public static string ShortNameTooLong => CurrentLanguage == LanguageEn ? "Short name too long!" : "Apelido muito longo!";
-
 		public static string UserOrPasswordIsInvalid => CurrentLanguage == LanguageEn ? "User or password is invalid!" : "Usuário ou senha inválidos!";
 		public static string AnErrorOccurredDuringTheLoginProcess => CurrentLanguage == LanguageEn ? "An error occurred during the login process 😢 - " : "Ocorreu um erro durante o processo de login 😢 - ";
+		public static string PartitionTypes => CurrentLanguage == LanguageEn ? "Partition Types" : "Tipos de Partição";
+		public static string DocumentTypes => CurrentLanguage == LanguageEn ? "Document Types" : "Tipos de Documento";
+		public static string Documents => CurrentLanguage == LanguageEn ? "Documents" : "Documentos";
+		public static string Profiles => CurrentLanguage == LanguageEn ? "Profiles" : "Perfis";
+		public static string Users => CurrentLanguage == LanguageEn ? "Users" : "Usuários";
+		public static string Creation => CurrentLanguage == LanguageEn ? "Creation" : "Criação";
+		public static string Listing => CurrentLanguage == LanguageEn ? "Listing" : "Listagem";
+		public static string Edition => CurrentLanguage == LanguageEn ? "Edition" : "Edição";
+		public static string Deletion => CurrentLanguage == LanguageEn ? "Deletion" : "Exclusão";
+		public static string InvalidPermission => CurrentLanguage == LanguageEn ? "Invalid permission!" : "Permissão inválida!";
+		public static string EditingProfileNotAllowed => CurrentLanguage == LanguageEn ? "Editing the profile \"ADMINISTRATOR\" is not allowed!" : "Não é permitido editar o perfil \"ADMINISTRADOR\"!";
+		public static string DeletingProfileNotAllowed => CurrentLanguage == LanguageEn ? "Deleting the profile \"ADMINISTRATOR\" is not allowed!" : "Não é permitido excluir o perfil \"ADMINISTRADOR\"!";
+		public static string InvalidUserName => CurrentLanguage == LanguageEn ? "Invalid user name!" : "Login inválido!";
+		public static string UserNameTooLong => CurrentLanguage == LanguageEn ? "User name too long!" : "Login muito longo!";
+		public static string UserNameTooShort => CurrentLanguage == LanguageEn ? "User name too short!" : "Login muito curto!";
+		public static string InvalidFullName => CurrentLanguage == LanguageEn ? "Invalid full name!" : "Nome completo inválido!";
+		public static string FullNameTooLong => CurrentLanguage == LanguageEn ? "Full name too long!" : "Nome completo muito longo!";
+		public static string FullNameTooShort => CurrentLanguage == LanguageEn ? "Full name too short!" : "Nome completo muito curto!";
+		public static string ProfileNotFound => CurrentLanguage == LanguageEn ? "Profile not found!" : "Perfil não encontrado!";
+		public static string NO_PROFILE => CurrentLanguage == LanguageEn ? "NO PROFILE" : "SEM PERFIL";
+		public static string UsersCannotActivateThemselves => CurrentLanguage == LanguageEn ? "Users cannot activate themselves!" : "Um usuário não pode ativar a si próprio!";
+		public static string UsersCannotDeactivateThemselves => CurrentLanguage == LanguageEn ? "Users cannot deactivate themselves!" : "Um usuário não pode desativar a si próprio!";
+		public static string UsersCannotResetTheirPassword => CurrentLanguage == LanguageEn ? "Users cannot reset their own password!" : "Um usuário não pode redefinir sua própria senha!";
+		public static string UsersCannotChangeTheirProfile => CurrentLanguage == LanguageEn ? "Users cannot change their own profile!" : "Um usuário não pode definir seu próprio perfil!";
+		public static string InvalidImageFormat => CurrentLanguage == LanguageEn ? "Invalid image format!" : "Imagem com formato inválido!";
+		public static string InvalidImageFile => CurrentLanguage == LanguageEn ? "Invalid image file!" : "Arquivo de imagem com formato inválido!";
+		public static string ErrorSavingProfileImage => CurrentLanguage == LanguageEn ? "Error saving the profile image!" : "Falha na gravação da foto do perfil!";
+		public static string InvalidPassword => CurrentLanguage == LanguageEn ? "Invalid password!" : "Password inválido!";
+		public static string CurrentPasswordDoesNotMatch => CurrentLanguage == LanguageEn ? "Current password does not match \uD83D\uDE22" : "Senha atual não confere \uD83D\uDE22";
+		public static string theDocumentType => CurrentLanguage == LanguageEn ? "the document type" : "o tipo de documento";
+		public static string EditDocumentType => CurrentLanguage == LanguageEn ? "Edit Document Type" : "Editar Tipo de Documento";
+		public static string documentType => CurrentLanguage == LanguageEn ? "document type" : "tipo de documento";
+		public static string DocumentTypeNotFound => CurrentLanguage == LanguageEn ? "Document type not found!" : "Tipo de documento não encontrado!";
+		public static string thePartitionType => CurrentLanguage == LanguageEn ? "the partition type" : "o tipo de partição";
+		public static string EditPartitionType => CurrentLanguage == LanguageEn ? "Edit Partition Type" : "Editar Tipo de Partição";
+		public static string partitionType => CurrentLanguage == LanguageEn ? "partition type" : "tipo de partição";
+		public static string PartitionTypeNotFound => CurrentLanguage == LanguageEn ? "Partition type not found!" : "Tipo de partição não encontrado!";
+		public static string theProfile => CurrentLanguage == LanguageEn ? "the profile" : "o perfil";
+		public static string profile => CurrentLanguage == LanguageEn ? "profile" : "perfil";
+		public static string user => CurrentLanguage == LanguageEn ? "user" : "usuário";
+		public static string theUserName => CurrentLanguage == LanguageEn ? "the user name" : "o login";
+		public static string Units => CurrentLanguage == LanguageEn ? "Units" : "Unidades";
 
 		#endregion
 

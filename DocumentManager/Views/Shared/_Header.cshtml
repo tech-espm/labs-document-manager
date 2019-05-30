@@ -27,6 +27,15 @@
 <link rel="stylesheet" href="~/lib/data-tables/css/data-tables.bootstrap-1.0.7.css" />
 <link rel="stylesheet" href="~/css/admin-1.0.24.css" />
 
+@{
+	User loggedUser = ViewBag.LoggedUser;
+}
+<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+	window.currentLanguageId = @(loggedUser == null ? 0 : loggedUser.LanguageId);
+	//]]>
+</script>
 <script type="text/javascript" src="~/lib/jquery/js/jquery-1.0.1.min.js"></script>
 <script type="text/javascript" src="~/lib/metis-menu/js/metis-menu-1.0.1.min.js"></script>
 <script type="text/javascript" src="~/js/main.js"></script>

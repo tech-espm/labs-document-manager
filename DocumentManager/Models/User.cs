@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using DocumentManager.Exceptions;
 using MySql.Data.MySqlClient;
 using Microsoft.AspNetCore.Mvc;
+using DocumentManager.Localization;
 
 namespace DocumentManager.Models {
 	public class User {
@@ -222,18 +223,18 @@ namespace DocumentManager.Models {
 		private static void Validate(ref string userName, ref string fullName) {
 			if (userName != "admin") {
 				if (string.IsNullOrWhiteSpace(userName) || userName.IndexOf('=') >= 0 || userName.IndexOf('@') <= 0)
-					throw new ValidationException("Login inválido!");
+					throw new ValidationException(Str.InvalidUserName);
 				if ((userName = userName.Trim().ToLower()).Length > 64)
-					throw new ValidationException("Login muito longo!");
+					throw new ValidationException(Str.UserNameTooLong);
 				if (userName.Length < 10)
-					throw new ValidationException("Login muito curto!");
+					throw new ValidationException(Str.UserNameTooShort);
 			}
 			if (string.IsNullOrWhiteSpace(fullName) || fullName.IndexOf('=') >= 0)
-				throw new ValidationException("Nome completo inválido!");
+				throw new ValidationException(Str.InvalidFullName);
 			if ((fullName = fullName.Trim().ToUpper()).Length > 64)
-				throw new ValidationException("Nome completo muito longo!");
+				throw new ValidationException(Str.FullNameTooLong);
 			if (fullName.Length < 3)
-				throw new ValidationException("Nome completo muito curto!");
+				throw new ValidationException(Str.FullNameTooShort);
 		}
 
 		public static User Create(string userName, string fullName, int profileId, int languageId) {
@@ -247,7 +248,7 @@ namespace DocumentManager.Models {
 						cmd.Parameters.AddWithValue("@profile_id", profileId);
 						object o = cmd.ExecuteScalar();
 						if (o == null || o == DBNull.Value)
-							throw new ValidationException("Perfil não encontrado!");
+							throw new ValidationException(Str.ProfileNotFound);
 					}
 				}
 				using (MySqlCommand cmd = new MySqlCommand("INSERT INTO user (user_name, full_name, password, profile_id, language_id, picture_version, active, token_low, token_high) VALUES (@user_name, @full_name, @password, @profile_id, @language_id, 0, 1, 0, 0)", conn)) {
@@ -271,9 +272,10 @@ namespace DocumentManager.Models {
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand("SELECT u.id, u.user_name, u.full_name, u.profile_id, u.language_id, p.name, u.active, u.picture_version FROM user u LEFT JOIN profile p ON p.id = u.profile_id ORDER BY p.name ASC, u.user_name ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
+						string noProfile = Str.NO_PROFILE;
 						while (reader.Read())
 							users.Add(new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(4), reader.GetInt32(7), reader.GetBoolean(6), 0, 0) {
-								ProfileName = (reader.IsDBNull(4) ? "SEM PERFIL" : reader.GetString(5))
+								ProfileName = (reader.IsDBNull(4) ? noProfile : reader.GetString(5))
 							});
 					}
 				}
@@ -314,7 +316,7 @@ namespace DocumentManager.Models {
 
 		public void Activate(int id) {
 			if (Id == id)
-				throw new ValidationException("Um usuário não pode ativar a si próprio!");
+				throw new ValidationException(Str.UsersCannotActivateThemselves);
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET active = 1, token_low = 0, token_high = 0 WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", id);
@@ -331,7 +333,7 @@ namespace DocumentManager.Models {
 
 		public void Deactivate(int id) {
 			if (Id == id)
-				throw new ValidationException("Um usuário não pode desativar a si próprio!");
+				throw new ValidationException(Str.UsersCannotDeactivateThemselves);
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET active = 0, token_low = 0, token_high = 0 WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@id", id);
@@ -348,7 +350,7 @@ namespace DocumentManager.Models {
 
 		public void ResetPassword(int id) {
 			if (Id == id)
-				throw new ValidationException("Um usuário não pode redefinir sua própria senha!");
+				throw new ValidationException(Str.UsersCannotResetTheirPassword);
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET password = @password, token_low = 0, token_high = 0 WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@password", DefaultPassword);
@@ -366,13 +368,13 @@ namespace DocumentManager.Models {
 
 		public void SetProfile(int id, int profileId) {
 			if (Id == id)
-				throw new ValidationException("Um usuário não pode definir seu próprio perfil!");
+				throw new ValidationException(Str.UsersCannotChangeTheirProfile);
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand("SELECT 1 FROM profile WHERE id = @profile_id LIMIT 1", conn)) {
 					cmd.Parameters.AddWithValue("@profile_id", profileId);
 					object o = cmd.ExecuteScalar();
 					if (o == null || o == DBNull.Value)
-						throw new ValidationException("Perfil não encontrado!");
+						throw new ValidationException(Str.ProfileNotFound);
 				}
 				using (MySqlCommand cmd = new MySqlCommand("UPDATE user SET profile_id = @profile_id, token_low = 0, token_high = 0 WHERE id = @id", conn)) {
 					cmd.Parameters.AddWithValue("@profile_id", profileId);
@@ -448,7 +450,7 @@ namespace DocumentManager.Models {
 					else if (picture.StartsWith("data:image/png;base64,"))
 						picture = picture.Substring(22);
 					else
-						throw new ValidationException("Imagem com formato inválido!");
+						throw new ValidationException(Str.InvalidImageFormat);
 
 					buffer = Convert.FromBase64String(picture);
 
@@ -468,13 +470,13 @@ namespace DocumentManager.Models {
 						}
 					}
 				} catch {
-					throw new ValidationException("Arquivo de imagem inválido!");
+					throw new ValidationException(Str.InvalidImageFile);
 				}
 
 				try {
 					File.WriteAllBytes(Storage.UserProfilePicture(Id), buffer);
 				} catch {
-					throw new ValidationException("Falha na gravação da foto do perfil!");
+					throw new ValidationException(Str.ErrorSavingProfileImage);
 				}
 
 				Interlocked.Increment(ref PictureVersion);
@@ -489,13 +491,13 @@ namespace DocumentManager.Models {
 				if (newPassword == null) newPassword = "";
 				if (newPassword2 == null) newPassword2 = "";
 				if (password.Length == 0 || newPassword.Length == 0 || newPassword2.Length == 0 || newPassword != newPassword2 || newPassword.Length > 20)
-					throw new ValidationException("Senha inválida!");
+					throw new ValidationException(Str.InvalidPassword);
 				using (MySqlConnection conn = Sql.OpenConnection()) {
 					using (MySqlCommand cmd = new MySqlCommand("SELECT password FROM user WHERE id = @id", conn)) {
 						cmd.Parameters.AddWithValue("@id", Id);
 						using (MySqlDataReader reader = cmd.ExecuteReader()) {
 							if (!reader.Read() || !PasswordHash.ValidatePassword(password, reader.GetString(0)))
-								throw new ValidationException("Senha atual não confere \uD83D\uDE22");
+								throw new ValidationException(Str.CurrentPasswordDoesNotMatch);
 						}
 					}
 

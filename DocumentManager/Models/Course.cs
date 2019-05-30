@@ -10,6 +10,8 @@ using System.Web;
 
 namespace DocumentManager.Models {
 	public class Course {
+		public static readonly MemoryCache<Course[]> CachedCourses = new MemoryCache<Course[]>(CacheStorageRefresher);
+
 		public int Id;
 		public Str Name, ShortName;
 
@@ -53,20 +55,31 @@ namespace DocumentManager.Models {
 				}
 			}
 
+			CachedCourses.Refresh();
+
 			return new Course(id, new Str(nameEn, namePtBr), new Str(shortNameEn, shortNamePtBr));
 		}
 
-		public static List<Course> GetAll() {
+		private static Course[] CacheStorageRefresher() {
 			List<Course> courses = new List<Course>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM course ORDER BY name ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM course ORDER BY name_en ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							courses.Add(new Course(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)), new Str(reader.GetString(3), reader.GetString(4))));
 					}
 				}
 			}
-			return courses;
+			return courses.ToArray();
+		}
+
+		public static Course[] GetAll() {
+			Course[] cachedCourses = CachedCourses.StartReading();
+			try {
+				return cachedCourses;
+			} finally {
+				CachedCourses.FinishReading();
+			}
 		}
 
 		public static Course GetById(int id) {
@@ -109,6 +122,8 @@ namespace DocumentManager.Models {
 					ShortName = new Str(shortNameEn, shortNamePtBr);
 				}
 			}
+
+			CachedCourses.Refresh();
 		}
 
 		public void Delete() {
@@ -118,6 +133,8 @@ namespace DocumentManager.Models {
 					cmd.ExecuteNonQuery();
 				}
 			}
+
+			CachedCourses.Refresh();
 		}
 	}
 }
