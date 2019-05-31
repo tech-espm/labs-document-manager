@@ -48,6 +48,8 @@ CREATE TABLE unity (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	name_en VARCHAR(64) NOT NULL,
 	name_ptbr VARCHAR(64) NOT NULL,
+	short_name_en VARCHAR(16) NOT NULL,
+	short_name_ptbr VARCHAR(16) NOT NULL,
 	UNIQUE KEY unity_name_en_un (name_en),
 	UNIQUE KEY unity_name_ptbr_un (name_ptbr)
 );

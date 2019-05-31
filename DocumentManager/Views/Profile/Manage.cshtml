@@ -1,6 +1,6 @@
 ﻿@model List<Profile>
 @{
-	ViewBag.Title = "Gerenciar Perfis";
+	ViewBag.Title = Str.ManageProfiles;
 }
 
 <div class="row">
@@ -21,10 +21,11 @@
 		window.dataTableMain = prepareDataTable("dataTableMain", {
 			order: [[0, "asc"]],
 			columns: [
-				{ title: "Nome", "class": "col-max", render: encode, data: "name" },
+				{ title: "@Str.Name (@Str.English)", "class": "col-50", render: encode, data: "name.valueEn" },
+				{ title: "@Str.Name (@Str.Portuguese)", "class": "col-50", render: encode, data: "name.valuePtBr" },
 				@if (ViewBag.ProfileEdit == true) {
 				<text>
-				{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return "<a target=\"_blank\" title=\"Editar\" href=\"@(Url.Action("Edit"))?id=" + row.id + "\" class=\"btn btn-outline btn-primary\"><i class=\"fa fa-nomargin fa-edit\"></i></a>"; } },
+				{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return "<a target=\"_blank\" title=\"@Str.Edit\" href=\"@(Url.Action("Edit"))?id=" + row.id + "\" class=\"btn btn-outline btn-primary\"><i class=\"fa fa-nomargin fa-edit\"></i></a>"; } },
 				</text>
 				} else {
 				<text>
@@ -34,7 +35,7 @@
 			],
 			data: @Json.Serialize(Model),
 			deferRender: true,
-			export: { title: "Perfis" }
+			export: { title: "@Str.Profiles" }
 		});
 		prepareDataTableMain();
 

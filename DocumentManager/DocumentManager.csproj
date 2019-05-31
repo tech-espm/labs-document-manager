@@ -25,6 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Unity\Edit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Unity\Manage.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\DocumentType\Edit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

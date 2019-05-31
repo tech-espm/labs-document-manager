@@ -72,6 +72,10 @@ namespace DocumentManager.Localization {
 		public static string _uma_a => CurrentLanguage == LanguageEn ? "a" : "uma";
 		public static string _um_an => CurrentLanguage == LanguageEn ? "an" : "um";
 		public static string _uma_an => CurrentLanguage == LanguageEn ? "an" : "uma";
+		public static string _Todos => CurrentLanguage == LanguageEn ? "All" : "Todos";
+		public static string _Todas => CurrentLanguage == LanguageEn ? "All" : "Todas";
+		public static string _Nenhum => CurrentLanguage == LanguageEn ? "None" : "Nenhum";
+		public static string _Nenhuma => CurrentLanguage == LanguageEn ? "None" : "Nenhuma";
 
 		public static string AppName => CurrentLanguage == LanguageEn ? "Repository of Academic Documents" : "Repositório de Documentos Acadêmicos";
 		public static string Language => CurrentLanguage == LanguageEn ? "Language" : "Idioma";
@@ -179,12 +183,31 @@ namespace DocumentManager.Localization {
 		public static string DocumentTypeSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Document type successfully created! 😄" : "Tipo de documento criado com sucesso! 😄";
 		public static string DocumentTypeSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Document type successfully changed! 😄" : "Tipo de documento alterado com sucesso! 😄";
 		public static string ManageDocumentTypes => CurrentLanguage == LanguageEn ? "Manage Document Types" : "Gerenciar Tipos de Documento";
+
 		public static string CreatePartitionType => CurrentLanguage == LanguageEn ? "Create Partition Type" : "Criar Tipo de Partição";
 		public static string DoYouReallyWantToDeleteThePartitionType => CurrentLanguage == LanguageEn ? "Do you really want to delete the partition type?" : "Tem certeza que deseja excluir o tipo de partição?";
 		public static string PartitionTypesBasicInformation => CurrentLanguage == LanguageEn ? "Partition Type's Basic Information" : "Informações Básicas do Tipo de Partição";
 		public static string PartitionTypeSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Partition type successfully created! 😄" : "Tipo de partição criado com sucesso! 😄";
 		public static string PartitionTypeSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Partition type successfully changed! 😄" : "Tipo de partição alterado com sucesso! 😄";
 		public static string ManagePartitionTypes => CurrentLanguage == LanguageEn ? "Manage Partition Types" : "Gerenciar Tipos de Partição";
+
+		public static string CreateUnity => CurrentLanguage == LanguageEn ? "Create Unity" : "Criar Unidade";
+		public static string DoYouReallyWantToDeleteTheUnity => CurrentLanguage == LanguageEn ? "Do you really want to delete the unity?" : "Tem certeza que deseja excluir a unidade?";
+		public static string UnitsBasicInformation => CurrentLanguage == LanguageEn ? "Unity's Basic Information" : "Informações Básicas da Unidade";
+		public static string UnitySuccessfullyCreated => CurrentLanguage == LanguageEn ? "Unity successfully created! 😄" : "Unidade criada com sucesso! 😄";
+		public static string UnitySuccessfullyChanged => CurrentLanguage == LanguageEn ? "Unity successfully changed! 😄" : "Unidade alterada com sucesso! 😄";
+		public static string ManageUnits => CurrentLanguage == LanguageEn ? "Manage Units" : "Gerenciar Unidades";
+		public static string unity => CurrentLanguage == LanguageEn ? "unity" : "unidade";
+		public static string theUnity => CurrentLanguage == LanguageEn ? "the unity" : "a unidade";
+		public static string EditUnity => CurrentLanguage == LanguageEn ? "Units" : "Unidades";
+		public static string UnityNotFound => CurrentLanguage == LanguageEn ? "Unity not found!" : "Unidade não encontrada!";
+
+		public static string CreateProfile => CurrentLanguage == LanguageEn ? "Create Profile" : "Criar Perfil";
+		public static string DoYouReallyWantToDeleteTheProfile => CurrentLanguage == LanguageEn ? "Do you really want to delete the profile?" : "Tem certeza que deseja excluir o perfil?";
+		public static string ProfilesBasicInformation => CurrentLanguage == LanguageEn ? "Profile's Basic Information" : "Informações Básicas do Perfil";
+		public static string ProfileSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Profile successfully created! 😄" : "Perfil criado com sucesso! 😄";
+		public static string ManageProfiles => CurrentLanguage == LanguageEn ? "Manage Units" : "Gerenciar Unidades";
+		public static string Permissions => CurrentLanguage == LanguageEn ? "Permissions" : "Permissões";
 
 		#endregion
 
