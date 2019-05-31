@@ -173,6 +173,18 @@ namespace DocumentManager.Localization {
 		public static string user => CurrentLanguage == LanguageEn ? "user" : "usuário";
 		public static string theUserName => CurrentLanguage == LanguageEn ? "the user name" : "o login";
 		public static string Units => CurrentLanguage == LanguageEn ? "Units" : "Unidades";
+		public static string CreateDocumentType => CurrentLanguage == LanguageEn ? "Create Document Type" : "Criar Tipo de Documento";
+		public static string DoYouReallyWantToDeleteTheDocumentType => CurrentLanguage == LanguageEn ? "Do you really want to delete the document type?" : "Tem certeza que deseja excluir o tipo de documento?";
+		public static string DocumentTypesBasicInformation => CurrentLanguage == LanguageEn ? "Document Type's Basic Information" : "Informações Básicas do Tipo de Documento";
+		public static string DocumentTypeSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Document type successfully created! 😄" : "Tipo de documento criado com sucesso! 😄";
+		public static string DocumentTypeSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Document type successfully changed! 😄" : "Tipo de documento alterado com sucesso! 😄";
+		public static string ManageDocumentTypes => CurrentLanguage == LanguageEn ? "Manage Document Types" : "Gerenciar Tipos de Documento";
+		public static string CreatePartitionType => CurrentLanguage == LanguageEn ? "Create Partition Type" : "Criar Tipo de Partição";
+		public static string DoYouReallyWantToDeleteThePartitionType => CurrentLanguage == LanguageEn ? "Do you really want to delete the partition type?" : "Tem certeza que deseja excluir o tipo de partição?";
+		public static string PartitionTypesBasicInformation => CurrentLanguage == LanguageEn ? "Partition Type's Basic Information" : "Informações Básicas do Tipo de Partição";
+		public static string PartitionTypeSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Partition type successfully created! 😄" : "Tipo de partição criado com sucesso! 😄";
+		public static string PartitionTypeSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Partition type successfully changed! 😄" : "Tipo de partição alterado com sucesso! 😄";
+		public static string ManagePartitionTypes => CurrentLanguage == LanguageEn ? "Manage Partition Types" : "Gerenciar Tipos de Partição";
 
 		#endregion
 

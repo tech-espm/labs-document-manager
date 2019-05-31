@@ -1,4 +1,4 @@
-﻿@model List<Course>
+﻿@model Course[]
 @{
 	ViewBag.Title = Str.ManageCourses;
 }
@@ -21,8 +21,8 @@
 		window.dataTableMain = prepareDataTable("dataTableMain", {
 			order: [[0, "asc"]],
 			columns: [
-				{ title: "@Str.Name (@Str.English)", render: encode, data: "name.valueEn" },
-				{ title: "@Str.Name (@Str.Portuguese)", render: encode, data: "name.valuePtBr" },
+				{ title: "@Str.Name (@Str.English)", "class": "col-50", render: encode, data: "name.valueEn" },
+				{ title: "@Str.Name (@Str.Portuguese)", "class": "col-50", render: encode, data: "name.valuePtBr" },
 				{ title: "@Str.ShortName (@Str.English)", "class": "col-min", render: encode, data: "shortName.valueEn" },
 				{ title: "@Str.ShortName (@Str.Portuguese)", "class": "col-min", render: encode, data: "shortName.valuePtBr" },
 				@if (ViewBag.CourseEdit == true) {
