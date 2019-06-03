@@ -185,14 +185,12 @@ namespace DocumentManager.Localization {
 		public static string DocumentTypeSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Document type successfully created! 😄" : "Tipo de documento criado com sucesso! 😄";
 		public static string DocumentTypeSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Document type successfully changed! 😄" : "Tipo de documento alterado com sucesso! 😄";
 		public static string ManageDocumentTypes => CurrentLanguage == LanguageEn ? "Manage Document Types" : "Gerenciar Tipos de Documento";
-
 		public static string CreatePartitionType => CurrentLanguage == LanguageEn ? "Create Partition Type" : "Criar Tipo de Partição";
 		public static string DoYouReallyWantToDeleteThePartitionType => CurrentLanguage == LanguageEn ? "Do you really want to delete the partition type?" : "Tem certeza que deseja excluir o tipo de partição?";
 		public static string PartitionTypesBasicInformation => CurrentLanguage == LanguageEn ? "Partition Type's Basic Information" : "Informações Básicas do Tipo de Partição";
 		public static string PartitionTypeSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Partition type successfully created! 😄" : "Tipo de partição criado com sucesso! 😄";
 		public static string PartitionTypeSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Partition type successfully changed! 😄" : "Tipo de partição alterado com sucesso! 😄";
 		public static string ManagePartitionTypes => CurrentLanguage == LanguageEn ? "Manage Partition Types" : "Gerenciar Tipos de Partição";
-
 		public static string CreateUnity => CurrentLanguage == LanguageEn ? "Create Unity" : "Criar Unidade";
 		public static string DoYouReallyWantToDeleteTheUnity => CurrentLanguage == LanguageEn ? "Do you really want to delete the unity?" : "Tem certeza que deseja excluir a unidade?";
 		public static string UnitsBasicInformation => CurrentLanguage == LanguageEn ? "Unity's Basic Information" : "Informações Básicas da Unidade";
@@ -203,14 +201,12 @@ namespace DocumentManager.Localization {
 		public static string theUnity => CurrentLanguage == LanguageEn ? "the unity" : "a unidade";
 		public static string EditUnity => CurrentLanguage == LanguageEn ? "Units" : "Unidades";
 		public static string UnityNotFound => CurrentLanguage == LanguageEn ? "Unity not found!" : "Unidade não encontrada!";
-
 		public static string CreateProfile => CurrentLanguage == LanguageEn ? "Create Profile" : "Criar Perfil";
 		public static string DoYouReallyWantToDeleteTheProfile => CurrentLanguage == LanguageEn ? "Do you really want to delete the profile?" : "Tem certeza que deseja excluir o perfil?";
 		public static string ProfilesBasicInformation => CurrentLanguage == LanguageEn ? "Profile's Basic Information" : "Informações Básicas do Perfil";
 		public static string ProfileSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Profile successfully created! 😄" : "Perfil criado com sucesso! 😄";
 		public static string ManageProfiles => CurrentLanguage == LanguageEn ? "Manage Profiles" : "Gerenciar Perfis";
 		public static string Permissions => CurrentLanguage == LanguageEn ? "Permissions" : "Permissões";
-
 		public static string SELECT => CurrentLanguage == LanguageEn ? "SELECT..." : "SELECIONE...";
 		public static string CreateUser => CurrentLanguage == LanguageEn ? "Create User" : "Criar Usuário";
 		public static string UsersBasicInformation => CurrentLanguage == LanguageEn ? "User's Basic Information" : "Informações Básicas do Usuário";
@@ -228,23 +224,50 @@ namespace DocumentManager.Localization {
 		public static string DoYouReallyWantToResetUsersPasswordEnd => CurrentLanguage == LanguageEn ? "'s password to \\\"1234\\\"?" : " para \\\"1234\\\"?";
 		public static string PasswordSuccessfullyResetTo1234 => CurrentLanguage == LanguageEn ? "Password successfully reset to \\\"1234\\\"! 😄" : "Senha redefinida para \\\"1234\\\" com sucesso! 😄";
 
+		public static string Tag => CurrentLanguage == LanguageEn ? "Tag" : "Etiqueta";
+		public static string Tags => CurrentLanguage == LanguageEn ? "Tags" : "Etiquetas";
+		public static string tag => CurrentLanguage == LanguageEn ? "tag" : "etiqueta";
+		public static string theTag => CurrentLanguage == LanguageEn ? "the tag" : "a etiqueta";
+		public static string TagNotFound => CurrentLanguage == LanguageEn ? "Tag not found!" : "Etiqueta não encontrada!";
+		public static string CreateTag => CurrentLanguage == LanguageEn ? "Create Tag" : "Criar Etiqueta";
+		public static string EditTag => CurrentLanguage == LanguageEn ? "Edit Tag" : "Editar Etiqueta";
+		public static string ManageTags => CurrentLanguage == LanguageEn ? "Manage Tags" : "Gerenciar Etiquetas";
+		public static string value => CurrentLanguage == LanguageEn ? "value" : "valor";
+		public static string values => CurrentLanguage == LanguageEn ? "values" : "valores";
+		public static string Value => CurrentLanguage == LanguageEn ? "Value" : "Valor";
+		public static string Values => CurrentLanguage == LanguageEn ? "Values" : "Valores";
+		public static string DoYouReallyWantToDeleteTheTag => CurrentLanguage == LanguageEn ? "Do you really want to delete the tag?" : "Tem certeza que deseja excluir a etiqueta?";
+		public static string TagsBasicInformation => CurrentLanguage == LanguageEn ? "Tag's Basic Information" : "Informações Básicas da Etiqueta";
+		public static string TagSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Tag successfully created! 😄" : "Etiqueta criada com sucesso! 😄";
+		public static string TagSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Tag successfully changed! 😄" : "Etiqueta alterada com sucesso! 😄";
+		public static string InvalidValue => CurrentLanguage == LanguageEn ? "Invalid value!" : "Valor inválido!";
+		public static string ValueTooLong => CurrentLanguage == LanguageEn ? "Value too long!" : "Valor muito longo!";
+
 		#endregion
 
 		#region Localizable String
-		public readonly string ValueEn, ValuePtBr;
-		private readonly string CurrentValue;
+		public string ValueEn, ValuePtBr;
+
+		public Str() {
+		}
 
 		public Str(string valueEn, string valuePtBr) {
 			ValueEn = valueEn;
 			ValuePtBr = valuePtBr;
-			CurrentValue = (CurrentLanguage == LanguageEn ? valueEn : valuePtBr);
 		}
 
-		public override string ToString() => CurrentValue;
+		public override string ToString() => (CurrentLanguage == LanguageEn ? ValueEn : ValuePtBr);
 
-		public override bool Equals(object obj) => CurrentValue.Equals(obj);
+		public override bool Equals(object obj) => ((obj is Str str) ? (str.ValueEn == ValueEn && str.ValuePtBr == ValuePtBr) : false);
 
-		public override int GetHashCode() => CurrentValue.GetHashCode();
+		public override int GetHashCode() => ValueEn.GetHashCode() ^ ValuePtBr.GetHashCode();
+
+		public void Normalize() {
+			ValueEn = (ValueEn ?? "").Trim().ToUpper();
+			ValuePtBr = (ValuePtBr ?? "").Trim().ToUpper();
+		}
+
+		public bool IsNullOrWhiteSpace => (string.IsNullOrWhiteSpace(ValueEn) || string.IsNullOrWhiteSpace(ValuePtBr));
 		#endregion
 	}
 }

@@ -22,6 +22,11 @@ namespace DocumentManager.Models {
 		public static List<KeyValuePair<int, string>> GetAllFeatures() {
 			List<KeyValuePair<int, string>> list = new List<KeyValuePair<int, string>>((int)Feature.Max + 1);
 
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentCreate, $"{Str.Documents}: {Str.Creation}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentList, $"{Str.Documents}: {Str.Listing}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentEdit, $"{Str.Documents}: {Str.Edition}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentDelete, $"{Str.Documents}: {Str.Deletion}"));
+
 			list.Add(new KeyValuePair<int, string>((int)Feature.UnityCreate, $"{Str.Courses}: {Str.Creation}"));
 			list.Add(new KeyValuePair<int, string>((int)Feature.UnityList, $"{Str.Courses}: {Str.Listing}"));
 			list.Add(new KeyValuePair<int, string>((int)Feature.UnityEdit, $"{Str.Courses}: {Str.Edition}"));
@@ -42,23 +47,20 @@ namespace DocumentManager.Models {
 			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeEdit, $"{Str.DocumentTypes}: {Str.Edition}"));
 			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentTypeDelete, $"{Str.DocumentTypes}: {Str.Deletion}"));
 
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentCreate, $"{Str.Documents}: {Str.Creation}"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentList, $"{Str.Documents}: {Str.Listing}"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentEdit, $"{Str.Documents}: {Str.Edition}"));
-			list.Add(new KeyValuePair<int, string>((int)Feature.DocumentDelete, $"{Str.Documents}: {Str.Deletion}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.TagCreate, $"{Str.Tags}: {Str.Creation}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.TagList, $"{Str.Tags}: {Str.Listing}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.TagEdit, $"{Str.Tags}: {Str.Edition}"));
+			list.Add(new KeyValuePair<int, string>((int)Feature.TagDelete, $"{Str.Tags}: {Str.Deletion}"));
 
 			return list;
 		}
 
 		private static void Validate(ref string nameEn, ref string namePtBr, int[] features) {
-			if (string.IsNullOrWhiteSpace(nameEn))
+			if (string.IsNullOrWhiteSpace(nameEn) ||
+				string.IsNullOrWhiteSpace(namePtBr))
 				throw new ValidationException(Str.InvalidName);
-			if ((nameEn = nameEn.Trim().ToUpper()).Length > 64)
-				throw new ValidationException(Str.NameTooLong);
-
-			if (string.IsNullOrWhiteSpace(namePtBr))
-				throw new ValidationException(Str.InvalidName);
-			if ((namePtBr = namePtBr.Trim().ToUpper()).Length > 64)
+			if ((nameEn = nameEn.Trim().ToUpper()).Length > 64 ||
+				(namePtBr = namePtBr.Trim().ToUpper()).Length > 64)
 				throw new ValidationException(Str.NameTooLong);
 
 			if (features != null) {
@@ -109,7 +111,7 @@ namespace DocumentManager.Models {
 		public static List<Profile> GetAll() {
 			List<Profile> profiles = new List<Profile>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM profile ORDER BY name_en ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand($"SELECT id, name_en, name_ptbr FROM profile ORDER BY name{Str._FieldSuffix} ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							profiles.Add(new Profile(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2))));

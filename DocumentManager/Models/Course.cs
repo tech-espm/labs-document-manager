@@ -16,24 +16,18 @@ namespace DocumentManager.Models {
 		public Str Name, ShortName;
 
 		private static void Validate(ref string nameEn, ref string namePtBr, ref string shortNameEn, ref string shortNamePtBr) {
-			if (string.IsNullOrWhiteSpace(nameEn))
+			if (string.IsNullOrWhiteSpace(nameEn) ||
+				string.IsNullOrWhiteSpace(namePtBr))
 				throw new ValidationException(Str.InvalidName);
-			if ((nameEn = nameEn.Trim().ToUpper()).Length > 64)
+			if ((nameEn = nameEn.Trim().ToUpper()).Length > 64 ||
+				(namePtBr = namePtBr.Trim().ToUpper()).Length > 64)
 				throw new ValidationException(Str.NameTooLong);
 
-			if (string.IsNullOrWhiteSpace(namePtBr))
-				throw new ValidationException(Str.InvalidName);
-			if ((namePtBr = namePtBr.Trim().ToUpper()).Length > 64)
-				throw new ValidationException(Str.NameTooLong);
-
-			if (string.IsNullOrWhiteSpace(shortNameEn))
+			if (string.IsNullOrWhiteSpace(shortNameEn) ||
+				string.IsNullOrWhiteSpace(shortNamePtBr))
 				throw new ValidationException(Str.InvalidShortName);
-			if ((shortNameEn = shortNameEn.Trim().ToUpper()).Length > 16)
-				throw new ValidationException(Str.ShortNameTooLong);
-
-			if (string.IsNullOrWhiteSpace(shortNamePtBr))
-				throw new ValidationException(Str.InvalidShortName);
-			if ((shortNamePtBr = shortNamePtBr.Trim().ToUpper()).Length > 16)
+			if ((shortNameEn = shortNameEn.Trim().ToUpper()).Length > 16 ||
+				(shortNamePtBr = shortNamePtBr.Trim().ToUpper()).Length > 16)
 				throw new ValidationException(Str.ShortNameTooLong);
 		}
 
@@ -63,7 +57,7 @@ namespace DocumentManager.Models {
 		private static Course[] CacheStorageRefresher() {
 			List<Course> courses = new List<Course>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM course ORDER BY name_en ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand($"SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM course ORDER BY name{Str._FieldSuffix} ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							courses.Add(new Course(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)), new Str(reader.GetString(3), reader.GetString(4))));

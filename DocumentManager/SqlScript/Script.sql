@@ -79,3 +79,24 @@ CREATE TABLE document_type (
 	UNIQUE KEY document_type_name_en_un (name_en),
 	UNIQUE KEY document_type_name_ptbr_un (name_ptbr)
 );
+
+CREATE TABLE tag (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name_en VARCHAR(64) NOT NULL,
+	name_ptbr VARCHAR(64) NOT NULL,
+	UNIQUE KEY profile_name_en_un (name_en),
+	UNIQUE KEY profile_name_ptbr_un (name_ptbr)
+);
+
+CREATE TABLE tag_value (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	tag_id INT NOT NULL,
+	position INT NOT NULL,
+	name_en VARCHAR(64) NOT NULL,
+	name_ptbr VARCHAR(64) NOT NULL,
+	CONSTRAINT tag_value_tag_id_fk
+		FOREIGN KEY (tag_id)
+		REFERENCES tag (id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+);

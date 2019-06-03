@@ -28,13 +28,18 @@ namespace DocumentManager.Models {
 		DocumentTypeEdit = 15,
 		DocumentTypeDelete = 16,
 
-		DocumentCreate = 17,
-		DocumentList = 18,
-		DocumentEdit = 19,
-		DocumentDelete = 20,
+		TagCreate = 17,
+		TagList = 18,
+		TagEdit = 19,
+		TagDelete = 20,
+
+		DocumentCreate = 21,
+		DocumentList = 22,
+		DocumentEdit = 23,
+		DocumentDelete = 24,
 
 		Min = 1,
-		Max = 20,
+		Max = 24,
 
 		// These features cannot be assigned to regular profiles, only
 		// administrators can work with them! That's why their values

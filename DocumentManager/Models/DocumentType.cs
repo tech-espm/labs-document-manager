@@ -16,14 +16,11 @@ namespace DocumentManager.Models {
 		public Str Name;
 
 		private static void Validate(ref string nameEn, ref string namePtBr) {
-			if (string.IsNullOrWhiteSpace(nameEn))
+			if (string.IsNullOrWhiteSpace(nameEn) ||
+				string.IsNullOrWhiteSpace(namePtBr))
 				throw new ValidationException(Str.InvalidName);
-			if ((nameEn = nameEn.Trim().ToUpper()).Length > 64)
-				throw new ValidationException(Str.NameTooLong);
-
-			if (string.IsNullOrWhiteSpace(namePtBr))
-				throw new ValidationException(Str.InvalidName);
-			if ((namePtBr = namePtBr.Trim().ToUpper()).Length > 64)
+			if ((nameEn = nameEn.Trim().ToUpper()).Length > 64 ||
+				(namePtBr = namePtBr.Trim().ToUpper()).Length > 64)
 				throw new ValidationException(Str.NameTooLong);
 		}
 
@@ -51,7 +48,7 @@ namespace DocumentManager.Models {
 		private static DocumentType[] CacheStorageRefresher() {
 			List<DocumentType> documentTypes = new List<DocumentType>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM document_type ORDER BY name_en ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand($"SELECT id, name_en, name_ptbr FROM document_type ORDER BY name{Str._FieldSuffix} ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							documentTypes.Add(new DocumentType(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2))));

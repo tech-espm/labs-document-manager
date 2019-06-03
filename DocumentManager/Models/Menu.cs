@@ -59,6 +59,24 @@ namespace DocumentManager.Models {
 
 				sub = null;
 
+				#region Documents
+				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentCreate));
+				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentList));
+				if (create || list) {
+					sub = new List<Menu>();
+					if (create)
+						sub.Add(new Menu("/Document/Create", "fa fa-plus fa-fw", Str.Create));
+					if (list)
+						sub.Add(new Menu("/Document/Manage", "fa fa-tasks fa-fw", Str.Manage));
+					menus.Add(new Menu("#", "fa fa-file-text-o fa-fw", Str.Documents, sub));
+				}
+				#endregion
+
+				if (sub != null) {
+					menus.Add(new Menu());
+					sub = null;
+				}
+
 				#region Units
 				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseCreate));
 				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.CourseList));
@@ -94,7 +112,7 @@ namespace DocumentManager.Models {
 						sub.Add(new Menu("/PartitionType/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
 						sub.Add(new Menu("/PartitionType/Manage", "fa fa-tasks fa-fw", Str.Manage));
-					menus.Add(new Menu("#", "fa fa-tags fa-fw", Str.PartitionTypes, sub));
+					menus.Add(new Menu("#", "fa fa-cubes fa-fw", Str.PartitionTypes, sub));
 				}
 				#endregion
 
@@ -107,25 +125,20 @@ namespace DocumentManager.Models {
 						sub.Add(new Menu("/DocumentType/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
 						sub.Add(new Menu("/DocumentType/Manage", "fa fa-tasks fa-fw", Str.Manage));
-					menus.Add(new Menu("#", "fa fa-tag fa-fw", Str.DocumentTypes, sub));
+					menus.Add(new Menu("#", "fa fa-files-o fa-fw", Str.DocumentTypes, sub));
 				}
 				#endregion
 
-				if (sub != null) {
-					menus.Add(new Menu());
-					sub = null;
-				}
-
-				#region Documents
-				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentCreate));
-				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.DocumentList));
+				#region Tags
+				create = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.TagCreate));
+				list = (profileId == Profile.ADMIN_ID || HasFeature(features, featureCount, Feature.TagList));
 				if (create || list) {
 					sub = new List<Menu>();
 					if (create)
-						sub.Add(new Menu("/Document/Create", "fa fa-plus fa-fw", Str.Create));
+						sub.Add(new Menu("/Tag/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
-						sub.Add(new Menu("/Document/Manage", "fa fa-tasks fa-fw", Str.Manage));
-					menus.Add(new Menu("#", "fa fa-file-text-o fa-fw", Str.Documents, sub));
+						sub.Add(new Menu("/Tag/Manage", "fa fa-tasks fa-fw", Str.Manage));
+					menus.Add(new Menu("#", "fa fa-tag fa-fw", Str.Tags, sub));
 				}
 				#endregion
 
