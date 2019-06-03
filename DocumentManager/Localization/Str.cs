@@ -60,6 +60,7 @@ namespace DocumentManager.Localization {
 		//
 		// string x = Localizer["x"];
 
+		public static string _FieldSuffix => CurrentLanguage == LanguageEn ? "_en" : "_ptbr";
 		public static string _o => CurrentLanguage == LanguageEn ? "the" : "o";
 		public static string _a => CurrentLanguage == LanguageEn ? "the" : "a";
 		public static string _os => CurrentLanguage == LanguageEn ? "the" : "os";
@@ -84,6 +85,7 @@ namespace DocumentManager.Localization {
 		public static string English => CurrentLanguage == LanguageEn ? "English" : "Inglês";
 		public static string Yes => CurrentLanguage == LanguageEn ? "Yes" : "Sim";
 		public static string No => CurrentLanguage == LanguageEn ? "No" : "Não";
+		public static string OK => "OK";
 		public static string Close => CurrentLanguage == LanguageEn ? "Close" : "Fechar";
 		public static string Cancel => CurrentLanguage == LanguageEn ? "Cancel" : "Cancelar";
 		public static string Create => CurrentLanguage == LanguageEn ? "Create" : "Criar";
@@ -155,15 +157,15 @@ namespace DocumentManager.Localization {
 		public static string FullNameTooShort => CurrentLanguage == LanguageEn ? "Full name too short!" : "Nome completo muito curto!";
 		public static string ProfileNotFound => CurrentLanguage == LanguageEn ? "Profile not found!" : "Perfil não encontrado!";
 		public static string NO_PROFILE => CurrentLanguage == LanguageEn ? "NO PROFILE" : "SEM PERFIL";
-		public static string UsersCannotActivateThemselves => CurrentLanguage == LanguageEn ? "Users cannot activate themselves!" : "Um usuário não pode ativar a si próprio!";
-		public static string UsersCannotDeactivateThemselves => CurrentLanguage == LanguageEn ? "Users cannot deactivate themselves!" : "Um usuário não pode desativar a si próprio!";
-		public static string UsersCannotResetTheirPassword => CurrentLanguage == LanguageEn ? "Users cannot reset their own password!" : "Um usuário não pode redefinir sua própria senha!";
-		public static string UsersCannotChangeTheirProfile => CurrentLanguage == LanguageEn ? "Users cannot change their own profile!" : "Um usuário não pode definir seu próprio perfil!";
+		public static string UsersCannotActivateThemselves => CurrentLanguage == LanguageEn ? "Users cannot activate themselves 😢" : "Um usuário não pode ativar a si próprio 😢";
+		public static string UsersCannotDeactivateThemselves => CurrentLanguage == LanguageEn ? "Users cannot deactivate themselves 😢" : "Um usuário não pode desativar a si próprio 😢";
+		public static string UsersCannotResetTheirPassword => CurrentLanguage == LanguageEn ? "Users cannot reset their own password 😢" : "Um usuário não pode redefinir sua própria senha 😢";
+		public static string UsersCannotChangeTheirProfile => CurrentLanguage == LanguageEn ? "Users cannot change their own profile 😢" : "Um usuário não pode definir seu próprio perfil 😢";
 		public static string InvalidImageFormat => CurrentLanguage == LanguageEn ? "Invalid image format!" : "Imagem com formato inválido!";
 		public static string InvalidImageFile => CurrentLanguage == LanguageEn ? "Invalid image file!" : "Arquivo de imagem com formato inválido!";
 		public static string ErrorSavingProfileImage => CurrentLanguage == LanguageEn ? "Error saving the profile image!" : "Falha na gravação da foto do perfil!";
 		public static string InvalidPassword => CurrentLanguage == LanguageEn ? "Invalid password!" : "Password inválido!";
-		public static string CurrentPasswordDoesNotMatch => CurrentLanguage == LanguageEn ? "Current password does not match \uD83D\uDE22" : "Senha atual não confere \uD83D\uDE22";
+		public static string CurrentPasswordDoesNotMatch => CurrentLanguage == LanguageEn ? "Current password does not match 😢" : "Senha atual não confere 😢";
 		public static string theDocumentType => CurrentLanguage == LanguageEn ? "the document type" : "o tipo de documento";
 		public static string EditDocumentType => CurrentLanguage == LanguageEn ? "Edit Document Type" : "Editar Tipo de Documento";
 		public static string documentType => CurrentLanguage == LanguageEn ? "document type" : "tipo de documento";
@@ -206,8 +208,25 @@ namespace DocumentManager.Localization {
 		public static string DoYouReallyWantToDeleteTheProfile => CurrentLanguage == LanguageEn ? "Do you really want to delete the profile?" : "Tem certeza que deseja excluir o perfil?";
 		public static string ProfilesBasicInformation => CurrentLanguage == LanguageEn ? "Profile's Basic Information" : "Informações Básicas do Perfil";
 		public static string ProfileSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Profile successfully created! 😄" : "Perfil criado com sucesso! 😄";
-		public static string ManageProfiles => CurrentLanguage == LanguageEn ? "Manage Units" : "Gerenciar Unidades";
+		public static string ManageProfiles => CurrentLanguage == LanguageEn ? "Manage Profiles" : "Gerenciar Perfis";
 		public static string Permissions => CurrentLanguage == LanguageEn ? "Permissions" : "Permissões";
+
+		public static string SELECT => CurrentLanguage == LanguageEn ? "SELECT..." : "SELECIONE...";
+		public static string CreateUser => CurrentLanguage == LanguageEn ? "Create User" : "Criar Usuário";
+		public static string UsersBasicInformation => CurrentLanguage == LanguageEn ? "User's Basic Information" : "Informações Básicas do Usuário";
+		public static string Profile => CurrentLanguage == LanguageEn ? "Profile" : "Perfil";
+		public static string UserSuccessfullyCreated => CurrentLanguage == LanguageEn ? "User successfully created! 😄" : "Usuário criado com sucesso! 😄";
+		public static string ManageUsers => CurrentLanguage == LanguageEn ? "Manage Users" : "Gerenciar Usuários";
+		public static string ChangeProfile => CurrentLanguage == LanguageEn ? "Change Profile" : "Alterar Perfil";
+		public static string ResetPassword => CurrentLanguage == LanguageEn ? "Reset Password" : "Redefinir Senha";
+		public static string Deactivate => CurrentLanguage == LanguageEn ? "Deactivate" : "Desativar";
+		public static string Activate => CurrentLanguage == LanguageEn ? "Activate" : "Ativar";
+		public static string Activation => CurrentLanguage == LanguageEn ? "Activation" : "Ativação";
+		public static string DoYouReallyWantToActivateUser => CurrentLanguage == LanguageEn ? "Do you really want to activate user" : "Deseja mesmo ativar o usuário";
+		public static string DoYouReallyWantToDeactivateUser => CurrentLanguage == LanguageEn ? "Do you really want to deactivate user" : "Deseja mesmo desativar o usuário";
+		public static string DoYouReallyWantToResetUsersPassword => CurrentLanguage == LanguageEn ? "Do you really want to reset user " : "Deseja mesmo redefinir a senha do usuário ";
+		public static string DoYouReallyWantToResetUsersPasswordEnd => CurrentLanguage == LanguageEn ? "'s password to \\\"1234\\\"?" : " para \\\"1234\\\"?";
+		public static string PasswordSuccessfullyResetTo1234 => CurrentLanguage == LanguageEn ? "Password successfully reset to \\\"1234\\\"! 😄" : "Senha redefinida para \\\"1234\\\" com sucesso! 😄";
 
 		#endregion
 

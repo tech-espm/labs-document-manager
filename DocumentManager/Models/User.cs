@@ -270,12 +270,12 @@ namespace DocumentManager.Models {
 		public static List<User> GetAllWithProfileName() {
 			List<User> users = new List<User>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT u.id, u.user_name, u.full_name, u.profile_id, u.language_id, p.name, u.active, u.picture_version FROM user u LEFT JOIN profile p ON p.id = u.profile_id ORDER BY p.name ASC, u.user_name ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand($"SELECT u.id, u.user_name, u.full_name, u.profile_id, u.language_id, p.name{Str._FieldSuffix}, u.active, u.picture_version FROM user u LEFT JOIN profile p ON p.id = u.profile_id ORDER BY p.name{Str._FieldSuffix} ASC, u.user_name ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						string noProfile = Str.NO_PROFILE;
 						while (reader.Read())
 							users.Add(new User(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetInt32(3), reader.GetInt32(4), reader.GetInt32(7), reader.GetBoolean(6), 0, 0) {
-								ProfileName = (reader.IsDBNull(4) ? noProfile : reader.GetString(5))
+								ProfileName = (reader.IsDBNull(5) ? noProfile : reader.GetString(5))
 							});
 					}
 				}

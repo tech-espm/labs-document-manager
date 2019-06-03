@@ -1,20 +1,20 @@
 ﻿@model List<User>
 @{
-	ViewBag.Title = "Gerenciar Usuários";
+	ViewBag.Title = Str.ManageUsers;
 }
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalProfileId">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">Alterar Perfil</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.ChangeProfile</h4>
 			</div>
 			<div class="modal-body">
 				<div class="form-group">
-					<label for="profileId">Perfil</label>
+					<label for="profileId">@Str.Profile</label>
 					<select id="profileId" name="profileId" size="1" class="form-control">
-						<option value="" selected="selected">SELECIONE...</option>
+						<option value="" selected="selected">@Str.SELECT</option>
 						@foreach (Profile profile in Profile.GetAll()) {
 							<option value="@profile.Id">@profile.Name</option>
 						}
@@ -28,8 +28,8 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" id="btnProfileId"><i class="fa fa-check"></i>Alterar Perfil</button>
-				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>Cancelar</button>
+				<button type="button" class="btn btn-primary" id="btnProfileId"><i class="fa fa-check"></i>@Str.ChangeProfile</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
 			</div>
 		</div>
 	</div>
@@ -39,15 +39,15 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">Oops...</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Oops</h4>
 			</div>
 			<div class="modal-body">
 				<p class="no-margin-bottom" id="pActivation"></p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" id="btnActivation"><i class="fa fa-check"></i>OK</button>
-				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>Cancelar</button>
+				<button type="button" class="btn btn-primary" id="btnActivation"><i class="fa fa-check"></i>@Str.OK</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
 			</div>
 		</div>
 	</div>
@@ -57,15 +57,15 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">Oops...</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Oops</h4>
 			</div>
 			<div class="modal-body">
 				<p class="no-margin-bottom" id="pResetPassword"></p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" id="btnResetPassword"><i class="fa fa-check"></i>OK</button>
-				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>Cancelar</button>
+				<button type="button" class="btn btn-primary" id="btnResetPassword"><i class="fa fa-check"></i>@Str.OK</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
 			</div>
 		</div>
 	</div>
@@ -89,9 +89,10 @@
 		window.dataTableMain = prepareDataTable("dataTableMain", {
 			order: [[0, "asc"]],
 			columns: [
-				{ title: "Login", "class": "col-min" },
-				{ title: "Nome", "class": "col-max", render: encode },
-				{ title: "Perfil", "class": "col-min text-center" },
+				{ title: "@Str.UserName", "class": "col-min" },
+				{ title: "@Str.FullName", "class": "col-max", render: encode },
+				{ title: "@Str.Profile", "class": "col-min text-center" },
+				{ title: "@Str.Activation", "class": "col-min text-center" },
 				{ title: " ", "class": "col-min", searchable: false, orderable: false }
 			],
 			data: [
@@ -101,13 +102,14 @@
 					"<img class=\"profile-img\" alt=\"Perfil\" src=\"/User/Picture?id=@(user.Id)&v=@(user.PictureVersion)\" width=\"40\" height=\"40\" />" + encode("@user.UserName"),
 					"@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.FullName))",
 					"<button id=\"btnProfile@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changeProfile(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.ProfileName))") + "</button>",
-					"@Html.Raw(user.Active ? "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-danger\\\" onclick=\\\"activateUser(0, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-times\\\"></i> Desativar</button>" : "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-success\\\" onclick=\\\"activateUser(1, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-check\\\"></i> Ativar</button>") <button type=\"button\" class=\"btn btn-outline btn-primary\" onclick=\"resetPassword('@user.UserName', @user.Id)\"><i class=\"fa fa-refresh\"></i>Redefinir senha</button>"
+					"@Html.Raw(user.Active ? "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-danger btn-block\\\" onclick=\\\"activateUser(0, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-times\\\"></i> " + Str.Deactivate + "</button>" : "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-success btn-block\\\" onclick=\\\"activateUser(1, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-check\\\"></i> " + Str.Activate + "</button>")",
+					"<button type=\"button\" class=\"btn btn-outline btn-primary\" onclick=\"resetPassword('@user.UserName', @user.Id)\"><i class=\"fa fa-refresh\"></i>@Str.ResetPassword</button>"
 				],
 					</text>
 				}
 			],
 			deferRender: true,
-			export: { title: "Usuários" }
+			export: { title: "@Str.Users" }
 		});
 
 		function changeProfile(btn, userName, id) {
@@ -146,7 +148,7 @@
 			if (JsonWebApi.active)
 				return;
 
-			_("pActivation").textContent = (how ? "Deseja mesmo ativar o usuário \"" + userName + "\"?" : "Deseja mesmo desativar o usuário \"" + userName + "\"?");
+			_("pActivation").textContent = (how ? "@Html.Raw(Str.DoYouReallyWantToActivateUser) \"" + userName + "\"?" : "@Html.Raw(Str.DoYouReallyWantToDeactivateUser) \"" + userName + "\"?");
 
 			_("btnActivation").onclick = function () {
 				if (JsonWebApi.active)
@@ -176,7 +178,7 @@
 			if (JsonWebApi.active)
 				return;
 
-			_("pResetPassword").textContent = "Deseja mesmo redefinir a senha do usuário \"" + userName + "\" para \"1234\"?";
+			_("pResetPassword").textContent = "@Html.Raw(@Str.DoYouReallyWantToResetUsersPassword)\"" + userName + "\"@Html.Raw(Str.DoYouReallyWantToResetUsersPasswordEnd)";
 
 			_("btnResetPassword").onclick = function () {
 				if (JsonWebApi.active)
@@ -190,7 +192,7 @@
 					Notification.hide();
 
 					if (response.success)
-						Notification.success("Senha do usuário \"" + userName + "\" redefinida para \"1234\" com sucesso! \uD83D\uDE04");
+						Notification.success("@Html.Raw(Str.PasswordSuccessfullyResetTo1234)");
 					else
 						Notification.error(response.value, true);
 				}, "id", id);
