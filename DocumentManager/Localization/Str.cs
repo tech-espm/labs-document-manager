@@ -242,6 +242,8 @@ namespace DocumentManager.Localization {
 		public static string TagSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Tag successfully changed! 😄" : "Etiqueta alterada com sucesso! 😄";
 		public static string InvalidValue => CurrentLanguage == LanguageEn ? "Invalid value!" : "Valor inválido!";
 		public static string ValueTooLong => CurrentLanguage == LanguageEn ? "Value too long!" : "Valor muito longo!";
+		public static string AddValue => CurrentLanguage == LanguageEn ? "Add Value" : "Adicionar Valor";
+		public static string DeleteValue => CurrentLanguage == LanguageEn ? "Delete Value" : "Excluir Valor";
 
 		#endregion
 
