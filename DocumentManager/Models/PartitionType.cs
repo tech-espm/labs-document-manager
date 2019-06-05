@@ -68,17 +68,21 @@ namespace DocumentManager.Models {
 		}
 
 		public static PartitionType GetById(int id) {
-			PartitionType course = null;
-			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM partition_type WHERE id = @id", conn)) {
-					cmd.Parameters.AddWithValue("@id", id);
-					using (MySqlDataReader reader = cmd.ExecuteReader()) {
-						if (reader.Read())
-							course = new PartitionType(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)));
+			// Since all partition type objects are cached in memory with all properties
+			// set, and since there are not too many of those objects, it is faster
+			// to look up for one of them here, instead of reading it from the database
+			PartitionType[] cachedPartitionTypes = CachedPartitionTypes.StartReading();
+			try {
+				if (cachedPartitionTypes != null) {
+					for (int i = cachedPartitionTypes.Length - 1; i >= 0; i--) {
+						if (cachedPartitionTypes[i].Id == id)
+							return cachedPartitionTypes[i];
 					}
 				}
+				return null;
+			} finally {
+				CachedPartitionTypes.FinishReading();
 			}
-			return course;
 		}
 
 		public PartitionType() {

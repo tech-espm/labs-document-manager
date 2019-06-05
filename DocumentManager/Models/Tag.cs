@@ -86,8 +86,8 @@ namespace DocumentManager.Models {
 						if (existingValue == null)
 							continue;
 						if (existingValue.Name.Equals(newValue.Name)) {
-							existingValues[i] = null;
-							newValues[j] = null;
+							existingValues[j] = null;
+							newValues[i] = null;
 							if (existingValue.Position != newValue.Position) {
 								newValue.Id = existingValue.Id;
 								valuesToUpdate.Add(newValue);
@@ -113,13 +113,22 @@ namespace DocumentManager.Models {
 			}
 		}
 
-		public static void SyncValuesInDatabase(MySqlConnection conn, MySqlTransaction tran, int tagId, List<Value> valuesToCreate, List<Value> valuesToUpdate, List<Value> valuesToDelete) {
+		public static void SyncValues(MySqlConnection conn, MySqlTransaction tran, int tagId, List<Value> existingValues, List<Value> valuesToCreate, List<Value> valuesToUpdate, List<Value> valuesToDelete) {
 			if (valuesToDelete.Count > 0) {
 				using (MySqlCommand cmd = new MySqlCommand("DELETE FROM tag_value WHERE id = @id", conn, tran)) {
 					cmd.Parameters.AddWithValue("@id", 0);
 					for (int i = valuesToDelete.Count - 1; i >= 0; i--) {
-						cmd.Parameters[0].Value = valuesToDelete[i].Id;
+						int id = valuesToDelete[i].Id;
+
+						cmd.Parameters[0].Value = id;
 						cmd.ExecuteNonQuery();
+
+						for (int j = existingValues.Count - 1; j >= 0; j--) {
+							if (existingValues[j].Id == id) {
+								existingValues.RemoveAt(j);
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -132,11 +141,20 @@ namespace DocumentManager.Models {
 					cmd.Parameters.AddWithValue("@id", 0);
 					for (int i = valuesToUpdate.Count - 1; i >= 0; i--) {
 						Value valueToUpdate = valuesToUpdate[i];
+						int id = valueToUpdate.Id;
+
 						cmd.Parameters[0].Value = valueToUpdate.Position;
 						cmd.Parameters[1].Value = valueToUpdate.Name.ValueEn;
 						cmd.Parameters[2].Value = valueToUpdate.Name.ValuePtBr;
-						cmd.Parameters[3].Value = valueToUpdate.Id;
+						cmd.Parameters[3].Value = id;
 						cmd.ExecuteNonQuery();
+
+						for (int j = existingValues.Count - 1; j >= 0; j--) {
+							if (existingValues[j].Id == id) {
+								existingValues[j] = valueToUpdate;
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -147,24 +165,31 @@ namespace DocumentManager.Models {
 					cmd.Parameters.AddWithValue("@position", 0);
 					cmd.Parameters.AddWithValue("@name_en", "");
 					cmd.Parameters.AddWithValue("@name_ptbr", "");
-					for (int i = valuesToCreate.Count - 1; i >= 0; i--) {
+					for (int i = 0; i < valuesToCreate.Count; i++) {
 						Value valueToCreate = valuesToCreate[i];
+
 						cmd.Parameters[1].Value = valueToCreate.Position;
 						cmd.Parameters[2].Value = valueToCreate.Name.ValueEn;
 						cmd.Parameters[3].Value = valueToCreate.Name.ValuePtBr;
 						cmd.ExecuteNonQuery();
+
 						using (MySqlCommand cmd2 = new MySqlCommand("SELECT last_insert_id()", conn, tran)) {
 							valueToCreate.Id = (int)(ulong)cmd2.ExecuteScalar();
 						}
+
+						existingValues.Add(valueToCreate);
 					}
 				}
 			}
+
+			existingValues.Sort((a, b) => a.Position - b.Position);
 		}
 
 		public static Tag Create(string nameEn, string namePtBr, Value[] values) {
 			Validate(ref nameEn, ref namePtBr, null, values, out List<Value> valuesToCreate, out List<Value> valuesToUpdate, out List<Value> valuesToDelete);
 
 			int id;
+			List<Value> existingValues = new List<Value>();
 
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlTransaction tran = conn.BeginTransaction()) {
@@ -177,7 +202,7 @@ namespace DocumentManager.Models {
 						using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn, tran)) {
 							id = (int)(ulong)cmd.ExecuteScalar();
 						}
-						SyncValuesInDatabase(conn, tran, id, valuesToCreate, valuesToUpdate, valuesToDelete);
+						SyncValues(conn, tran, id, existingValues, valuesToCreate, valuesToUpdate, valuesToDelete);
 					} catch {
 						tran.Rollback();
 						throw;
@@ -188,10 +213,8 @@ namespace DocumentManager.Models {
 
 			CachedTags.Refresh();
 
-			valuesToCreate.Sort((a, b) => a.Position - b.Position);
-
 			return new Tag(id, new Str(nameEn, namePtBr)) {
-				Values = valuesToCreate
+				Values = existingValues
 			};
 		}
 
@@ -231,32 +254,21 @@ namespace DocumentManager.Models {
 		}
 
 		public static Tag GetById(int id) {
-			Tag tag = null;
-			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM tag WHERE id = @id", conn)) {
-					cmd.Parameters.AddWithValue("@id", id);
-					using (MySqlDataReader reader = cmd.ExecuteReader()) {
-						if (reader.Read())
-							tag = new Tag(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2))) {
-								Values = new List<Value>()
-							};
+			// Since all unity objects are cached in memory with all properties
+			// set, and since there are not too many of those objects, it is faster
+			// to look up for one of them here, instead of reading it from the database
+			Tag[] cachedTags = CachedTags.StartReading();
+			try {
+				if (cachedTags != null) {
+					for (int i = cachedTags.Length - 1; i >= 0; i--) {
+						if (cachedTags[i].Id == id)
+							return cachedTags[i];
 					}
 				}
-				if (tag != null) {
-					using (MySqlCommand cmd = new MySqlCommand("SELECT id, position, name_en, name_ptbr FROM tag_value WHERE tag_id = @tag_id ORDER BY position ASC", conn)) {
-						cmd.Parameters.AddWithValue("@tag_id", id);
-						using (MySqlDataReader reader = cmd.ExecuteReader()) {
-							while (reader.Read())
-								tag.Values.Add(new Value() {
-									Id = reader.GetInt32(0),
-									Position = reader.GetInt32(1),
-									Name = new Str(reader.GetString(2), reader.GetString(3))
-								});
-						}
-					}
-				}
+				return null;
+			} finally {
+				CachedTags.FinishReading();
 			}
-			return tag;
 		}
 
 		public Tag() {
@@ -283,10 +295,7 @@ namespace DocumentManager.Models {
 							cmd.ExecuteNonQuery();
 							Name = new Str(nameEn, namePtBr);
 						}
-						SyncValuesInDatabase(conn, tran, Id, valuesToCreate, valuesToUpdate, valuesToDelete);
-						Values = valuesToCreate;
-						Values.AddRange(valuesToUpdate);
-						Values.Sort((a, b) => a.Position - b.Position);
+						SyncValues(conn, tran, Id, Values, valuesToCreate, valuesToUpdate, valuesToDelete);
 					} catch {
 						tran.Rollback();
 						throw;

@@ -77,17 +77,21 @@ namespace DocumentManager.Models {
 		}
 
 		public static Unity GetById(int id) {
-			Unity unity = null;
-			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM unity WHERE id = @id", conn)) {
-					cmd.Parameters.AddWithValue("@id", id);
-					using (MySqlDataReader reader = cmd.ExecuteReader()) {
-						if (reader.Read())
-							unity = new Unity(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)), new Str(reader.GetString(3), reader.GetString(4)));
+			// Since all unity objects are cached in memory with all properties
+			// set, and since there are not too many of those objects, it is faster
+			// to look up for one of them here, instead of reading it from the database
+			Unity[] cachedUnits = CachedUnits.StartReading();
+			try {
+				if (cachedUnits != null) {
+					for (int i = cachedUnits.Length - 1; i >= 0; i--) {
+						if (cachedUnits[i].Id == id)
+							return cachedUnits[i];
 					}
 				}
+				return null;
+			} finally {
+				CachedUnits.FinishReading();
 			}
-			return unity;
 		}
 
 		public Unity() {

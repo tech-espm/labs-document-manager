@@ -68,17 +68,21 @@ namespace DocumentManager.Models {
 		}
 
 		public static DocumentType GetById(int id) {
-			DocumentType course = null;
-			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr FROM document_type WHERE id = @id", conn)) {
-					cmd.Parameters.AddWithValue("@id", id);
-					using (MySqlDataReader reader = cmd.ExecuteReader()) {
-						if (reader.Read())
-							course = new DocumentType(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)));
+			// Since all document type objects are cached in memory with all properties
+			// set, and since there are not too many of those objects, it is faster
+			// to look up for one of them here, instead of reading it from the database
+			DocumentType[] cachedDocumentTypes = CachedDocumentTypes.StartReading();
+			try {
+				if (cachedDocumentTypes != null) {
+					for (int i = cachedDocumentTypes.Length - 1; i >= 0; i--) {
+						if (cachedDocumentTypes[i].Id == id)
+							return cachedDocumentTypes[i];
 					}
 				}
+				return null;
+			} finally {
+				CachedDocumentTypes.FinishReading();
 			}
-			return course;
 		}
 
 		public DocumentType() {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace DocumentManager.Localization {
 	// I was going to call this class I18n, but I thought Str would be
@@ -244,6 +245,7 @@ namespace DocumentManager.Localization {
 		public static string ValueTooLong => CurrentLanguage == LanguageEn ? "Value too long!" : "Valor muito longo!";
 		public static string AddValue => CurrentLanguage == LanguageEn ? "Add Value" : "Adicionar Valor";
 		public static string DeleteValue => CurrentLanguage == LanguageEn ? "Delete Value" : "Excluir Valor";
+		public static string AtLeastOneValueNeedsToBeAddedToTheTag => CurrentLanguage == LanguageEn ? "At least one value needs to be added to the tag 😢" : "Pelo menos um valor precisa ser adicionado à etiqueta 😢";
 
 		#endregion
 
@@ -269,6 +271,7 @@ namespace DocumentManager.Localization {
 			ValuePtBr = (ValuePtBr ?? "").Trim().ToUpper();
 		}
 
+		[IgnoreDataMember]
 		public bool IsNullOrWhiteSpace => (string.IsNullOrWhiteSpace(ValueEn) || string.IsNullOrWhiteSpace(ValuePtBr));
 		#endregion
 	}

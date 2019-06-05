@@ -23,6 +23,7 @@
 			columns: [
 				{ title: "@Str.Name (@Str.English)", "class": "col-50", render: encode, data: "name.valueEn" },
 				{ title: "@Str.Name (@Str.Portuguese)", "class": "col-50", render: encode, data: "name.valuePtBr" },
+				{ title: "@Str.Values", "class": "col-min text-right", data: "values.length" },
 				@if (ViewBag.TagEdit == true) {
 				<text>
 				{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return "<a target=\"_blank\" title=\"@Str.Edit\" href=\"@(Url.Action("Edit"))?id=" + row.id + "\" class=\"btn btn-outline btn-primary\"><i class=\"fa fa-nomargin fa-edit\"></i></a>"; } },

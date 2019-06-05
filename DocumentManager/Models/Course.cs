@@ -77,17 +77,21 @@ namespace DocumentManager.Models {
 		}
 
 		public static Course GetById(int id) {
-			Course course = null;
-			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM course WHERE id = @id", conn)) {
-					cmd.Parameters.AddWithValue("@id", id);
-					using (MySqlDataReader reader = cmd.ExecuteReader()) {
-						if (reader.Read())
-							course = new Course(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)), new Str(reader.GetString(3), reader.GetString(4)));
+			// Since all course objects are cached in memory with all properties
+			// set, and since there are not too many of those objects, it is faster
+			// to look up for one of them here, instead of reading it from the database
+			Course[] cachedCourses = CachedCourses.StartReading();
+			try {
+				if (cachedCourses != null) {
+					for (int i = cachedCourses.Length - 1; i >= 0; i--) {
+						if (cachedCourses[i].Id == id)
+							return cachedCourses[i];
 					}
 				}
+				return null;
+			} finally {
+				CachedCourses.FinishReading();
 			}
-			return course;
 		}
 
 		public Course() {
