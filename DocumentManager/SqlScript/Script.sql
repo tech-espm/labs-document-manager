@@ -100,3 +100,29 @@ CREATE TABLE tag_value (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
+
+CREATE TABLE user_permission_partition_type (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	user_id INT NOT NULL,
+	unity_id INT NOT NULL,
+	course_id INT NOT NULL,
+	partition_type_id INT NOT NULL,
+	CONSTRAINT user_permission_partition_type_partition_type_id_fk
+		FOREIGN KEY (partition_type_id)
+		REFERENCES partition_type (id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE user_permission_document_type (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	user_id INT NOT NULL,
+	unity_id INT NOT NULL,
+	course_id INT NOT NULL,
+	document_type_id INT NOT NULL,
+	CONSTRAINT user_permission_document_type_document_type_id_fk
+		FOREIGN KEY (document_type_id)
+		REFERENCES document_type (id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+);
