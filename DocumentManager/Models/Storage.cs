@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace DocumentManager.Models {
 	public static class Storage {
 		public static string WWWRoot => AppDomain.CurrentDomain.GetData("WWWRootDirectory").ToString();
 		public static string AppData => AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
+		public static readonly string DefaultMime = "application/octet-stream";
 
 		#region MimesByExtension
 		private static readonly Dictionary<string, string> MimesByExtension = new Dictionary<string, string>() {
@@ -118,6 +120,59 @@ namespace DocumentManager.Models {
 				return null;
 			MimesByExtension.TryGetValue(extension.ToLowerInvariant(), out string mime);
 			return mime;
+		}
+
+		public static string SafeFileName(string fileName) {
+			// After benchmarking, chained Replace() calls have proved to be faster only
+			// if they do not replace any characters!
+			//
+			// Not replacing a single character (1M iterations):
+			// Chained Replace(): 1500 ms
+			// Compiled Regex (new Regex(..., RegexOptions.Compiled)): 1600 ms
+			// StringBuilder (calling ToLower() for each character): 1800 ms
+			// StringBuilder (calling ToLower() before): 780 ms
+			//
+			// Replacing characters (1M iterations):
+			// Chained Replace(): 3900 ms
+			// Compiled Regex (new Regex(..., RegexOptions.Compiled)): 8900 ms
+			// StringBuilder (calling ToLower() for each character): 2000 ms
+			// StringBuilder (calling ToLower() before): 1000 ms
+
+			//return fileName.Replace('.', '_').Replace('/', '_').Replace('?', '_').Replace('*', '_').Replace('\\', '_').Replace('<', '_').Replace('>', '_').Replace('{', '_').Replace('}', '_').Replace('$', '_').Replace('!', '_').Replace('~', '_').Replace('%', '_').Replace(':', '_').Replace(';', '_').Replace(',', '_').Replace('|', '_').Replace('\"', '_').Replace('\'', '_').Replace('`', '_');
+
+			int total = fileName.Length;
+			StringBuilder builder = new StringBuilder(total);
+			for (int i = 0; i < total; i++) {
+				char c = fileName[i];
+				switch (c) {
+					case '.':
+					case '/':
+					case '?':
+					case '*':
+					case '\\':
+					case '<':
+					case '>':
+					case '{':
+					case '}':
+					case '$':
+					case '!':
+					case '~':
+					case '%':
+					case ':':
+					case ';':
+					case ',':
+					case '|':
+					case '\"':
+					case '\'':
+					case '`':
+						builder.Append('_');
+						break;
+					default:
+						builder.Append((c < 32) ? '_' : c);
+						break;
+				}
+			}
+			return builder.ToString();
 		}
 	}
 }

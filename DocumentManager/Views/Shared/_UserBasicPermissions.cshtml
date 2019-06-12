@@ -1,5 +1,6 @@
 ﻿@{
 	User loggedUser = ViewBag.LoggedUser;
+	int[] initialUserPermissions = ViewBag.InitialUserPermissions;
 }
 <div class="row">
 	<div class="col-sm-6 col-md-3">
@@ -31,10 +32,10 @@
 		"use strict";
 
 		(function () {
-			var cbUnity = document.getElementById("unity"),
-				cbCourse = document.getElementById("course"),
-				cbPartitionType = document.getElementById("partitionType"),
-				cbDocumentType = document.getElementById("documentType"),
+			var cbUnity = _("unity"),
+				cbCourse = _("course"),
+				cbPartitionType = _("partitionType"),
+				cbDocumentType = _("documentType"),
 				valueProp = "@Str._ValueProperty",
 				units = @Json.Serialize(loggedUser.Permissions),
 				option;
@@ -86,6 +87,15 @@
 				option.setAttribute("value", units[i].unity.id);
 				option.textContent = units[i].unity.name[valueProp];
 				cbUnity.appendChild(option);
+			}
+
+			@if (initialUserPermissions != null && initialUserPermissions.Length == 4) {
+			<text>
+			setCbSearch(cbUnity, "@initialUserPermissions[0]");
+			setCbSearch(cbCourse, "@initialUserPermissions[1]");
+			setCbSearch(cbPartitionType, "@initialUserPermissions[2]");
+			setCbSearch(cbDocumentType, "@initialUserPermissions[3]");
+			</text>
 			}
 
 		})();

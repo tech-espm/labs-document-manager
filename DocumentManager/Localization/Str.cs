@@ -61,6 +61,9 @@ namespace DocumentManager.Localization {
 		//
 		// string x = Localizer["x"];
 
+		public static string _DateFormat => CurrentLanguage == LanguageEn ? "MM/dd/yyyy" : "dd/MM/yyyy";
+		public static string _TimeFormat => "HH:mm";
+		public static string _DateTimeFormat => CurrentLanguage == LanguageEn ? "MM/dd/yyyy HH:mm" : "dd/MM/yyyy HH:mm";
 		public static string _FieldSuffix => CurrentLanguage == LanguageEn ? "_en" : "_ptbr";
 		public static string _ValueProperty => CurrentLanguage == LanguageEn ? "valueEn" : "valuePtBr";
 		public static string _o => CurrentLanguage == LanguageEn ? "the" : "o";
@@ -130,13 +133,32 @@ namespace DocumentManager.Localization {
 		public static string CoursesBasicInformation => CurrentLanguage == LanguageEn ? "Course's Basic Information" : "Informações Básicas do Curso";
 		public static string Name => CurrentLanguage == LanguageEn ? "Name" : "Nome";
 		public static string ShortName => CurrentLanguage == LanguageEn ? "Short Name" : "Apelido";
+		public static string Description => CurrentLanguage == LanguageEn ? "Description" : "Descrição";
+		public static string Optional => CurrentLanguage == LanguageEn ? "Optional" : "Opcional";
 		public static string CourseSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Course successfully created! 😄" : "Curso criado com sucesso! 😄";
 		public static string CourseSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Course successfully changed! 😄" : "Curso alterado com sucesso! 😄";
 		public static string CourseNotFound => CurrentLanguage == LanguageEn ? "Course not found!" : "Curso não encontrado!";
+		public static string InvalidDocumentData => CurrentLanguage == LanguageEn ? "Invalid document data!" : "Dados de documento inválidos!";
 		public static string InvalidName => CurrentLanguage == LanguageEn ? "Invalid name!" : "Nome inválido!";
 		public static string InvalidShortName => CurrentLanguage == LanguageEn ? "Invalid short name!" : "Apelido inválido!";
+		public static string InvalidUnity => CurrentLanguage == LanguageEn ? "Invalid unity!" : "Unidade inválida!";
+		public static string InvalidCourse => CurrentLanguage == LanguageEn ? "Invalid course!" : "Curso inválido!";
+		public static string InvalidPartitionType => CurrentLanguage == LanguageEn ? "Invalid partition type!" : "Tipo de partição inválido!";
+		public static string InvalidDocumentType => CurrentLanguage == LanguageEn ? "Invalid document type!" : "Tipo de documento inválido!";
+		public static string InvalidTags => CurrentLanguage == LanguageEn ? "Invalid tags!" : "Etiquetas inválidas!";
+		public static string InvalidFileName => CurrentLanguage == LanguageEn ? "Invalid file name 😢" : "Nome de arquivo inválido 😢";
+		public static string InvalidFileExtension => CurrentLanguage == LanguageEn ? "Invalid file extension 😢" : "Extensão de arquivo inválida 😢";
+		public static string InvalidFileSize => CurrentLanguage == LanguageEn ? "Invalid file size!" : "Tamanho de arquivo inválido!";
+		public static string NoFilesWereAdded => CurrentLanguage == LanguageEn ? "No files were added 😢" : "Nenhum arquivo foi adicionado 😢";
 		public static string NameTooLong => CurrentLanguage == LanguageEn ? "Name too long!" : "Nome muito longo!";
 		public static string ShortNameTooLong => CurrentLanguage == LanguageEn ? "Short name too long!" : "Apelido muito longo!";
+		public static string DescriptionTooLong => CurrentLanguage == LanguageEn ? "Description too long!" : "Descrição muito longa!";
+		public static string FileExtensionTooLong => CurrentLanguage == LanguageEn ? "File extension too long!" : "Extensão de arquivo muito longa!";
+		public static string FileSize => CurrentLanguage == LanguageEn ? "File Size" : "Tamanho do Arquivo";
+		public static string FileSizeTooSmall => CurrentLanguage == LanguageEn ? "File size too small!" : "Tamanho de arquivo muito pequeno!";
+		public static string FileSizeTooLarge => CurrentLanguage == LanguageEn ? "File size too large!" : "Tamanho de arquivo muito grande!";
+		public static string FileSizeSmallerThan => CurrentLanguage == LanguageEn ? "The file size is smaller than" : "O tamanho do arquivo é menor do que";
+		public static string FileSizeLargerThan => CurrentLanguage == LanguageEn ? "The file size is larger than" : "O tamanho do arquivo é maior do que";
 		public static string UserOrPasswordIsInvalid => CurrentLanguage == LanguageEn ? "User or password is invalid!" : "Usuário ou senha inválidos!";
 		public static string AnErrorOccurredDuringTheLoginProcess => CurrentLanguage == LanguageEn ? "An error occurred during the login process 😢 - " : "Ocorreu um erro durante o processo de login 😢 - ";
 		public static string PartitionTypes => CurrentLanguage == LanguageEn ? "Partition Types" : "Tipos de Partição";
@@ -230,7 +252,6 @@ namespace DocumentManager.Localization {
 		public static string DoYouReallyWantToResetUsersPassword => CurrentLanguage == LanguageEn ? "Do you really want to reset user " : "Deseja mesmo redefinir a senha do usuário ";
 		public static string DoYouReallyWantToResetUsersPasswordEnd => CurrentLanguage == LanguageEn ? "'s password to \\\"1234\\\"?" : " para \\\"1234\\\"?";
 		public static string PasswordSuccessfullyResetTo1234 => CurrentLanguage == LanguageEn ? "Password successfully reset to \\\"1234\\\"! 😄" : "Senha redefinida para \\\"1234\\\" com sucesso! 😄";
-
 		public static string Tag => CurrentLanguage == LanguageEn ? "Tag" : "Etiqueta";
 		public static string Tags => CurrentLanguage == LanguageEn ? "Tags" : "Etiquetas";
 		public static string tag => CurrentLanguage == LanguageEn ? "tag" : "etiqueta";
@@ -256,8 +277,19 @@ namespace DocumentManager.Localization {
 		public static string theDocument => CurrentLanguage == LanguageEn ? "the document" : "o documento";
 		public static string DocumentNotFound => CurrentLanguage == LanguageEn ? "Document not found!" : "Documento não encontrado!";
 		public static string CreateDocument => CurrentLanguage == LanguageEn ? "Create Document" : "Criar Documento";
+		public static string CreateDocuments => CurrentLanguage == LanguageEn ? "Create Documents" : "Criar Documentos";
 		public static string EditDocument => CurrentLanguage == LanguageEn ? "Edit Document" : "Editar Documento";
 		public static string ManageDocuments => CurrentLanguage == LanguageEn ? "Manage Documents" : "Gerenciar Documentos";
+		public static string DocumentsBasicInformation => CurrentLanguage == LanguageEn ? "Document's Basic Information" : "Informações Básicas do Documento";
+		public static string DoYouReallyWantToDeleteTheDocument => CurrentLanguage == LanguageEn ? "Do you really want to delete the document?" : "Tem certeza que deseja excluir o documento?";
+		public static string DocumentSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Document successfully created! 😄" : "Documento criado com sucesso! 😄";
+		public static string DocumentSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Document successfully changed! 😄" : "Documento alterado com sucesso! 😄";
+		public static string file => CurrentLanguage == LanguageEn ? "file" : "arquivo";
+		public static string files => CurrentLanguage == LanguageEn ? "files" : "arquivos";
+		public static string Total => "Total";
+		public static string AddFiles => CurrentLanguage == LanguageEn ? "Add Files" : "Adicionar Arquivos";
+		public static string ClearFiles => CurrentLanguage == LanguageEn ? "Clear Files" : "Limpar Arquivos";
+		public static string YouCanAlsoDragAndDropFilesHere => CurrentLanguage == LanguageEn ? "You can also drag an drop files here" : "Você também pode arrastar e soltar arquivos aqui";
 
 		#endregion
 

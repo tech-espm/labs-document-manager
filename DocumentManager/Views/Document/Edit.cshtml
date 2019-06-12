@@ -1,0 +1,383 @@
+﻿@model Document
+@{
+	ViewBag.Title = (Model == null ? Str.CreateDocument : Str.EditDocument);
+
+	ViewBag.InitialUserPermissions = (Model == null ? null : new int[] { Model.Unity.Id, Model.Course.Id, Model.PartitionType.Id, Model.DocumentType.Id });
+}
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modalDelete">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Oops</h4>
+			</div>
+			<div class="modal-body">
+				<p class="no-margin-bottom">@Str.DoYouReallyWantToDeleteTheDocument @Str.ThisOperationCannotBeUndone</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" onclick="deleteItem(true)"><i class="fa fa-check"></i>@Str.Delete</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<form class="row" action="." method="post" id="form">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-heading clearfix">
+				<div class="pull-left">
+					@Str.DocumentsBasicInformation
+				</div>
+				@if (Model != null && ViewBag.DocumentDelete == true) {
+					<div class="pull-right">
+						<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
+					</div>
+				}
+			</div>
+			<div class="panel-body no-bottom">
+				@if (Model != null) {
+					<div class="form-group text-right">
+						<span class="label label-default">Id @Model.Id</span>
+					</div>
+				}
+				<div class="row" id="divNameDescription">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="name">@Str.Name</label>
+							<input id="name" name="name" maxlength="128" class="form-control upper" type="text" placeholder="@(Model == null ? Str.Optional : "")" value="@(Model == null ? "" : Model.Name)" />
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="description">@Str.Description</label>
+							<input id="description" name="description" maxlength="255" class="form-control upper" type="text" placeholder="@Str.Optional" value="@(Model == null ? "" : Model.Description)" />
+						</div>
+					</div>
+				</div>
+
+				<partial name="_UserBasicPermissions" />
+
+				@if (Model == null) {
+					<div class="panel panel-default">
+						<div class="panel-heading"><div id="divFileTitle">0 @Str.files (@Str.Total: 0 bytes)</div><div class="text-right"><small>@Str.YouCanAlsoDragAndDropFilesHere</small></div></div>
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-sm-6 col-sm-space-bottom">
+									<button class="btn btn-primary btn-block" type="button" onclick="addFiles()"><i class="fa fa-file-text-o"></i>@Str.AddFiles...</button>
+								</div>
+								<div class="col-sm-6">
+									<button class="btn btn-outline btn-danger btn-block" type="button" onclick="clearFiles()"><i class="fa fa-file-text-o"></i>@Str.ClearFiles</button>
+								</div>
+							</div>
+							<div class="table-responsive">
+								<table id="tableFiles" class="table table-striped table-hover no-margin-bottom hidden">
+									<thead>
+										<tr>
+											<th class="col-max">@Str.Name</th>
+											<th class="col-min text-right">@Str.FileSize</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody id="tableFilesBody"></tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				}
+
+			</div>
+			<div class="panel-footer">
+				<input id="btnSave" value="@(Model == null ? Str.CreateDocument : Str.SaveChanges)" class="btn btn-primary btn-lg btn-block" type="submit" />
+				<div style="position: absolute; height: 0; overflow: hidden"><input id="txtFile" onchange="txtFile_change()" class="form-control" type="file" multiple="multiple" /></div>
+			</div>
+		</div>
+	</div>
+</form>
+
+@section Scripts {
+	<script type="text/javascript">
+		//<![CDATA[
+		"use strict";
+
+		var divNameDescription = _("divNameDescription"),
+			divFileTitle = _("divFileTitle"),
+			tableFiles = _("tableFiles"),
+			tableFilesBody = _("tableFilesBody"),
+			btnSave = _("btnSave"),
+			txtFile = _("txtFile");
+
+		function updatePanel() {
+			var i, totalSize = 0, count = tableFilesBody.childNodes.length;
+			for (i = count - 1; i >= 0; i--)
+				totalSize += tableFilesBody.childNodes[i].file.size;
+			divFileTitle.textContent = count + ((count === 1) ? " @Str.file" : " @Str.files") + " (@Str.Total: " + formatSize(totalSize) + ")";
+			tableFiles.className = (count ? "table table-striped table-hover no-margin-bottom" : "table table-striped table-hover no-margin-bottom hidden");
+			divNameDescription.className = ((count > 1) ? "row hidden" : "row");
+			btnSave.value = ((count <= 1) ? "@Str.CreateDocument" : "@Str.CreateDocuments");
+		}
+
+		function addFile(file) {
+			var tr = document.createElement("tr"), td, i, name, extension = "";
+			name = file.name.toUpperCase();
+			if ((i = name.lastIndexOf("/")) >= 0)
+				name = name.substr(i + 1);
+			if ((i = name.lastIndexOf("\\")) >= 0)
+				name = name.substr(i + 1);
+			if ((i = name.lastIndexOf(".")) >= 0) {
+				extension = name.substr(i + 1);
+				name = name.substr(0, i);
+			}
+			if (!name) {
+				Notification.error("@Str.InvalidFileName");
+				return;
+			}
+			if (!extension || extension.length > 10) {
+				Notification.error("@Str.InvalidFileExtension");
+				return;
+			}
+			if (file.size < @Document.MinFileSizeInBytes) {
+				Notification.error("@Str.FileSizeSmallerThan @Document.MinFileSizeInBytes bytes \uD83D\uDE22");
+				return;
+			}
+			if (file.size > @Document.MaxFileSizeInBytes) {
+				Notification.error("@Str.FileSizeLargerThan @Document.MaxFileSizeInMiB MiB \uD83D\uDE22");
+				return;
+			}
+
+			tr.file = file;
+			tr.setAttribute("data-name", name);
+			tr.setAttribute("data-extension", extension);
+			td = document.createElement("td");
+			td.className = "col-max";
+			td.appendChild(document.createTextNode(name));
+			tr.appendChild(td);
+			td = document.createElement("td");
+			td.className = "col-min text-right";
+			td.appendChild(document.createTextNode(formatSize(file.size)));
+			tr.appendChild(td);
+			td = document.createElement("td");
+			td.className = "col-min";
+			createRoundButton(td, "fa-trash-o", "btn-outline btn-danger", deleteFile, "title", "@Str.Delete");
+			tr.appendChild(td);
+			tableFilesBody.appendChild(tr);
+			updatePanel();
+		}
+
+		function deleteFile() {
+			if (JsonWebApi.active)
+				return;
+
+			tableFilesBody.removeChild(this.parentNode.parentNode);
+			updatePanel();
+		}
+
+		function txtFile_change() {
+			if (!window.File || !window.FileReader || !window.FormData) {
+				Notification.error("@Str.YourBrowserDoesNotSupportAdvancedFileHandling");
+				return;
+			}
+
+			if (JsonWebApi.active || !txtFile.files || !txtFile.files.length)
+				return;
+
+			var i, parent = txtFile.parentNode;
+
+			for (i = 0; i < txtFile.files.length; i++)
+				addFile(txtFile.files[i]);
+
+			parent.removeChild(txtFile);
+			txtFile = document.createElement("input");
+			txtFile.setAttribute("id", "txtFile");
+			txtFile.setAttribute("type", "file");
+			txtFile.setAttribute("multiple", "multiple");
+			txtFile.onchange = txtFile_change;
+			txtFile.className = "form-control";
+			parent.appendChild(txtFile);
+		}
+
+		function addFiles() {
+			if (JsonWebApi.active)
+				return;
+
+			txtFile.click();
+		}
+
+		function clearFiles() {
+			if (JsonWebApi.active)
+				return;
+
+			while (tableFilesBody.firstChild)
+				tableFilesBody.removeChild(tableFilesBody.firstChild);
+			updatePanel();
+		}
+
+		if (tableFilesBody) {
+			window.addEventListener("dragover", function (e) {
+				return cancelEvent(e);
+			}, true);
+
+			window.addEventListener("drop", function (e) {
+				if (JsonWebApi.active)
+					return cancelEvent(e);
+				var i, dt = e.dataTransfer;
+				if (dt.items) {
+					for (i = 0; i < dt.items.length; i++) {
+						if (dt.items[i].kind == "file")
+							addFile(dt.items[i].getAsFile());
+					}
+				} else {
+					for (i = 0; i < dt.files.length; i++)
+						addFile(dt.files[i]);
+				}
+				return cancelEvent(e);
+			}, true);
+
+			window.addEventListener("dragend", function (e) {
+				var i, dt = e.dataTransfer;
+				if (dt.items) {
+					for (i = 0; i < dt.items.length; i++)
+						dt.items.remove(i);
+				} else {
+					dt.clearData();
+				}
+			}, true);
+		}
+
+		function deleteItem(confirmed) {
+			if (JsonWebApi.active)
+				return;
+
+			Notification.hide();
+
+			if (!confirmed) {
+				$("#modalDelete").modal({
+					backdrop: true,
+					keyboard: true
+				});
+			} else {
+				$("#modalDelete").modal("hide");
+
+				Notification.wait();
+
+				JsonWebApi.get("@Url.Action("Delete")", function (response) {
+					if (response.success)
+						window.location.href = "@Url.Action("Manage")";
+					else
+						Notification.error(response.value, true);
+				}, "id", "@(Model == null ? 0 : Model.Id)");
+			}
+		}
+
+		function createFile(d, getFileNameFromFiles, files, i) {
+			if (getFileNameFromFiles)
+				d.name = files[i].name;
+			d.extension = files[i].extension;
+			d.size = files[i].size;
+
+			var formData = new FormData();
+			for (var a in d)
+				formData.append(a, d[a]);
+			formData.append("file", files[i].file);
+
+			JsonWebApi.postFormData("@Url.Action("Create")", formData, function (response) {
+				if (response.success) {
+					tableFilesBody.removeChild(tableFilesBody.firstChild);
+					i++;
+					if (i >= files.length) {
+						resetForm(form);
+						clearFiles();
+						Notification.success("@Html.Raw(Str.DocumentSuccessfullyCreated)");
+					} else {
+						createFile(d, getFileNameFromFiles, files, i);
+					}
+				} else {
+					Notification.error(response.value, true);
+				}
+			});
+		}
+
+		$("#form").validate({
+			rules: {
+				name: {
+					maxlength: 128,
+					required: @(Model == null ? "false" : "true"),
+				},
+				description: {
+					maxlength: 255
+				},
+				unity: {
+					required: true
+				},
+				course: {
+					required: true
+				},
+				partitionType: {
+					required: true
+				},
+				documentType: {
+					required: true
+				}
+			},
+			submitHandler: function (form) {
+				if (JsonWebApi.active)
+					return;
+
+				var i, file, name, extension, files = [];
+
+				if (tableFilesBody) {
+					for (i = 0; i < tableFilesBody.childNodes.length; i++) {
+						file = tableFilesBody.childNodes[i].file;
+						name = tableFilesBody.childNodes[i].getAttribute("data-name");
+						extension = tableFilesBody.childNodes[i].getAttribute("data-extension");
+						if (!file || !file.size || !name || !extension)
+							continue;
+						files.push({
+							file: file,
+							name: name,
+							extension: extension,
+							size: file.size
+						});
+					}
+
+					if (!files.length) {
+						Notification.error("@Str.NoFilesWereAdded");
+						return;
+					}
+				}
+
+				var d = {
+					id: @(Model == null ? 0 : Model.Id),
+					name: trim(_("name").value),
+					description: _("description").value,
+					unity: parseInt(_("unity").value),
+					course: parseInt(_("course").value),
+					partitionType: parseInt(_("partitionType").value),
+					documentType: parseInt(_("documentType").value)
+				};
+
+				Notification.wait();
+
+				@if (Model == null) {
+					<text>
+					if (files.length > 1)
+						d.description = "";
+					createFile(d, files.length > 1 || !d.name, files, 0);
+					</text>
+				} else {
+					<text>
+					JsonWebApi.post("@Url.Action("Update")", d, function (response) {
+						if (response.success)
+							Notification.success("@Html.Raw(Str.DocumentSuccessfullyChanged)");
+						else
+							Notification.error(response.value, true);
+					});
+					</text>
+				}
+			}
+		});
+
+		//]]>
+	</script>
+}
