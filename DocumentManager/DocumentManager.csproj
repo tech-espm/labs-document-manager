@@ -9,6 +9,7 @@
     <Content Remove="App_Data\**" />
     <EmbeddedResource Remove="App_Data\**" />
     <None Remove="App_Data\**" />
+    <None Remove="Utils\.gitignore" />
   </ItemGroup>
 
   <ItemGroup>
