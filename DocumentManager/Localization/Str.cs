@@ -252,6 +252,12 @@ namespace DocumentManager.Localization {
 		public static string AddValue => CurrentLanguage == LanguageEn ? "Add Value" : "Adicionar Valor";
 		public static string DeleteValue => CurrentLanguage == LanguageEn ? "Delete Value" : "Excluir Valor";
 		public static string AtLeastOneValueNeedsToBeAddedToTheTag => CurrentLanguage == LanguageEn ? "At least one value needs to be added to the tag 😢" : "Pelo menos um valor precisa ser adicionado à etiqueta 😢";
+		public static string document => CurrentLanguage == LanguageEn ? "document" : "documento";
+		public static string theDocument => CurrentLanguage == LanguageEn ? "the document" : "o documento";
+		public static string DocumentNotFound => CurrentLanguage == LanguageEn ? "Document not found!" : "Documento não encontrado!";
+		public static string CreateDocument => CurrentLanguage == LanguageEn ? "Create Document" : "Criar Documento";
+		public static string EditDocument => CurrentLanguage == LanguageEn ? "Edit Document" : "Editar Documento";
+		public static string ManageDocuments => CurrentLanguage == LanguageEn ? "Manage Documents" : "Gerenciar Documentos";
 
 		#endregion
 
