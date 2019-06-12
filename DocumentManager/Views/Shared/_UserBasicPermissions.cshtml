@@ -1,0 +1,95 @@
+﻿@{
+	User loggedUser = ViewBag.LoggedUser;
+}
+<div class="row">
+	<div class="col-sm-6 col-md-3">
+		<div class="form-group">
+			<label for="unity">@Str.Unity</label>
+			<select size="1" id="unity" name="unity" class="form-control"><option value="">@Str.SELECT</option></select>
+		</div>
+	</div>
+	<div class="col-sm-6 col-md-3">
+		<div class="form-group">
+			<label for="course">@Str.Course</label>
+			<select size="1" id="course" name="course" class="form-control"><option value="">@Str.SELECT</option></select>
+		</div>
+	</div>
+	<div class="col-sm-6 col-md-3">
+		<div class="form-group">
+			<label for="partitionType">@Str.PartitionType</label>
+			<select size="1" id="partitionType" name="partitionType" class="form-control"><option value="">@Str.SELECT</option></select>
+		</div>
+	</div>
+	<div class="col-sm-6 col-md-3">
+		<div class="form-group">
+			<label for="documentType">@Str.DocumentType</label>
+			<select size="1" id="documentType" name="documentType" class="form-control"><option value="">@Str.SELECT</option></select>
+		</div>
+	</div>
+	<script type="text/javascript">
+		//<![CDATA[
+		"use strict";
+
+		(function () {
+			var cbUnity = document.getElementById("unity"),
+				cbCourse = document.getElementById("course"),
+				cbPartitionType = document.getElementById("partitionType"),
+				cbDocumentType = document.getElementById("documentType"),
+				valueProp = "@Str._ValueProperty",
+				units = @Json.Serialize(loggedUser.Permissions),
+				option;
+
+			prepareCascadeCbSearch(cbUnity, cbCourse, "", true,
+				function (cp) { return cp.course.id; },
+				function (cp) { return cp.course.shortName[valueProp]; },
+				function (selectedIndex) {
+					if (!selectedIndex) {
+						cbUnity.unity = null;
+						return [];
+					}
+					cbUnity.unity = units[selectedIndex - 1];
+					return cbUnity.unity.courses;
+				}
+			);
+
+			prepareCascadeCbSearch(cbCourse, cbPartitionType, "", true,
+				function (ptp) { return ptp.partitionType.id; },
+				function (ptp) { return ptp.partitionType.name[valueProp]; },
+				function (selectedIndex) {
+					if (!selectedIndex || !cbUnity.unity) {
+						cbCourse.course = null;
+						return [];
+					}
+					cbCourse.course = cbUnity.unity.courses[selectedIndex - 1];
+					return cbCourse.course.partitionTypes;
+				}
+			);
+
+			prepareCascadeCbSearch(cbCourse, cbDocumentType, "", true,
+				function (dtp) { return dtp.documentType.id; },
+				function (dtp) { return dtp.documentType.name[valueProp]; },
+				function (selectedIndex) {
+					if (!selectedIndex || !cbUnity.unity) {
+						cbCourse.course = null;
+						return [];
+					}
+					cbCourse.course = cbUnity.unity.courses[selectedIndex - 1];
+					return cbCourse.course.documentTypes;
+				}
+			);
+
+			if (!units || !units.length)
+				return;
+
+			for (var i = 0; i < units.length; i++) {
+				option = document.createElement("option");
+				option.setAttribute("value", units[i].unity.id);
+				option.textContent = units[i].unity.name[valueProp];
+				cbUnity.appendChild(option);
+			}
+
+		})();
+
+		//]]>
+	</script>
+</div>

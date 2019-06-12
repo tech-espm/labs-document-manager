@@ -2049,8 +2049,15 @@ window.mergeLists = function (destination, listB) {
 		if (!select)
 			return;
 		select.value = value;
-		if (select.onchange)
+		if (("createEvent" in document)) {
+			var e = document.createEvent("HTMLEvents");
+			e.initEvent("change", false, true);
+			select.dispatchEvent(e);
+		} else if (("fireEvent" in select)) {
+			select.fireEvent("onchange");
+		} else if (select.onchange) {
 			select.onchange();
+		}
 		if (select.cbSearchChange)
 			select.cbSearchChange();
 	};
@@ -2137,5 +2144,36 @@ window.mergeLists = function (destination, listB) {
 
 		if (select.value && parseInt(select.value))
 			cbSearch_Change.apply(select);
+	};
+
+	window.prepareCascadeCbSearch = function (select, nextSelect, emptyValue, autoSetSingleValue, valueGetter, textGetter, optsCallback) {
+		if (!select)
+			return;
+
+		if (!select.cbSearchChange)
+			prepareCbSearch(select);
+
+		if (!nextSelect.cbSearchChange)
+			prepareCbSearch(nextSelect);
+
+		if (!nextSelect || !valueGetter || !textGetter || !optsCallback)
+			return;
+
+		select.addEventListener("change", function () {
+			var i, nextValue = emptyValue, opt, opts = optsCallback(select.options.selectedIndex, select.value);
+			while (nextSelect.childNodes.length > 1)
+				nextSelect.removeChild(nextSelect.childNodes[1]);
+			if (opts && opts.length) {
+				for (i = 0; i < opts.length; i++) {
+					opt = document.createElement("option");
+					opt.setAttribute("value", valueGetter(opts[i]));
+					opt.textContent = textGetter(opts[i]);
+					nextSelect.appendChild(opt);
+				}
+				if (autoSetSingleValue && opts.length === 1)
+					nextValue = valueGetter(opts[0]);
+			}
+			setCbSearch(nextSelect, nextValue);
+		});
 	};
 })();

@@ -21,6 +21,60 @@ namespace DocumentManager.Models {
 			LoggedInButNoPermission = -1
 		}
 
+		public class DocumentTypePermission {
+			public readonly DocumentType DocumentType;
+
+			public DocumentTypePermission(DocumentType documentType) {
+				DocumentType = documentType;
+			}
+
+			public override string ToString() {
+				return DocumentType.ToString();
+			}
+		}
+
+		public class PartitionTypePermission {
+			public readonly PartitionType PartitionType;
+
+			public PartitionTypePermission(PartitionType partitionType) {
+				PartitionType = partitionType;
+			}
+
+			public override string ToString() {
+				return PartitionType.ToString();
+			}
+		}
+
+		public class CoursePermission {
+			public readonly Course Course;
+			public readonly PartitionTypePermission[] PartitionTypes;
+			public readonly DocumentTypePermission[] DocumentTypes;
+
+			public CoursePermission(Course course, PartitionTypePermission[] partitionTypes, DocumentTypePermission[] documentTypes) {
+				Course = course;
+				PartitionTypes = partitionTypes;
+				DocumentTypes = documentTypes;
+			}
+
+			public override string ToString() {
+				return Course.ToString();
+			}
+		}
+
+		public class UnityPermission {
+			public readonly Unity Unity;
+			public readonly CoursePermission[] Courses;
+
+			public UnityPermission(Unity unity, CoursePermission[] courses) {
+				Unity = unity;
+				Courses = courses;
+			}
+
+			public override string ToString() {
+				return Unity.ToString();
+			}
+		}
+
 		private static readonly Dictionary<int, User> UsersById = new Dictionary<int, User>(16);
 		private static readonly CommonReadRareWriteLock Lock = new CommonReadRareWriteLock();
 
@@ -35,6 +89,7 @@ namespace DocumentManager.Models {
 		public string ProfileName;
 		public long TokenLow, TokenHigh;
 		private int[] Features;
+		private UnityPermission[] UnityPermissions;
 
 		private string Serialize() {
 			byte[] buffer = new byte[24];
@@ -408,6 +463,55 @@ namespace DocumentManager.Models {
 
 		public override string ToString() {
 			return UserName;
+		}
+
+		public UnityPermission[] Permissions {
+			get {
+				// TODO: Placeholder
+				if (UnityPermissions == null) {
+					PartitionType[] partitionTypes = PartitionType.GetAll();
+					List<PartitionTypePermission> partitionTypePermissions = new List<PartitionTypePermission>();
+					foreach (PartitionType partitionType in partitionTypes)
+						partitionTypePermissions.Add(new PartitionTypePermission(partitionType));
+					PartitionTypePermission[] partitionTypePermissionsArray = partitionTypePermissions.ToArray();
+
+					DocumentType[] documentTypes = DocumentType.GetAll();
+					List<DocumentTypePermission> documentTypePermissions = new List<DocumentTypePermission>();
+					foreach (DocumentType documentType in documentTypes)
+						documentTypePermissions.Add(new DocumentTypePermission(documentType));
+					DocumentTypePermission[] documentTypePermissionsArray = documentTypePermissions.ToArray();
+
+					Course[] courses = Course.GetAll();
+					List<CoursePermission> coursePermissions = new List<CoursePermission>();
+					foreach (Course course in courses)
+						coursePermissions.Add(new CoursePermission(course, partitionTypePermissionsArray, documentTypePermissionsArray));
+					CoursePermission[] coursePermissionsArray = coursePermissions.ToArray();
+
+					Unity[] units = Unity.GetAll();
+					List<UnityPermission> unityPermissions = new List<UnityPermission>();
+					foreach (Unity unity in units)
+						unityPermissions.Add(new UnityPermission(unity, coursePermissionsArray));
+
+					UnityPermissions = unityPermissions.ToArray();
+				}
+
+				return UnityPermissions;
+			}
+		}
+
+		public bool HasPermission(int unity) {
+			// TODO: Placeholder
+			return true;
+		}
+
+		public bool HasPermission(int unity, int course) {
+			// TODO: Placeholder
+			return true;
+		}
+
+		public bool HasPermission(int unity, int course, int partitionType, int documentType) {
+			// TODO: Placeholder
+			return true;
 		}
 
 		public bool HasFeature(Feature requestedFeature) {

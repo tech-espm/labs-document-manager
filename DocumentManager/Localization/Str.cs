@@ -62,6 +62,7 @@ namespace DocumentManager.Localization {
 		// string x = Localizer["x"];
 
 		public static string _FieldSuffix => CurrentLanguage == LanguageEn ? "_en" : "_ptbr";
+		public static string _ValueProperty => CurrentLanguage == LanguageEn ? "valueEn" : "valuePtBr";
 		public static string _o => CurrentLanguage == LanguageEn ? "the" : "o";
 		public static string _a => CurrentLanguage == LanguageEn ? "the" : "a";
 		public static string _os => CurrentLanguage == LanguageEn ? "the" : "os";
@@ -139,10 +140,15 @@ namespace DocumentManager.Localization {
 		public static string UserOrPasswordIsInvalid => CurrentLanguage == LanguageEn ? "User or password is invalid!" : "Usuário ou senha inválidos!";
 		public static string AnErrorOccurredDuringTheLoginProcess => CurrentLanguage == LanguageEn ? "An error occurred during the login process 😢 - " : "Ocorreu um erro durante o processo de login 😢 - ";
 		public static string PartitionTypes => CurrentLanguage == LanguageEn ? "Partition Types" : "Tipos de Partição";
+		public static string PartitionType => CurrentLanguage == LanguageEn ? "Partition Type" : "Tipo de Partição";
 		public static string DocumentTypes => CurrentLanguage == LanguageEn ? "Document Types" : "Tipos de Documento";
+		public static string DocumentType => CurrentLanguage == LanguageEn ? "Document Type" : "Tipo de Documento";
 		public static string Documents => CurrentLanguage == LanguageEn ? "Documents" : "Documentos";
+		public static string Document => CurrentLanguage == LanguageEn ? "Document" : "Documento";
 		public static string Profiles => CurrentLanguage == LanguageEn ? "Profiles" : "Perfis";
+		public static string Profile => CurrentLanguage == LanguageEn ? "Profile" : "Perfil";
 		public static string Users => CurrentLanguage == LanguageEn ? "Users" : "Usuários";
+		public static string User => CurrentLanguage == LanguageEn ? "User" : "Usuário";
 		public static string Creation => CurrentLanguage == LanguageEn ? "Creation" : "Criação";
 		public static string Listing => CurrentLanguage == LanguageEn ? "Listing" : "Listagem";
 		public static string Edition => CurrentLanguage == LanguageEn ? "Edition" : "Edição";
@@ -180,6 +186,7 @@ namespace DocumentManager.Localization {
 		public static string user => CurrentLanguage == LanguageEn ? "user" : "usuário";
 		public static string theUserName => CurrentLanguage == LanguageEn ? "the user name" : "o login";
 		public static string Units => CurrentLanguage == LanguageEn ? "Units" : "Unidades";
+		public static string Unity => CurrentLanguage == LanguageEn ? "Unity" : "Unidade";
 		public static string CreateDocumentType => CurrentLanguage == LanguageEn ? "Create Document Type" : "Criar Tipo de Documento";
 		public static string DoYouReallyWantToDeleteTheDocumentType => CurrentLanguage == LanguageEn ? "Do you really want to delete the document type?" : "Tem certeza que deseja excluir o tipo de documento?";
 		public static string DocumentTypesBasicInformation => CurrentLanguage == LanguageEn ? "Document Type's Basic Information" : "Informações Básicas do Tipo de Documento";
@@ -211,7 +218,6 @@ namespace DocumentManager.Localization {
 		public static string SELECT => CurrentLanguage == LanguageEn ? "SELECT..." : "SELECIONE...";
 		public static string CreateUser => CurrentLanguage == LanguageEn ? "Create User" : "Criar Usuário";
 		public static string UsersBasicInformation => CurrentLanguage == LanguageEn ? "User's Basic Information" : "Informações Básicas do Usuário";
-		public static string Profile => CurrentLanguage == LanguageEn ? "Profile" : "Perfil";
 		public static string UserSuccessfullyCreated => CurrentLanguage == LanguageEn ? "User successfully created! 😄" : "Usuário criado com sucesso! 😄";
 		public static string ManageUsers => CurrentLanguage == LanguageEn ? "Manage Users" : "Gerenciar Usuários";
 		public static string ChangeProfile => CurrentLanguage == LanguageEn ? "Change Profile" : "Alterar Perfil";
