@@ -126,3 +126,42 @@ CREATE TABLE user_permission_document_type (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
+
+CREATE TABLE document (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(128) NOT NULL,
+	description VARCHAR(255) NOT NULL,
+	extension VARCHAR(10) NOT NULL,
+	size INT NOT NULL,
+	unity_id INT NOT NULL,
+	course_id INT NOT NULL,
+	partition_type_id INT NOT NULL,
+	document_type_id INT NOT NULL,
+	creation_user_id INT NOT NULL,
+	creation_time DATETIME NOT NULL,
+	CONSTRAINT document_unity_id_fk
+		FOREIGN KEY (unity_id)
+		REFERENCES unity (id)
+		ON DELETE RESTRICT
+		ON UPDATE CASCADE,
+	CONSTRAINT document_course_id_fk
+		FOREIGN KEY (course_id)
+		REFERENCES course (id)
+		ON DELETE RESTRICT
+		ON UPDATE CASCADE,
+	CONSTRAINT document_partition_type_id_fk
+		FOREIGN KEY (partition_type_id)
+		REFERENCES partition_type (id)
+		ON DELETE RESTRICT
+		ON UPDATE CASCADE,
+	CONSTRAINT document_document_type_id_fk
+		FOREIGN KEY (document_type_id)
+		REFERENCES document_type (id)
+		ON DELETE RESTRICT
+		ON UPDATE CASCADE,
+	CONSTRAINT document_creation_user_id_fk
+		FOREIGN KEY (creation_user_id)
+		REFERENCES user (id)
+		ON DELETE NO ACTION
+		ON UPDATE CASCADE
+);

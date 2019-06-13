@@ -61,6 +61,18 @@ namespace DocumentManager.Controllers {
 			return View("_NotFound");
 		}
 
+		protected ActionResult FileResult(string path, string extensionOverride = null) {
+			if (extensionOverride == null)
+				extensionOverride = System.IO.Path.GetExtension(path).ToLowerInvariant();
+			return new PhysicalFileResult(path, Storage.Mime(extensionOverride) ?? Storage.DefaultMime);
+		}
+
+		protected ActionResult DownloadResult(string path, string downloadName = null, string extensionOverride = null) {
+			ActionResult result = FileResult(path, extensionOverride ?? System.IO.Path.GetExtension(path).ToLowerInvariant());
+			Response.Headers.Add("Content-Disposition", "attachment; filename=" + (downloadName ?? System.IO.Path.GetFileName(path)));
+			return result;
+		}
+
 		public override void OnActionExecuting(ActionExecutingContext context) {
 			LoggedUser = Models.User.GetFromClient(HttpContext);
 			ViewBag.LoggedUser = LoggedUser;
