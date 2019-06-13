@@ -10,6 +10,7 @@
     <EmbeddedResource Remove="App_Data\**" />
     <None Remove="App_Data\**" />
     <None Remove="Utils\.gitignore" />
+    <Content Remove="appsettings.Development.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -100,4 +101,7 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="appsettings.Development.json" />
+  </ItemGroup>
 </Project>
