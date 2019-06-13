@@ -2,6 +2,92 @@
 @{
 	ViewBag.Title = Str.ManageUsers;
 }
+<div class="modal fade" tabindex="-1" role="dialog" id="modalPermissionId">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">@Str.Permissions</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+
+                     
+
+                    <ul class="nav nav-tabs">
+                        <li role="presentation" class="active" data-toggle="tab" href="#nav-partition"><a href="#">@Str.partitionType</a></li>
+                        <li role="presentation" data-toggle="tab" href="#nav-documents"><a href="#">@Str.Documents</a></li>
+                    </ul>
+                    <div class="tab-content " id="nav-tabContent">
+                        <div class="tab-pane active" id="nav-partition">
+                            <table class="table table-striped table-hover no-margin-bottom">
+                                <thead>
+                                    <tr>
+                                        <td>@Str.partitionType</td>
+                                        <td>@Str.Delete</td>
+                                        <td>@Str.Download</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (PartitionType partitionType in PartitionType.GetAll())
+            {
+                        <tr>
+
+                            <td class="clickable col-max">@partitionType.Name</td>
+                            <td class="clickable col-min">
+                                <input type="checkbox" />
+                            </td>
+                            <td class="clickable col-min">
+                                <input type="checkbox" />
+                            </td>
+                        </tr>
+}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="nav-documents">
+
+                            <table class="table table-striped table-hover no-margin-bottom">
+                                <thead>
+                                    <tr>
+                                        <td>@Str.DocumentType</td>
+                                        <td>@Str.Delete</td>
+                                        <td>@Str.Download</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (DocumentType documentType in DocumentType.GetAll())
+            {
+                        <tr>
+
+                            <td class="clickable col-max">@documentType.Name</td>
+                            <td class="clickable col-min">
+                                <input type="checkbox" />
+                            </td>
+                            <td class="clickable col-min">
+                                <input type="checkbox" />
+                            </td>
+                        </tr>
+}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <script type="text/javascript">
+//<![CDATA[
+                        "use strict";
+                        prepareCbSearch(document.getElementById("profileId"));
+                        //]]></script>
+                </div>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnPermissionId"><i class="fa fa-check"></i>@Str.SaveChanges</button>
+                <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalProfileId">
 	<div class="modal-dialog" role="document">
@@ -91,6 +177,7 @@
 			columns: [
 				{ title: "@Str.UserName", "class": "col-min" },
 				{ title: "@Str.FullName", "class": "col-max", render: encode },
+                { title: "@Str.Permission", "class": "col-min text-center" },
 				{ title: "@Str.Profile", "class": "col-min text-center" },
 				{ title: "@Str.Activation", "class": "col-min text-center" },
 				{ title: " ", "class": "col-min", searchable: false, orderable: false }
@@ -101,7 +188,8 @@
 				[
 					"<img class=\"profile-img\" alt=\"Perfil\" src=\"/User/Picture?id=@(user.Id)&v=@(user.PictureVersion)\" width=\"40\" height=\"40\" />" + encode("@user.UserName"),
 					"@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.FullName))",
-					"<button id=\"btnProfile@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changeProfile(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.ProfileName))") + "</button>",
+                    "<button id=\"btnPermission@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changePermission(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Str.EditPermission))") + "</button>",
+                    "<button id=\"btnProfile@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changeProfile(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.ProfileName))") + "</button>",
 					"@Html.Raw(user.Active ? "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-danger btn-block\\\" onclick=\\\"activateUser(0, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-times\\\"></i> " + Str.Deactivate + "</button>" : "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-success btn-block\\\" onclick=\\\"activateUser(1, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-check\\\"></i> " + Str.Activate + "</button>")",
 					"<button type=\"button\" class=\"btn btn-outline btn-primary\" onclick=\"resetPassword('@user.UserName', @user.Id)\"><i class=\"fa fa-refresh\"></i>@Str.ResetPassword</button>"
 				],
@@ -111,6 +199,38 @@
 			deferRender: true,
 			export: { title: "@Str.Users" }
 		});
+
+        function changePermission(btn, userName, id) {
+            if (JsonWebApi.active)
+                return;
+
+         /*     setCbSearch(_("permissionId"), "");
+
+          _("btnPermissionId").onclick = function () {
+                var cbPermissionId = _("permissionId"), permissionId = parseInt(cbPermissionId.value), permissionName;
+
+                if (JsonWebApi.active)
+                    return;
+
+                $("#modalPermissionId").modal("hide");
+
+                permissionName = cbPermissionId.options[cbPermissionId.options.selectedIndex].textContent;
+
+                Notification.wait();
+
+                JsonWebApi.get("@Url.Action("SetPermission")", function (response) {
+                    if (response.success)
+                        location.reload(true);
+                    else
+                        Notification.error(response.value, true);
+                }, "id", id, "permissionId", permissionId);
+            };
+    */
+            $("#modalPermissionId").modal({
+                backdrop: true,
+                keyboard: true
+            });
+        }
 
 		function changeProfile(btn, userName, id) {
 			if (JsonWebApi.active)
