@@ -106,7 +106,9 @@ namespace DocumentManager.Localization {
 		public static string Login => "Login";
 		public static string Logout => "Logout";
 		public static string NoPermission => CurrentLanguage == LanguageEn ? "No Permission" : "Sem Permissão";
-		public static string NoAccessPermission => CurrentLanguage == LanguageEn ? "No access permission 😢" : "Sem permissão de acesso 😢";
+        public static string Permission => CurrentLanguage == LanguageEn ? "Permission" : "Permissão";
+        public static string EditPermission => CurrentLanguage == LanguageEn ? "Edit Permissions" : "Editar Permissões";
+        public static string NoAccessPermission => CurrentLanguage == LanguageEn ? "No access permission 😢" : "Sem permissão de acesso 😢";
 		public static string MyProfile => CurrentLanguage == LanguageEn ? "My Profile" : "Meu Perfil";
 		public static string EditProfile => CurrentLanguage == LanguageEn ? "Edit Profile" : "Editar Perfil";
 		public static string FullName => CurrentLanguage == LanguageEn ? "Full Name" : "Nome Completo";
@@ -210,7 +212,8 @@ namespace DocumentManager.Localization {
 		public static string theUserName => CurrentLanguage == LanguageEn ? "the user name" : "o login";
 		public static string Units => CurrentLanguage == LanguageEn ? "Units" : "Unidades";
 		public static string Unity => CurrentLanguage == LanguageEn ? "Unity" : "Unidade";
-		public static string CreateDocumentType => CurrentLanguage == LanguageEn ? "Create Document Type" : "Criar Tipo de Documento";
+        public static string Download => CurrentLanguage == LanguageEn ? "Download" : "Download";
+        public static string CreateDocumentType => CurrentLanguage == LanguageEn ? "Create Document Type" : "Criar Tipo de Documento";
 		public static string DoYouReallyWantToDeleteTheDocumentType => CurrentLanguage == LanguageEn ? "Do you really want to delete the document type?" : "Tem certeza que deseja excluir o tipo de documento?";
 		public static string DocumentTypesBasicInformation => CurrentLanguage == LanguageEn ? "Document Type's Basic Information" : "Informações Básicas do Tipo de Documento";
 		public static string DocumentTypeSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Document type successfully created! 😄" : "Tipo de documento criado com sucesso! 😄";
