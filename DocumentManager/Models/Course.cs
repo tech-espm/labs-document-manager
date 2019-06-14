@@ -10,7 +10,7 @@ using System.Web;
 
 namespace DocumentManager.Models {
 	public class Course {
-		public static readonly MemoryCache<Course[]> CachedCourses = new MemoryCache<Course[]>(CacheStorageRefresher);
+		public static readonly MemoryCache<Course[][]> CachedCourses = new MemoryCache<Course[][]>(CacheStorageRefresher);
 
 		public int Id;
 		public Str Name, ShortName;
@@ -54,23 +54,29 @@ namespace DocumentManager.Models {
 			return new Course(id, new Str(nameEn, namePtBr), new Str(shortNameEn, shortNamePtBr));
 		}
 
-		private static Course[] CacheStorageRefresher() {
+		private static Course[][] CacheStorageRefresher() {
 			List<Course> courses = new List<Course>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand($"SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM course ORDER BY name{Str._FieldSuffix} ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand($"SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM course", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							courses.Add(new Course(reader.GetInt32(0), new Str(reader.GetString(1), reader.GetString(2)), new Str(reader.GetString(3), reader.GetString(4))));
 					}
 				}
 			}
-			return courses.ToArray();
+			Course[] arrayEn, arrayPtBr;
+			Array.Sort(arrayEn = courses.ToArray(), (a, b) => a.Name.ValueEn.CompareTo(b.Name.ValueEn));
+			Array.Sort(arrayPtBr = courses.ToArray(), (a, b) => a.Name.ValuePtBr.CompareTo(b.Name.ValuePtBr));
+			// Ordered by language
+			// Str.LanguagePtBr = 0
+			// Str.LanguageEn = 1
+			return new Course[][] { arrayPtBr, arrayEn };
 		}
 
 		public static Course[] GetAll() {
-			Course[] cachedCourses = CachedCourses.StartReading();
+			Course[][] cachedCourses = CachedCourses.StartReading();
 			try {
-				return cachedCourses;
+				return cachedCourses?[Str.CurrentLanguage];
 			} finally {
 				CachedCourses.FinishReading();
 			}
@@ -80,12 +86,13 @@ namespace DocumentManager.Models {
 			// Since all course objects are cached in memory with all properties
 			// set, and since there are not too many of those objects, it is faster
 			// to look up for one of them here, instead of reading it from the database
-			Course[] cachedCourses = CachedCourses.StartReading();
+			Course[][] cachedCourses = CachedCourses.StartReading();
 			try {
-				if (cachedCourses != null) {
-					for (int i = cachedCourses.Length - 1; i >= 0; i--) {
-						if (cachedCourses[i].Id == id)
-							return cachedCourses[i];
+				Course[] courses;
+				if ((courses = cachedCourses?[0]) != null) {
+					for (int i = courses.Length - 1; i >= 0; i--) {
+						if (courses[i].Id == id)
+							return courses[i];
 					}
 				}
 				return null;

@@ -10,7 +10,7 @@ using System.Web;
 
 namespace DocumentManager.Models {
 	public class Unity {
-		public static readonly MemoryCache<Unity[]> CachedUnits = new MemoryCache<Unity[]>(CacheStorageRefresher);
+		public static readonly MemoryCache<Unity[][]> CachedUnits = new MemoryCache<Unity[][]>(CacheStorageRefresher);
 
 		public int Id;
 		public Str Name, ShortName;
@@ -54,7 +54,7 @@ namespace DocumentManager.Models {
 			return new Unity(id, new Str(nameEn, namePtBr), new Str(shortNameEn, shortNamePtBr));
 		}
 
-		private static Unity[] CacheStorageRefresher() {
+		private static Unity[][] CacheStorageRefresher() {
 			List<Unity> units = new List<Unity>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand($"SELECT id, name_en, name_ptbr, short_name_en, short_name_ptbr FROM unity ORDER BY name{Str._FieldSuffix} ASC", conn)) {
@@ -64,13 +64,19 @@ namespace DocumentManager.Models {
 					}
 				}
 			}
-			return units.ToArray();
+			Unity[] arrayEn, arrayPtBr;
+			Array.Sort(arrayEn = units.ToArray(), (a, b) => a.Name.ValueEn.CompareTo(b.Name.ValueEn));
+			Array.Sort(arrayPtBr = units.ToArray(), (a, b) => a.Name.ValuePtBr.CompareTo(b.Name.ValuePtBr));
+			// Ordered by language
+			// Str.LanguagePtBr = 0
+			// Str.LanguageEn = 1
+			return new Unity[][] { arrayPtBr, arrayEn };
 		}
 
 		public static Unity[] GetAll() {
-			Unity[] cachedUnits = CachedUnits.StartReading();
+			Unity[][] cachedUnits = CachedUnits.StartReading();
 			try {
-				return cachedUnits;
+				return cachedUnits?[Str.CurrentLanguage];
 			} finally {
 				CachedUnits.FinishReading();
 			}
@@ -80,12 +86,13 @@ namespace DocumentManager.Models {
 			// Since all unity objects are cached in memory with all properties
 			// set, and since there are not too many of those objects, it is faster
 			// to look up for one of them here, instead of reading it from the database
-			Unity[] cachedUnits = CachedUnits.StartReading();
+			Unity[][] cachedUnits = CachedUnits.StartReading();
 			try {
-				if (cachedUnits != null) {
-					for (int i = cachedUnits.Length - 1; i >= 0; i--) {
-						if (cachedUnits[i].Id == id)
-							return cachedUnits[i];
+				Unity[] units;
+				if ((units = cachedUnits?[0]) != null) {
+					for (int i = units.Length - 1; i >= 0; i--) {
+						if (units[i].Id == id)
+							return units[i];
 					}
 				}
 				return null;

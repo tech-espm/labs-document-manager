@@ -10,7 +10,7 @@ using System.Web;
 
 namespace DocumentManager.Models {
 	public class PartitionType {
-		public static readonly MemoryCache<PartitionType[]> CachedPartitionTypes = new MemoryCache<PartitionType[]>(CacheStorageRefresher);
+		public static readonly MemoryCache<PartitionType[][]> CachedPartitionTypes = new MemoryCache<PartitionType[][]>(CacheStorageRefresher);
 
 		public int Id;
 		public Str Name;
@@ -45,7 +45,7 @@ namespace DocumentManager.Models {
 			return new PartitionType(id, new Str(nameEn, namePtBr));
 		}
 
-		private static PartitionType[] CacheStorageRefresher() {
+		private static PartitionType[][] CacheStorageRefresher() {
 			List<PartitionType> partitionTypes = new List<PartitionType>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand($"SELECT id, name_en, name_ptbr FROM partition_type ORDER BY name{Str._FieldSuffix} ASC", conn)) {
@@ -55,13 +55,19 @@ namespace DocumentManager.Models {
 					}
 				}
 			}
-			return partitionTypes.ToArray();
+			PartitionType[] arrayEn, arrayPtBr;
+			Array.Sort(arrayEn = partitionTypes.ToArray(), (a, b) => a.Name.ValueEn.CompareTo(b.Name.ValueEn));
+			Array.Sort(arrayPtBr = partitionTypes.ToArray(), (a, b) => a.Name.ValuePtBr.CompareTo(b.Name.ValuePtBr));
+			// Ordered by language
+			// Str.LanguagePtBr = 0
+			// Str.LanguageEn = 1
+			return new PartitionType[][] { arrayPtBr, arrayEn };
 		}
 
 		public static PartitionType[] GetAll() {
-			PartitionType[] cachedPartitionTypes = CachedPartitionTypes.StartReading();
+			PartitionType[][] cachedPartitionTypes = CachedPartitionTypes.StartReading();
 			try {
-				return cachedPartitionTypes;
+				return cachedPartitionTypes?[Str.CurrentLanguage];
 			} finally {
 				CachedPartitionTypes.FinishReading();
 			}
@@ -71,12 +77,13 @@ namespace DocumentManager.Models {
 			// Since all partition type objects are cached in memory with all properties
 			// set, and since there are not too many of those objects, it is faster
 			// to look up for one of them here, instead of reading it from the database
-			PartitionType[] cachedPartitionTypes = CachedPartitionTypes.StartReading();
+			PartitionType[][] cachedPartitionTypes = CachedPartitionTypes.StartReading();
 			try {
-				if (cachedPartitionTypes != null) {
-					for (int i = cachedPartitionTypes.Length - 1; i >= 0; i--) {
-						if (cachedPartitionTypes[i].Id == id)
-							return cachedPartitionTypes[i];
+				PartitionType[] partitionTypes;
+				if ((partitionTypes = cachedPartitionTypes?[0]) != null) {
+					for (int i = partitionTypes.Length - 1; i >= 0; i--) {
+						if (partitionTypes[i].Id == id)
+							return partitionTypes[i];
 					}
 				}
 				return null;

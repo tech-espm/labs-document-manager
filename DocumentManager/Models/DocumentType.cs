@@ -10,7 +10,7 @@ using System.Web;
 
 namespace DocumentManager.Models {
 	public class DocumentType {
-		public static readonly MemoryCache<DocumentType[]> CachedDocumentTypes = new MemoryCache<DocumentType[]>(CacheStorageRefresher);
+		public static readonly MemoryCache<DocumentType[][]> CachedDocumentTypes = new MemoryCache<DocumentType[][]>(CacheStorageRefresher);
 
 		public int Id;
 		public Str Name;
@@ -45,7 +45,7 @@ namespace DocumentManager.Models {
 			return new DocumentType(id, new Str(nameEn, namePtBr));
 		}
 
-		private static DocumentType[] CacheStorageRefresher() {
+		private static DocumentType[][] CacheStorageRefresher() {
 			List<DocumentType> documentTypes = new List<DocumentType>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand($"SELECT id, name_en, name_ptbr FROM document_type ORDER BY name{Str._FieldSuffix} ASC", conn)) {
@@ -55,13 +55,19 @@ namespace DocumentManager.Models {
 					}
 				}
 			}
-			return documentTypes.ToArray();
+			DocumentType[] arrayEn, arrayPtBr;
+			Array.Sort(arrayEn = documentTypes.ToArray(), (a, b) => a.Name.ValueEn.CompareTo(b.Name.ValueEn));
+			Array.Sort(arrayPtBr = documentTypes.ToArray(), (a, b) => a.Name.ValuePtBr.CompareTo(b.Name.ValuePtBr));
+			// Ordered by language
+			// Str.LanguagePtBr = 0
+			// Str.LanguageEn = 1
+			return new DocumentType[][] { arrayPtBr, arrayEn };
 		}
 
 		public static DocumentType[] GetAll() {
-			DocumentType[] cachedDocumentTypes = CachedDocumentTypes.StartReading();
+			DocumentType[][] cachedDocumentTypes = CachedDocumentTypes.StartReading();
 			try {
-				return cachedDocumentTypes;
+				return cachedDocumentTypes?[Str.CurrentLanguage];
 			} finally {
 				CachedDocumentTypes.FinishReading();
 			}
@@ -71,12 +77,13 @@ namespace DocumentManager.Models {
 			// Since all document type objects are cached in memory with all properties
 			// set, and since there are not too many of those objects, it is faster
 			// to look up for one of them here, instead of reading it from the database
-			DocumentType[] cachedDocumentTypes = CachedDocumentTypes.StartReading();
+			DocumentType[][] cachedDocumentTypes = CachedDocumentTypes.StartReading();
 			try {
-				if (cachedDocumentTypes != null) {
-					for (int i = cachedDocumentTypes.Length - 1; i >= 0; i--) {
-						if (cachedDocumentTypes[i].Id == id)
-							return cachedDocumentTypes[i];
+				DocumentType[] documentTypes;
+				if ((documentTypes = cachedDocumentTypes?[0]) != null) {
+					for (int i = documentTypes.Length - 1; i >= 0; i--) {
+						if (documentTypes[i].Id == id)
+							return documentTypes[i];
 					}
 				}
 				return null;
