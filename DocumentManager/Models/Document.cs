@@ -25,6 +25,8 @@ namespace DocumentManager.Models {
 			public int PartitionType { get; set; }
 			public int DocumentType { get; set; }
 			public string Name { get; set; }
+			public string NameEn { get; set; }
+			public string NamePtBr { get; set; }
 			public string Description { get; set; }
 			public string Extension { get; set; }
 			public int[] TagIds { get; set; }
@@ -37,6 +39,8 @@ namespace DocumentManager.Models {
 		public List<IdValuePair> Tags;
 
 		public string SafeDownloadName => Storage.SafeFileName(Name.ToLower()) + "." + Extension;
+
+		public string FormattedSize => Storage.SafeFileName(Name.ToLower()) + "." + Extension;
 
 		private static void Validate(Data data) {
 			if (data == null)
@@ -159,19 +163,105 @@ namespace DocumentManager.Models {
 		public static List<Document> GetAll() {
 			List<Document> documents = new List<Document>();
 			string dateTimeFormat = Str._DateTimeFormat;
+			string fieldSuffix = Str._FieldSuffix;
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand($@"
 SELECT d.id, d.name, d.description, d.extension, d.size, d.creation_time,
-d.unity_id, un.name{Str._FieldSuffix},
-d.course_id, co.name{Str._FieldSuffix},
-d.partition_type_id, pt.name{Str._FieldSuffix},
-d.document_type_id, dt.name{Str._FieldSuffix}
+d.unity_id, un.name{fieldSuffix},
+d.course_id, co.name{fieldSuffix},
+d.partition_type_id, pt.name{fieldSuffix},
+d.document_type_id, dt.name{fieldSuffix}
 FROM document d
 INNER JOIN unity un ON un.id = d.unity_id
 INNER JOIN course co ON co.id = d.course_id
 INNER JOIN partition_type pt ON pt.id = d.partition_type_id
 INNER JOIN document_type dt ON dt.id = d.document_type_id
-ORDER BY un.name{Str._FieldSuffix} ASC, co.name{Str._FieldSuffix} ASC, pt.name{Str._FieldSuffix} ASC, dt.name{Str._FieldSuffix} ASC, d.name ASC", conn)) {
+ORDER BY un.name{fieldSuffix} ASC, co.name{fieldSuffix} ASC, pt.name{fieldSuffix} ASC, dt.name{fieldSuffix} ASC, d.name ASC", conn)) {
+					using (MySqlDataReader reader = cmd.ExecuteReader()) {
+						while (reader.Read())
+							documents.Add(
+								new Document(
+									reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), reader.GetDateTime(5).ToString(dateTimeFormat),
+									new IdNamePair(reader.GetInt32(6), reader.GetString(7)),
+									new IdNamePair(reader.GetInt32(8), reader.GetString(9)),
+									new IdNamePair(reader.GetInt32(10), reader.GetString(11)),
+									new IdNamePair(reader.GetInt32(12), reader.GetString(13))
+								)
+							);
+					}
+				}
+			}
+			return documents;
+		}
+
+		public static List<Document> GetAllByFilter(Data data, User user) {
+			List<Document> documents = new List<Document>();
+			string dateTimeFormat = Str._DateTimeFormat;
+			string fieldSuffix = Str._FieldSuffix;
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlCommand cmd = new MySqlCommand()) {
+					StringBuilder builder = new StringBuilder(1024);
+					builder.Append($@"
+SELECT d.id, d.name, d.description, d.extension, d.size, d.creation_time,
+d.unity_id, un.name{fieldSuffix},
+d.course_id, co.name{fieldSuffix},
+d.partition_type_id, pt.name{fieldSuffix},
+d.document_type_id, dt.name{fieldSuffix}
+FROM document d
+INNER JOIN unity un ON un.id = d.unity_id
+INNER JOIN course co ON co.id = d.course_id
+INNER JOIN partition_type pt ON pt.id = d.partition_type_id
+INNER JOIN document_type dt ON dt.id = d.document_type_id
+");
+					// TODO: add EXISTS to restrict which documents the user can actually see
+					builder.Append(@"
+WHERE 1 = 1
+");
+
+					if (data != null) {
+						if (data.Id > 0) {
+							builder.Append(" AND d.id = @id");
+							cmd.Parameters.AddWithValue("@id", data.Id);
+						}
+
+						if (data.Unity > 0) {
+							builder.Append(" AND d.unity_id = @unity_id");
+							cmd.Parameters.AddWithValue("@unity_id", data.Unity);
+						}
+
+						if (data.Course > 0) {
+							builder.Append(" AND d.course_id = @course_id");
+							cmd.Parameters.AddWithValue("@course_id", data.Course);
+						}
+
+						if (data.PartitionType > 0) {
+							builder.Append(" AND d.partition_type_id = @partition_type_id");
+							cmd.Parameters.AddWithValue("@partition_type_id", data.PartitionType);
+						}
+
+						if (data.DocumentType > 0) {
+							builder.Append(" AND d.document_type_id = @document_type_id");
+							cmd.Parameters.AddWithValue("@document_type_id", data.DocumentType);
+						}
+
+						if (!string.IsNullOrWhiteSpace(data.NameEn)) {
+							builder.Append($" AND d.name_en LIKE @name_en");
+							cmd.Parameters.AddWithValue("@name_en", $"%{data.NameEn.Trim().ToUpper()}%");
+						}
+
+						if (!string.IsNullOrWhiteSpace(data.NamePtBr)) {
+							builder.Append($" AND d.name_ptbr LIKE @name_ptbr");
+							cmd.Parameters.AddWithValue("@name_ptbr", $"%{data.NamePtBr.Trim().ToUpper()}%");
+						}
+					}
+
+					builder.Append($@"
+ORDER BY un.name{fieldSuffix} ASC, co.name{fieldSuffix} ASC, pt.name{fieldSuffix} ASC, dt.name{fieldSuffix} ASC, d.name ASC
+");
+
+					cmd.Connection = conn;
+					cmd.CommandText = builder.ToString();
+
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						while (reader.Read())
 							documents.Add(
@@ -192,13 +282,14 @@ ORDER BY un.name{Str._FieldSuffix} ASC, co.name{Str._FieldSuffix} ASC, pt.name{S
 		public static Document GetById(int id, bool full) {
 			Document document = null;
 			string dateTimeFormat = Str._DateTimeFormat;
+			string fieldSuffix = Str._FieldSuffix;
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlCommand cmd = new MySqlCommand($@"
 SELECT d.id, d.name, d.description, d.extension, d.size, d.creation_time,
-d.unity_id, un.name{Str._FieldSuffix},
-d.course_id, co.name{Str._FieldSuffix},
-d.partition_type_id, pt.name{Str._FieldSuffix},
-d.document_type_id, dt.name{Str._FieldSuffix}
+d.unity_id, un.name{fieldSuffix},
+d.course_id, co.name{fieldSuffix},
+d.partition_type_id, pt.name{fieldSuffix},
+d.document_type_id, dt.name{fieldSuffix}
 FROM document d
 INNER JOIN unity un ON un.id = d.unity_id
 INNER JOIN course co ON co.id = d.course_id

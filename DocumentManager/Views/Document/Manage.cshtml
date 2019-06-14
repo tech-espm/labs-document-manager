@@ -1,0 +1,112 @@
+﻿@{
+	ViewBag.Title = Str.Documents;
+	ViewBag.RemoveLabelsFromUserPermissions = true;
+}
+
+<div class="panel panel-default">
+	<form class="panel-body no-bottom" action="." method="post" id="form">
+
+		<partial name="_UserBasicPermissions" />
+
+		<div class="row">
+			<div class="col-sm-4">
+				<div class="form-group">
+					<input id="id" name="id" class="form-control upper" type="number" placeholder="@Str.Id">
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="form-group">
+					<input id="nameEn" name="nameEn" maxlength="128" class="form-control upper" type="text" placeholder="@Str.Name (@Str.English)">
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="form-group">
+					<input id="namePtBr" name="namePtBr" maxlength="128" class="form-control upper" type="text" placeholder="@Str.Name (@Str.Portuguese)">
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-3 col-sm-offset-9">
+				<div class="form-group">
+					<button class="btn btn-primary btn-block" type="submit"><i class="fa fa-search"></i>@Str.Search</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="panel panel-default hidden" id="dataTablePanel">
+	<div class="panel-body">
+		<div id="dataTableMainPlaceholder" class="dataTable_wrapper"></div>
+	</div>
+</div>
+
+@section Scripts {
+	<script type="text/javascript">
+		//<![CDATA[
+		"use strict";
+
+		var dataTablePanel = _("dataTablePanel"), dataTableMainPlaceholder = _("dataTableMainPlaceholder");
+
+		_("form").onsubmit = function (e) {
+			if (JsonWebApi.active)
+				return;			Notification.wait();
+			window.dataTableMain = undefined;			dataTablePanel.className = "panel panel-default hidden";			while (dataTableMainPlaceholder.firstChild)
+				dataTableMainPlaceholder.removeChild(dataTableMainPlaceholder.firstChild);
+			var formData = new FormData();
+
+			formData.append("unity", _("unity").value);
+			formData.append("course", _("course").value);
+			formData.append("partitionType", _("partitionType").value);
+			formData.append("documentType", _("documentType").value);
+			formData.append("id", _("id").value);
+			formData.append("nameEn", _("nameEn").value);
+			formData.append("namePtBr", _("namePtBr").value);
+
+			JsonWebApi.postFormData("@Url.Action("GetAllByFilter")", formData, function (response) {
+				Notification.hide();
+
+				if (response.success) {
+					var table = document.createElement("table");
+					table.setAttribute("id", "dataTableMain");
+					table.className = "table table-striped table-hover table-row-pointer";
+					dataTableMainPlaceholder.appendChild(table);
+					dataTablePanel.className = "panel panel-default";
+
+					window.dataTableMain = prepareDataTable("dataTableMain", {
+						order: [[0, "asc"]],
+						columns: [
+							{ title: "@Str.Unity", render: encode, data: "unity.name" },
+							{ title: "@Str.Course", render: encode, data: "course.name" },
+							{ title: "@Str.PartitionType", render: encode, data: "partitionType.name" },
+							{ title: "@Str.DocumentType", render: encode, data: "documentType.name" },
+							{ title: "@Str.Name", render: encode, data: "name" },
+							{ title: "", data: "size", visible: false, searchable: false, orderable: false },
+							{ title: "@Str.FileSize", data: null, orderData: 5, render: function (v, type, row) { return formatSize(row.size); } },
+							@if (ViewBag.DocumentEdit == true) {
+							<text>
+							{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return "<a target=\"_blank\" title=\"@Str.Edit\" href=\"@(Url.Action("Edit"))?id=" + row.id + "\" class=\"btn btn-outline btn-primary\"><i class=\"fa fa-nomargin fa-edit\"></i></a>"; } },
+							</text>
+							} else {
+							<text>
+							{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return ""; } },
+							</text>
+							}
+						],
+						data: response.value,
+						deferRender: true,
+						export: { title: "@Str.Documents" }
+					});
+					prepareDataTableMain();
+
+				} else {
+					Notification.error(response.value, true);
+				}
+			});
+			return cancelEvent(e);
+		};
+
+		//]]>
+	</script>
+}

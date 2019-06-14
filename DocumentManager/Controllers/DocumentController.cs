@@ -18,7 +18,13 @@ namespace DocumentManager.Controllers {
 		[AccessControl(Feature.DocumentList)]
 		public IActionResult Manage() {
 			ViewBag.DocumentEdit = LoggedUser.HasFeature(Feature.DocumentEdit);
-			return View(Document.GetAll());
+			return View();
+		}
+
+		[HttpPost]
+		[AccessControl(Feature.DocumentList, true)]
+		public IActionResult GetAllByFilter(Document.Data documentData) {
+			return Json(Document.GetAllByFilter(documentData, LoggedUser));
 		}
 
 		[HttpGet]

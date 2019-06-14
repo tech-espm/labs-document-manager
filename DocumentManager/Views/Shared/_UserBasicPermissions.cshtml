@@ -1,30 +1,40 @@
 ﻿@{
 	User loggedUser = ViewBag.LoggedUser;
 	int[] initialUserPermissions = ViewBag.InitialUserPermissions;
+	bool removeLabels = (ViewBag.RemoveLabelsFromUserPermissions == true);
+	bool onlyUnityAndCourse = (ViewBag.OnlyUnityAndCourseUserPermissions == true);
 }
 <div class="row">
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6 @(onlyUnityAndCourse ? "" : "col-md-3")">
 		<div class="form-group">
-			<label for="unity">@Str.Unity</label>
-			<select size="1" id="unity" name="unity" class="form-control"><option value="">@Str.SELECT</option></select>
+			@if (!removeLabels) {
+				<label for="unity">@Str.Unity</label>
+			}
+			<select size="1" id="unity" name="unity" class="form-control"><option value="">@(removeLabels ? Str.UNITY : Str.SELECT)</option></select>
 		</div>
 	</div>
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6 @(onlyUnityAndCourse ? "" : "col-md-3")">
 		<div class="form-group">
-			<label for="course">@Str.Course</label>
-			<select size="1" id="course" name="course" class="form-control"><option value="">@Str.SELECT</option></select>
+			@if (!removeLabels) {
+				<label for="course">@Str.Course</label>
+			}
+			<select size="1" id="course" name="course" class="form-control"><option value="">@(removeLabels ? Str.COURSE : Str.SELECT)</option></select>
 		</div>
 	</div>
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6 col-md-3 @(onlyUnityAndCourse ? "hidden" : "")">
 		<div class="form-group">
-			<label for="partitionType">@Str.PartitionType</label>
-			<select size="1" id="partitionType" name="partitionType" class="form-control"><option value="">@Str.SELECT</option></select>
+			@if (!removeLabels) {
+				<label for="partitionType">@Str.PartitionType</label>
+			}
+			<select size="1" id="partitionType" name="partitionType" class="form-control"><option value="">@(removeLabels ? Str.PARTITIONTYPE : Str.SELECT)</option></select>
 		</div>
 	</div>
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6 col-md-3 @(onlyUnityAndCourse ? "hidden" : "")">
 		<div class="form-group">
-			<label for="documentType">@Str.DocumentType</label>
-			<select size="1" id="documentType" name="documentType" class="form-control"><option value="">@Str.SELECT</option></select>
+			@if (!removeLabels) {
+				<label for="documentType">@Str.DocumentType</label>
+			}
+			<select size="1" id="documentType" name="documentType" class="form-control"><option value="">@(removeLabels ? Str.DOCUMENTTYPE : Str.SELECT)</option></select>
 		</div>
 	</div>
 	<script type="text/javascript">
@@ -53,31 +63,35 @@
 				}
 			);
 
-			prepareCascadeCbSearch(cbCourse, cbPartitionType, "", true,
-				function (ptp) { return ptp.partitionType.id; },
-				function (ptp) { return ptp.partitionType.name[valueProp]; },
-				function (selectedIndex) {
-					if (!selectedIndex || !cbUnity.unity) {
-						cbCourse.course = null;
-						return [];
+			@if (!onlyUnityAndCourse) {
+				<text>
+				prepareCascadeCbSearch(cbCourse, cbPartitionType, "", true,
+					function (ptp) { return ptp.partitionType.id; },
+					function (ptp) { return ptp.partitionType.name[valueProp]; },
+					function (selectedIndex) {
+						if (!selectedIndex || !cbUnity.unity) {
+							cbCourse.course = null;
+							return [];
+						}
+						cbCourse.course = cbUnity.unity.courses[selectedIndex - 1];
+						return cbCourse.course.partitionTypes;
 					}
-					cbCourse.course = cbUnity.unity.courses[selectedIndex - 1];
-					return cbCourse.course.partitionTypes;
-				}
-			);
+				);
 
-			prepareCascadeCbSearch(cbCourse, cbDocumentType, "", true,
-				function (dtp) { return dtp.documentType.id; },
-				function (dtp) { return dtp.documentType.name[valueProp]; },
-				function (selectedIndex) {
-					if (!selectedIndex || !cbUnity.unity) {
-						cbCourse.course = null;
-						return [];
+				prepareCascadeCbSearch(cbCourse, cbDocumentType, "", true,
+					function (dtp) { return dtp.documentType.id; },
+					function (dtp) { return dtp.documentType.name[valueProp]; },
+					function (selectedIndex) {
+						if (!selectedIndex || !cbUnity.unity) {
+							cbCourse.course = null;
+							return [];
+						}
+						cbCourse.course = cbUnity.unity.courses[selectedIndex - 1];
+						return cbCourse.course.documentTypes;
 					}
-					cbCourse.course = cbUnity.unity.courses[selectedIndex - 1];
-					return cbCourse.course.documentTypes;
-				}
-			);
+				);
+				</text>
+			}
 
 			if (!units || !units.length)
 				return;

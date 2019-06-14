@@ -134,6 +134,7 @@ namespace DocumentManager.Localization {
 		public static string DoYouReallyWantToDeleteTheCourse => CurrentLanguage == LanguageEn ? "Do you really want to delete the course?" : "Tem certeza que deseja excluir o curso?";
 		public static string ThisOperationCannotBeUndone => CurrentLanguage == LanguageEn ? "This operation cannot be undone!" : "Essa operação NÃO pode ser desfeita!";
 		public static string Course => CurrentLanguage == LanguageEn ? "Course" : "Curso";
+		public static string COURSE => CurrentLanguage == LanguageEn ? "COURSE" : "CURSO";
 		public static string course => CurrentLanguage == LanguageEn ? "course" : "curso";
 		public static string theCourse => CurrentLanguage == LanguageEn ? "the course" : "o curso";
 		public static string Courses => CurrentLanguage == LanguageEn ? "Courses" : "Cursos";
@@ -171,8 +172,10 @@ namespace DocumentManager.Localization {
 		public static string AnErrorOccurredDuringTheLoginProcess => CurrentLanguage == LanguageEn ? "An error occurred during the login process 😢 - " : "Ocorreu um erro durante o processo de login 😢 - ";
 		public static string PartitionTypes => CurrentLanguage == LanguageEn ? "Partition Types" : "Tipos de Partição";
 		public static string PartitionType => CurrentLanguage == LanguageEn ? "Partition Type" : "Tipo de Partição";
+		public static string PARTITIONTYPE => CurrentLanguage == LanguageEn ? "PARTITION TYPE" : "TIPO DE PARTIÇÃO";
 		public static string DocumentTypes => CurrentLanguage == LanguageEn ? "Document Types" : "Tipos de Documento";
 		public static string DocumentType => CurrentLanguage == LanguageEn ? "Document Type" : "Tipo de Documento";
+		public static string DOCUMENTTYPE => CurrentLanguage == LanguageEn ? "DOCUMENT TYPE" : "TIPO DE DOCUMENTO";
 		public static string Documents => CurrentLanguage == LanguageEn ? "Documents" : "Documentos";
 		public static string Document => CurrentLanguage == LanguageEn ? "Document" : "Documento";
 		public static string Profiles => CurrentLanguage == LanguageEn ? "Profiles" : "Perfis";
@@ -217,7 +220,8 @@ namespace DocumentManager.Localization {
 		public static string theUserName => CurrentLanguage == LanguageEn ? "the user name" : "o login";
 		public static string Units => CurrentLanguage == LanguageEn ? "Units" : "Unidades";
 		public static string Unity => CurrentLanguage == LanguageEn ? "Unity" : "Unidade";
-        public static string Download => CurrentLanguage == LanguageEn ? "Download" : "Download";
+		public static string UNITY => CurrentLanguage == LanguageEn ? "UNITY" : "UNIDADE";
+		public static string Download => CurrentLanguage == LanguageEn ? "Download" : "Download";
         public static string CreateDocumentType => CurrentLanguage == LanguageEn ? "Create Document Type" : "Criar Tipo de Documento";
 		public static string DoYouReallyWantToDeleteTheDocumentType => CurrentLanguage == LanguageEn ? "Do you really want to delete the document type?" : "Tem certeza que deseja excluir o tipo de documento?";
 		public static string DocumentTypesBasicInformation => CurrentLanguage == LanguageEn ? "Document Type's Basic Information" : "Informações Básicas do Tipo de Documento";
