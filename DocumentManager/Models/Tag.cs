@@ -10,7 +10,7 @@ using System.Web;
 
 namespace DocumentManager.Models {
 	public class Tag {
-		public static readonly MemoryCache<Tag[]> CachedTags = new MemoryCache<Tag[]>(CacheStorageRefresher);
+		private static readonly MemoryCache<Tag[][]> CachedTags = new MemoryCache<Tag[][]>(CacheStorageRefresher);
 
 		public class Value {
 			public int Id, Position;
@@ -218,10 +218,10 @@ namespace DocumentManager.Models {
 			};
 		}
 
-		private static Tag[] CacheStorageRefresher() {
+		private static Tag[][] CacheStorageRefresher() {
 			List<Tag> tags = new List<Tag>();
 			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand($"SELECT t.id, t.name_en, t.name_ptbr, v.id, v.position, v.name_en, v.name_ptbr FROM tag t INNER JOIN tag_value v ON v.tag_id = t.id ORDER BY t.name{Str._FieldSuffix} ASC, v.position ASC", conn)) {
+				using (MySqlCommand cmd = new MySqlCommand($"SELECT t.id, t.name_en, t.name_ptbr, v.id, v.position, v.name_en, v.name_ptbr FROM tag t INNER JOIN tag_value v ON v.tag_id = t.id ORDER BY t.id ASC, v.position ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						Tag lastTag = new Tag();
 						while (reader.Read()) {
@@ -241,13 +241,19 @@ namespace DocumentManager.Models {
 					}
 				}
 			}
-			return tags.ToArray();
+			Tag[] arrayEn, arrayPtBr;
+			Array.Sort(arrayEn = tags.ToArray(), (a, b) => a.Name.ValueEn.CompareTo(b.Name.ValueEn));
+			Array.Sort(arrayPtBr = tags.ToArray(), (a, b) => a.Name.ValuePtBr.CompareTo(b.Name.ValuePtBr));
+			// Ordered by language
+			// Str.LanguagePtBr = 0
+			// Str.LanguageEn = 1
+			return new Tag[][] { arrayPtBr, arrayEn };
 		}
 
 		public static Tag[] GetAll() {
-			Tag[] cachedTags = CachedTags.StartReading();
+			Tag[][] cachedTags = CachedTags.StartReading();
 			try {
-				return cachedTags;
+				return cachedTags?[Str.CurrentLanguage];
 			} finally {
 				CachedTags.FinishReading();
 			}
@@ -257,12 +263,13 @@ namespace DocumentManager.Models {
 			// Since all unity objects are cached in memory with all properties
 			// set, and since there are not too many of those objects, it is faster
 			// to look up for one of them here, instead of reading it from the database
-			Tag[] cachedTags = CachedTags.StartReading();
+			Tag[][] cachedTags = CachedTags.StartReading();
 			try {
-				if (cachedTags != null) {
-					for (int i = cachedTags.Length - 1; i >= 0; i--) {
-						if (cachedTags[i].Id == id)
-							return cachedTags[i];
+				Tag[] tags;
+				if ((tags = cachedTags?[0]) != null) {
+					for (int i = tags.Length - 1; i >= 0; i--) {
+						if (tags[i].Id == id)
+							return tags[i];
 					}
 				}
 				return null;

@@ -5,6 +5,19 @@
 	ViewBag.InitialUserPermissions = (Model == null ? null : new int[] { Model.Unity.Id, Model.Course.Id, Model.PartitionType.Id, Model.DocumentType.Id });
 }
 
+@section Styles {
+	<style type="text/css">
+		.content-section {
+			counter-reset: content-section;
+		}
+
+		.content-enum::before {
+			counter-increment: content-section;
+			content: counter(content-section);
+		}
+	</style>
+}
+
 <div class="modal fade" tabindex="-1" role="dialog" id="modalDelete">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -59,6 +72,45 @@
 
 				<partial name="_UserBasicPermissions" />
 
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-sm-6 col-md-8 col-sm-space-bottom">
+								<select id="cbNewTag" class="form-control" size="1">
+									@foreach (Tag t in Tag.GetAll()) {
+										<option value="@t.Id">@t.Name.ToString()</option>
+									}
+								</select>
+								<script type="text/javascript">
+									//<![CDATA[
+									"use strict";
+									prepareCbSearch(_("cbNewTag"));
+									//]]>
+								</script>
+							</div>
+							<div class="col-sm-6 col-md-4">
+								<button class="btn btn-outline btn-success btn-block" type="button" onclick="addTag()"><i class="fa fa-tag"></i>@Str.AddTag</button>
+							</div>
+						</div>
+					</div>
+					<div class="panel-body">
+						<!-- overflow: visible in order to make cbSearch work... -->
+						<div class="table-responsive" style="overflow: visible;">
+							<table class="table table-striped table-hover no-margin-bottom">
+								<thead>
+									<tr>
+										<th></th>
+										<th class="col-50">@Str.Name</th>
+										<th class="col-50">@Str.Value</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody id="tableTagsBody" class="content-section ui-sortable"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
 				@if (Model == null) {
 					<div class="panel panel-default">
 						<div class="panel-heading"><div id="divFileTitle">0 @Str.files (@Str.Total: 0 bytes)</div><div class="text-right"><small>@Str.YouCanAlsoDragAndDropFilesHere</small></div></div>
@@ -101,12 +153,68 @@
 		//<![CDATA[
 		"use strict";
 
-		var divNameDescription = _("divNameDescription"),
+		var valueProp = "@Str._ValueProperty",
+			tags = @Json.Serialize(Tag.GetAll()),
+			tagsById = {},
+			modelTags = @Json.Serialize(Model?.Tags),
+			cbNewTag = _("cbNewTag"),
+			divNameDescription = _("divNameDescription"),
 			divFileTitle = _("divFileTitle"),
 			tableFiles = _("tableFiles"),
 			tableFilesBody = _("tableFilesBody"),
 			btnSave = _("btnSave"),
-			txtFile = _("txtFile");
+			txtFile = _("txtFile"),
+			tableTagsBody = _("tableTagsBody");
+
+		$(tableTagsBody).sortable().disableSelection();
+
+		$(tableTagsBody).on("click", "button", function () {
+			tableTagsBody.removeChild(this.parentNode.parentNode);
+		});
+
+		function clearTags() {
+			if (JsonWebApi.active)
+				return;
+
+			while (tableTagsBody.firstChild)
+				tableTagsBody.removeChild(tableTagsBody.firstChild);
+		}
+
+		function addTag(id, valueId) {
+			if (JsonWebApi.active)
+				return;
+
+			if (!id) {
+				id = parseInt(cbNewTag.value);
+				if (!id)
+					return;
+			}
+
+			var tag = tagsById[id], tr, i, v, select;
+			if (!tag)
+				return;
+
+			tr = $('<tr data-id="' + id + '" class="ui-sortable-handle"><td class="col-min content-enum"></td><td class="col-50">' + encode(tag.name[valueProp]) + '</td><td class="col-50"><select size="1" class="form-control upper"></select></td><td class="col-min"><button type="button" title="@Str.Delete" class="btn btn-outline btn-danger"><i class="fa fa-nomargin fa-trash-o"></i></button></td></tr>')[0];
+			select = $(tr.getElementsByTagName("select")[0]);
+			for (i = 0; i < tag.values.length; i++) {
+				v = tag.values[i];
+				select.append('<option value="' + v.id + '">' + encode(v.name[valueProp]) + '</option>');
+			}
+			prepareCbSearch(select[0]);
+			if (valueId)
+				setCbSearch(select[0], valueId);
+			tableTagsBody.appendChild(tr);
+		}
+
+		(function () {
+			var i;
+			for (i = tags.length - 1; i >= 0; i--)
+				tagsById[tags[i].id] = tags[i];
+			if (modelTags && modelTags.length) {
+				for (i = 0; i < modelTags.length; i++)
+					addTag(modelTags[i].id, modelTags[i].value);
+			}
+		})();
 
 		function updatePanel() {
 			var i, totalSize = 0, count = tableFilesBody.childNodes.length;
@@ -270,15 +378,29 @@
 			}
 		}
 
+		function createFormData(d) {
+			var formData = new FormData(), t, tr;
+
+			for (var a in d)
+				formData.append(a, d[a]);
+
+			for (t = 0; t < tableTagsBody.childNodes.length; t++) {
+				tr = tableTagsBody.childNodes[t];
+				formData.append("tagIds", tr.getAttribute("data-id"));
+				formData.append("tagValues", tr.getElementsByTagName("select")[0].value);
+			}
+
+			return formData;
+		}
+
 		function createFile(d, getFileNameFromFiles, files, i) {
 			if (getFileNameFromFiles)
 				d.name = files[i].name;
 			d.extension = files[i].extension;
 			d.size = files[i].size;
 
-			var formData = new FormData();
-			for (var a in d)
-				formData.append(a, d[a]);
+			var formData = createFormData(d);
+
 			formData.append("file", files[i].file);
 
 			JsonWebApi.postFormData("@Url.Action("Create")", formData, function (response) {
@@ -286,7 +408,10 @@
 					tableFilesBody.removeChild(tableFilesBody.firstChild);
 					i++;
 					if (i >= files.length) {
-						resetForm(form);
+						//resetForm(form);
+						_("name").value = "";
+						_("description").value = "";
+						//clearTags();
 						clearFiles();
 						Notification.success("@Html.Raw(Str.DocumentSuccessfullyCreated)");
 					} else {
@@ -367,7 +492,7 @@
 					</text>
 				} else {
 					<text>
-					JsonWebApi.post("@Url.Action("Update")", d, function (response) {
+					JsonWebApi.postFormData("@Url.Action("Update")", createFormData(d), function (response) {
 						if (response.success)
 							Notification.success("@Html.Raw(Str.DocumentSuccessfullyChanged)");
 						else

@@ -96,6 +96,7 @@ namespace DocumentManager.Localization {
 		public static string Create => CurrentLanguage == LanguageEn ? "Create" : "Criar";
 		public static string Manage => CurrentLanguage == LanguageEn ? "Manage" : "Gerenciar";
 		public static string Delete => CurrentLanguage == LanguageEn ? "Delete" : "Excluir";
+		public static string View => CurrentLanguage == LanguageEn ? "View" : "Visualizar";
 		public static string Edit => CurrentLanguage == LanguageEn ? "Edit" : "Editar";
 		public static string Error => CurrentLanguage == LanguageEn ? "Error" : "Erro";
 		public static string SomethingWentWrong => CurrentLanguage == LanguageEn ? "Something went wrong! 😢" : "Algo saiu muito errado! 😢";
@@ -259,6 +260,7 @@ namespace DocumentManager.Localization {
 		public static string TagNotFound => CurrentLanguage == LanguageEn ? "Tag not found!" : "Etiqueta não encontrada!";
 		public static string CreateTag => CurrentLanguage == LanguageEn ? "Create Tag" : "Criar Etiqueta";
 		public static string EditTag => CurrentLanguage == LanguageEn ? "Edit Tag" : "Editar Etiqueta";
+		public static string AddTag => CurrentLanguage == LanguageEn ? "Add Tag" : "Adicionar Etiqueta";
 		public static string ManageTags => CurrentLanguage == LanguageEn ? "Manage Tags" : "Gerenciar Etiquetas";
 		public static string value => CurrentLanguage == LanguageEn ? "value" : "valor";
 		public static string values => CurrentLanguage == LanguageEn ? "values" : "valores";

@@ -288,7 +288,7 @@ window.customFilterHandler = function (table, input) {
 	input.onkeyup = handler;
 };
 window.prepareCustomFilter = function (table, tableId, customFilterLabel, placeholder) {
-	var label, input, parent = document.getElementById(tableId + "_filter");
+	var label, input, parent = _(tableId + "_filter");
 	if (parent) {
 		while (parent.firstChild)
 			parent.removeChild(parent.firstChild);
@@ -632,7 +632,7 @@ window.prepareDataTableMain = (function () {
 					docOk = true;
 				}
 				if (!wrapper)
-					wrapper = document.getElementById("wrapper");
+					wrapper = _("wrapper");
 				ul = this.getElementsByTagName("ul");
 				if (closeLastBootstrap())
 					return;

@@ -141,7 +141,7 @@
 		}
 
 		$("#tableValuesBody").on("click", "button", function () {
-			document.getElementById("tableValuesBody").removeChild(this.parentNode.parentNode);
+			_("tableValuesBody").removeChild(this.parentNode.parentNode);
 		});
 
 		function deleteItem(confirmed) {
@@ -200,7 +200,7 @@
 
 				var nameEn = _("nameEn").value, namePtBr = _("namePtBr").value, values = [], i, trs, inputs;
 
-				trs = document.getElementById("tableValuesBody").getElementsByTagName("tr");
+				trs = _("tableValuesBody").getElementsByTagName("tr");
 				for (i = 0; i < trs.length; i++) {
 					inputs = trs[i].getElementsByTagName("input");
 					values.push({
@@ -236,7 +236,7 @@
 					<text>
 					JsonWebApi.post("@Url.Action("Update")", values, function (response) {
 						if (response.success) {
-							var i, values = response.value.values, trs = document.getElementById("tableValuesBody").getElementsByTagName("tr");
+							var i, values = response.value.values, trs = _("tableValuesBody").getElementsByTagName("tr");
 							for (i = values.length - 1; i >= 0; i--)
 								trs[i].setAttribute("data-id", values[i].id);
 							Notification.success("@Html.Raw(Str.TagSuccessfullyChanged)");

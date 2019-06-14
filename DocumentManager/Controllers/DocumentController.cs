@@ -41,7 +41,7 @@ namespace DocumentManager.Controllers {
 
 		[HttpPost]
 		[AccessControl(Feature.DocumentEdit, true)]
-		public IActionResult Update([FromBody]Document.Data documentData) {
+		public IActionResult Update(Document.Data documentData) {
 			try {
 				Document document = Document.GetById(documentData == null ? 0 : documentData.Id, true);
 				if (document == null)

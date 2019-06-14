@@ -107,6 +107,7 @@ CREATE TABLE user_permission_partition_type (
 	unity_id INT NOT NULL,
 	course_id INT NOT NULL,
 	partition_type_id INT NOT NULL,
+	feature_permission_id INT NOT NULL,
 	CONSTRAINT user_permission_partition_type_partition_type_id_fk
 		FOREIGN KEY (partition_type_id)
 		REFERENCES partition_type (id)
@@ -120,6 +121,7 @@ CREATE TABLE user_permission_document_type (
 	unity_id INT NOT NULL,
 	course_id INT NOT NULL,
 	document_type_id INT NOT NULL,
+	feature_permission_id INT NOT NULL,
 	CONSTRAINT user_permission_document_type_document_type_id_fk
 		FOREIGN KEY (document_type_id)
 		REFERENCES document_type (id)
@@ -163,5 +165,28 @@ CREATE TABLE document (
 		FOREIGN KEY (creation_user_id)
 		REFERENCES user (id)
 		ON DELETE NO ACTION
+		ON UPDATE CASCADE
+);
+
+CREATE TABLE document_tag (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	document_id INT NOT NULL,
+	tag_id INT NOT NULL,
+	tag_value_id INT NOT NULL,
+	UNIQUE KEY document_tag_document_id_tag_id_tag_value_id_un (document_id, tag_id, tag_value_id),
+	CONSTRAINT document_tag_document_id_fk
+		FOREIGN KEY (document_id)
+		REFERENCES document (id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT document_tag_id_fk
+		FOREIGN KEY (tag_id)
+		REFERENCES tag (id)
+		ON DELETE RESTRICT
+		ON UPDATE CASCADE,
+	CONSTRAINT document_tag_value_id_fk
+		FOREIGN KEY (tag_value_id)
+		REFERENCES tag_value (id)
+		ON DELETE RESTRICT
 		ON UPDATE CASCADE
 );

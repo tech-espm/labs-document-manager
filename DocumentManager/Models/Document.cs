@@ -85,6 +85,22 @@ namespace DocumentManager.Models {
 			}
 		}
 
+		private static void CreateTags(Data data, int id, MySqlConnection conn, MySqlTransaction tran) {
+			if (data.TagIds.Length > 0) {
+				using (MySqlCommand cmd = new MySqlCommand("INSERT INTO document_tag (document_id, tag_id, tag_value_id) VALUES (@document_id, @tag_id, @tag_value_id)", conn, tran)) {
+					cmd.Parameters.AddWithValue("@document_id", id);
+					cmd.Parameters.AddWithValue("@tag_id", 0);
+					cmd.Parameters.AddWithValue("@tag_value_id", 0);
+
+					for (int i = 0; i < data.TagIds.Length; i++) {
+						cmd.Parameters[1].Value = data.TagIds[i];
+						cmd.Parameters[2].Value = data.TagValues[i];
+						cmd.ExecuteNonQuery();
+					}
+				}
+			}
+		}
+
 		public static Document Create(Data data, IFormFile file, User user) {
 			Validate(data);
 
@@ -114,8 +130,7 @@ namespace DocumentManager.Models {
 						using (MySqlCommand cmd = new MySqlCommand("SELECT last_insert_id()", conn, tran)) {
 							id = (int)(ulong)cmd.ExecuteScalar();
 						}
-
-						// TODO: create tags
+						CreateTags(data, id, conn, tran);
 
 						path = Storage.Document(id, data.Extension);
 
@@ -201,9 +216,16 @@ WHERE d.id = @id", conn)) {
 								new IdNamePair(reader.GetInt32(12), reader.GetString(13))
 							);
 					}
+				}
+				if (full && document != null) {
+					document.Tags = new List<IdValuePair>();
 
-					if (full && document != null) {
-						// TODO: load tags
+					using (MySqlCommand cmd = new MySqlCommand($@"SELECT tag_id, tag_value_id FROM document_tag WHERE document_id = @document_id ORDER BY id ASC", conn)) {
+						cmd.Parameters.AddWithValue("@document_id", id);
+						using (MySqlDataReader reader = cmd.ExecuteReader()) {
+							while (reader.Read())
+								document.Tags.Add(new IdValuePair(reader.GetInt32(0), reader.GetInt32(1)));
+						}
 					}
 				}
 			}
@@ -235,23 +257,54 @@ WHERE d.id = @id", conn)) {
 			}
 			Validate(data);
 
-			using (MySqlConnection conn = Sql.OpenConnection()) {
-				using (MySqlCommand cmd = new MySqlCommand("UPDATE document SET name = @name, description = @description, unity_id = @unity_id, course_id = @course_id, partition_type_id = @partition_type_id, document_type_id = @document_type_id WHERE id = @id", conn)) {
-					cmd.Parameters.AddWithValue("@name", data.Name);
-					cmd.Parameters.AddWithValue("@description", data.Description);
-					cmd.Parameters.AddWithValue("@unity_id", data.Unity);
-					cmd.Parameters.AddWithValue("@course_id", data.Course);
-					cmd.Parameters.AddWithValue("@partition_type_id", data.PartitionType);
-					cmd.Parameters.AddWithValue("@document_type_id", data.DocumentType);
-					cmd.Parameters.AddWithValue("@id", Id);
-					cmd.ExecuteNonQuery();
+			bool recreateTags = true;
+			if (Tags.Count == data.TagIds.Length) {
+				recreateTags = false;
 
-					Name = data.Name;
-					Description = data.Description;
-					Unity.Id = data.Unity;
-					Course.Id = data.Course;
-					PartitionType.Id = data.PartitionType;
-					DocumentType.Id = data.DocumentType;
+				for (int i = 0; i < Tags.Count; i++) {
+					IdValuePair tag = Tags[i];
+					if (tag.Id != data.TagIds[i] ||
+						tag.Value != data.TagValues[i]) {
+						recreateTags = true;
+						break;
+					}
+				}
+			}
+
+			using (MySqlConnection conn = Sql.OpenConnection()) {
+				using (MySqlTransaction tran = conn.BeginTransaction()) {
+					try {
+						using (MySqlCommand cmd = new MySqlCommand("UPDATE document SET name = @name, description = @description, unity_id = @unity_id, course_id = @course_id, partition_type_id = @partition_type_id, document_type_id = @document_type_id WHERE id = @id", conn)) {
+							cmd.Parameters.AddWithValue("@name", data.Name);
+							cmd.Parameters.AddWithValue("@description", data.Description);
+							cmd.Parameters.AddWithValue("@unity_id", data.Unity);
+							cmd.Parameters.AddWithValue("@course_id", data.Course);
+							cmd.Parameters.AddWithValue("@partition_type_id", data.PartitionType);
+							cmd.Parameters.AddWithValue("@document_type_id", data.DocumentType);
+							cmd.Parameters.AddWithValue("@id", Id);
+							cmd.ExecuteNonQuery();
+
+							Name = data.Name;
+							Description = data.Description;
+							Unity.Id = data.Unity;
+							Course.Id = data.Course;
+							PartitionType.Id = data.PartitionType;
+							DocumentType.Id = data.DocumentType;
+						}
+
+						if (recreateTags) {
+							using (MySqlCommand cmd = new MySqlCommand("DELETE FROM document_tag WHERE document_id = @document_id", conn, tran)) {
+								cmd.Parameters.AddWithValue("@document_id", Id);
+								cmd.ExecuteNonQuery();
+							}
+							CreateTags(data, Id, conn, tran);
+						}
+
+						tran.Commit();
+					} catch {
+						tran.Rollback();
+						throw;
+					}
 				}
 			}
 		}
