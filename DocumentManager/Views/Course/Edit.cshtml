@@ -21,58 +21,54 @@
 	</div>
 </div>
 
-<form class="row" action="." method="post" id="form">
-	<div class="col-lg-12">
-		<div class="panel panel-default">
-			<div class="panel-heading clearfix">
-				<div class="pull-left">
-					@Str.CoursesBasicInformation
-				</div>
-				@if (Model != null && ViewBag.CourseDelete == true) {
-					<div class="pull-right">
-						<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
-					</div>
-				}
+<form class="panel panel-default" action="." method="post" id="form">
+	<div class="panel-heading clearfix">
+		<div class="pull-left">
+			@Str.CoursesBasicInformation
+		</div>
+		@if (Model != null && ViewBag.CourseDelete == true) {
+			<div class="pull-right">
+				<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
 			</div>
-			<div class="panel-body no-bottom">
-				@if (Model != null) {
-					<div class="form-group text-right">
-						<span class="label label-default">Id @Model.Id</span>
-					</div>
-				}
-				<div class="row">
-					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="nameEn">@Str.Name (@Str.English)</label>
-							<input id="nameEn" name="nameEn" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name.ValueEn)" />
-						</div>
-					</div>
-					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="namePtBr">@Str.Name (@Str.Portuguese)</label>
-							<input id="namePtBr" name="namePtBr" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name.ValuePtBr)" />
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="shortNameEn">@Str.ShortName (@Str.English)</label>
-							<input id="shortNameEn" name="shortNameEn" maxlength="16" class="form-control upper" type="text" spellcheck="false" value="@(Model == null ? "" : Model.ShortName.ValueEn)" />
-						</div>
-					</div>
-					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="shortNamePtBr">@Str.ShortName (@Str.Portuguese)</label>
-							<input id="shortNamePtBr" name="shortNamePtBr" maxlength="16" class="form-control upper" type="text" spellcheck="false" value="@(Model == null ? "" : Model.ShortName.ValuePtBr)" />
-						</div>
-					</div>
+		}
+	</div>
+	<div class="panel-body no-bottom">
+		@if (Model != null) {
+			<div class="form-group text-right">
+				<span class="label label-default">Id @Model.Id</span>
+			</div>
+		}
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="form-group">
+					<label for="nameEn">@Str.Name (@Str.English)</label>
+					<input id="nameEn" name="nameEn" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name.ValueEn)" />
 				</div>
 			</div>
-			<div class="panel-footer">
-				<input value="@(Model == null ? Str.CreateCourse : Str.SaveChanges)" class="btn btn-primary btn-lg btn-block" type="submit" />
+			<div class="col-sm-6">
+				<div class="form-group">
+					<label for="namePtBr">@Str.Name (@Str.Portuguese)</label>
+					<input id="namePtBr" name="namePtBr" maxlength="64" class="form-control upper" type="text" value="@(Model == null ? "" : Model.Name.ValuePtBr)" />
+				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="form-group">
+					<label for="shortNameEn">@Str.ShortName (@Str.English)</label>
+					<input id="shortNameEn" name="shortNameEn" maxlength="16" class="form-control upper" type="text" spellcheck="false" value="@(Model == null ? "" : Model.ShortName.ValueEn)" />
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group">
+					<label for="shortNamePtBr">@Str.ShortName (@Str.Portuguese)</label>
+					<input id="shortNamePtBr" name="shortNamePtBr" maxlength="16" class="form-control upper" type="text" spellcheck="false" value="@(Model == null ? "" : Model.ShortName.ValuePtBr)" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel-footer">
+		<input value="@(Model == null ? Str.CreateCourse : Str.SaveChanges)" class="btn btn-primary btn-lg btn-block" type="submit" />
 	</div>
 </form>
 

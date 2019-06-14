@@ -36,119 +36,115 @@
 	</div>
 </div>
 
-<form class="row" action="." method="post" id="form">
-	<div class="col-lg-12">
-		<div class="panel panel-default">
-			<div class="panel-heading clearfix">
-				<div class="pull-left">
-					@Str.DocumentsBasicInformation
-				</div>
-				@if (Model != null) {
-					<div class="pull-right">
-						<a target="_blank" href="~/Document/@Model.Id/@Model.SafeDownloadName" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-file-text-o"></i>@Str.View</a>
-						<a target="_blank" href="~/Document/Download/@Model.Id/@Model.SafeDownloadName" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-cloud-download"></i>@Str.Download</a>
-						@if (ViewBag.DocumentDelete == true) {
-							<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
-						}
-					</div>
+<form class="panel panel-default" action="." method="post" id="form">
+	<div class="panel-heading clearfix">
+		<div class="pull-left">
+			@Str.DocumentsBasicInformation
+		</div>
+		@if (Model != null) {
+			<div class="pull-right">
+				<a target="_blank" href="~/Document/@Model.Id/@Model.SafeDownloadName" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-file-text-o"></i>@Str.View</a>
+				<a target="_blank" href="~/Document/Download/@Model.Id/@Model.SafeDownloadName" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-cloud-download"></i>@Str.Download</a>
+				@if (ViewBag.DocumentDelete == true) {
+					<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
 				}
 			</div>
-			<div class="panel-body no-bottom">
-				@if (Model != null) {
-					<div class="form-group text-right">
-						<span class="label label-default">Id @Model.Id</span>
-					</div>
-				}
-				<div class="row" id="divNameDescription">
-					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="name">@Str.Name</label>
-							<input id="name" name="name" maxlength="128" class="form-control upper" type="text" placeholder="@(Model == null ? Str.Optional : "")" value="@(Model == null ? "" : Model.Name)" />
-						</div>
-					</div>
-					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="description">@Str.Description</label>
-							<input id="description" name="description" maxlength="255" class="form-control upper" type="text" placeholder="@Str.Optional" value="@(Model == null ? "" : Model.Description)" />
-						</div>
-					</div>
-				</div>
-
-				<partial name="_UserBasicPermissions" />
-
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="row">
-							<div class="col-sm-6 col-md-8 col-sm-space-bottom">
-								<select id="cbNewTag" class="form-control" size="1">
-									@foreach (Tag t in Tag.GetAll()) {
-										<option value="@t.Id">@t.Name.ToString()</option>
-									}
-								</select>
-								<script type="text/javascript">
-									//<![CDATA[
-									"use strict";
-									prepareCbSearch(_("cbNewTag"));
-									//]]>
-								</script>
-							</div>
-							<div class="col-sm-6 col-md-4">
-								<button class="btn btn-outline btn-success btn-block" type="button" onclick="addTag()"><i class="fa fa-tag"></i>@Str.AddTag</button>
-							</div>
-						</div>
-					</div>
-					<div class="panel-body">
-						<!-- overflow: visible in order to make cbSearch work... -->
-						<div class="table-responsive" style="overflow: visible;">
-							<table class="table table-striped table-hover no-margin-bottom">
-								<thead>
-									<tr>
-										<th></th>
-										<th class="col-50">@Str.Name</th>
-										<th class="col-50">@Str.Value</th>
-										<th></th>
-									</tr>
-								</thead>
-								<tbody id="tableTagsBody" class="content-section ui-sortable"></tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-
-				@if (Model == null) {
-					<div class="panel panel-default">
-						<div class="panel-heading"><div id="divFileTitle">0 @Str.files (@Str.Total: 0 bytes)</div><div class="text-right"><small>@Str.YouCanAlsoDragAndDropFilesHere</small></div></div>
-						<div class="panel-body">
-							<div class="row">
-								<div class="col-sm-6 col-sm-space-bottom">
-									<button class="btn btn-primary btn-block" type="button" onclick="addFiles()"><i class="fa fa-file-text-o"></i>@Str.AddFiles...</button>
-								</div>
-								<div class="col-sm-6">
-									<button class="btn btn-outline btn-danger btn-block" type="button" onclick="clearFiles()"><i class="fa fa-file-text-o"></i>@Str.ClearFiles</button>
-								</div>
-							</div>
-							<div class="table-responsive">
-								<table id="tableFiles" class="table table-striped table-hover no-margin-bottom hidden">
-									<thead>
-										<tr>
-											<th class="col-max">@Str.Name</th>
-											<th class="col-min text-right">@Str.FileSize</th>
-											<th></th>
-										</tr>
-									</thead>
-									<tbody id="tableFilesBody"></tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				}
-
+		}
+	</div>
+	<div class="panel-body no-bottom">
+		@if (Model != null) {
+			<div class="form-group text-right">
+				<span class="label label-default">Id @Model.Id</span>
 			</div>
-			<div class="panel-footer">
-				<input id="btnSave" value="@(Model == null ? Str.CreateDocument : Str.SaveChanges)" class="btn btn-primary btn-lg btn-block" type="submit" />
-				<div style="position: absolute; height: 0; overflow: hidden"><input id="txtFile" onchange="txtFile_change()" class="form-control" type="file" multiple="multiple" /></div>
+		}
+		<div class="row" id="divNameDescription">
+			<div class="col-sm-6">
+				<div class="form-group">
+					<label for="name">@Str.Name</label>
+					<input id="name" name="name" maxlength="128" class="form-control upper" type="text" placeholder="@(Model == null ? Str.Optional : "")" value="@(Model == null ? "" : Model.Name)" />
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group">
+					<label for="description">@Str.Description</label>
+					<input id="description" name="description" maxlength="255" class="form-control upper" type="text" placeholder="@Str.Optional" value="@(Model == null ? "" : Model.Description)" />
+				</div>
 			</div>
 		</div>
+
+		<partial name="_UserBasicPermissions" />
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-sm-6 col-md-8 col-sm-space-bottom">
+						<select id="cbNewTag" class="form-control" size="1">
+							@foreach (Tag t in Tag.GetAll()) {
+								<option value="@t.Id">@t.Name.ToString()</option>
+							}
+						</select>
+						<script type="text/javascript">
+							//<![CDATA[
+							"use strict";
+							prepareCbSearch(_("cbNewTag"));
+							//]]>
+						</script>
+					</div>
+					<div class="col-sm-6 col-md-4">
+						<button class="btn btn-outline btn-success btn-block" type="button" onclick="addTag()"><i class="fa fa-tag"></i>@Str.AddTag</button>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<!-- overflow: visible in order to make cbSearch work... -->
+				<div class="table-responsive" style="overflow: visible;">
+					<table class="table table-striped table-hover no-margin-bottom">
+						<thead>
+							<tr>
+								<th></th>
+								<th class="col-50">@Str.Name</th>
+								<th class="col-50">@Str.Value</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody id="tableTagsBody" class="content-section ui-sortable"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		@if (Model == null) {
+			<div class="panel panel-default">
+				<div class="panel-heading"><div id="divFileTitle">0 @Str.files (@Str.Total: 0 bytes)</div><div class="text-right"><small>@Str.YouCanAlsoDragAndDropFilesHere</small></div></div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-sm-6 col-sm-space-bottom">
+							<button class="btn btn-primary btn-block" type="button" onclick="addFiles()"><i class="fa fa-file-text-o"></i>@Str.AddFiles...</button>
+						</div>
+						<div class="col-sm-6">
+							<button class="btn btn-outline btn-danger btn-block" type="button" onclick="clearFiles()"><i class="fa fa-file-text-o"></i>@Str.ClearFiles</button>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<table id="tableFiles" class="table table-striped table-hover no-margin-bottom hidden">
+							<thead>
+								<tr>
+									<th class="col-max">@Str.Name</th>
+									<th class="col-min text-right">@Str.FileSize</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody id="tableFilesBody"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		}
+
+	</div>
+	<div class="panel-footer">
+		<input id="btnSave" value="@(Model == null ? Str.CreateDocument : Str.SaveChanges)" class="btn btn-primary btn-lg btn-block" type="submit" />
+		<div style="position: absolute; height: 0; overflow: hidden"><input id="txtFile" onchange="txtFile_change()" class="form-control" type="file" multiple="multiple" /></div>
 	</div>
 </form>
 

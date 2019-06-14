@@ -3,49 +3,45 @@
 	ViewBag.Title = Str.MyProfile;
 }
 
-<form class="row" action="." method="post" id="form">
-	<div class="col-lg-12">
-		<div class="panel panel-default">
-			<div class="panel-heading clearfix">
-				<div class="pull-left">
-					@Str.EditProfile
-				</div>
-			</div>
-			<div class="panel-body no-bottom">
-				<div class="form-group">
-					<label for="fullName">@Str.FullName</label>
-					<input id="fullName" name="fullName" maxlength="64" class="form-control upper" type="text" spellcheck="false" value="@ViewBag.LoggedUser.FullName" />
-				</div>
-				<div class="form-group">
-					<label for="languageId">@Str.Language</label>
-					<select id="languageId" name="languageId" size="1" class="form-control upper" type="text">
-						<option value="@Str.LanguageEn" selected="@(ViewBag.LoggedUser.LanguageId == Str.LanguageEn)">@Str.English</option>
-						<option value="@Str.LanguagePtBr" selected="@(ViewBag.LoggedUser.LanguageId == Str.LanguagePtBr)">@Str.Portuguese</option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label for="picture">@Str.NewProfileImage <small>(@Str.UpTo1MiB)</small></label>
-					<input id="picture" name="picture" class="form-control" type="file" accept="image/jpeg" />
-				</div>
-				<div class="divider-body"></div>
-				<p>@Str.InOrderToChangeCurrentPassword</p>
-				<div id="currentPass" class="form-group">
-					<label for="password">@Str.CurrentPassword</label>
-					<input id="password" name="password" maxlength="20" class="form-control upper" type="password" />
-				</div>
-				<div class="form-group">
-					<label for="newPassword">@Str.NewPassword</label>
-					<input id="newPassword" name="newPassword" maxlength="20" class="form-control upper" type="password" />
-				</div>
-				<div class="form-group">
-					<label for="newPassword2">@Str.ConfirmNewPassword</label>
-					<input id="newPassword2" name="newPassword2" maxlength="20" class="form-control upper" type="password" />
-				</div>
-			</div>
-			<div class="panel-footer">
-				<input value="@Str.SaveChanges" class="btn btn-primary btn-lg btn-block" type="submit" />
-			</div>
+<form class="panel panel-default" action="." method="post" id="form">
+	<div class="panel-heading clearfix">
+		<div class="pull-left">
+			@Str.EditProfile
 		</div>
+	</div>
+	<div class="panel-body no-bottom">
+		<div class="form-group">
+			<label for="fullName">@Str.FullName</label>
+			<input id="fullName" name="fullName" maxlength="64" class="form-control upper" type="text" spellcheck="false" value="@ViewBag.LoggedUser.FullName" />
+		</div>
+		<div class="form-group">
+			<label for="languageId">@Str.Language</label>
+			<select id="languageId" name="languageId" size="1" class="form-control upper" type="text">
+				<option value="@Str.LanguageEn" selected="@(ViewBag.LoggedUser.LanguageId == Str.LanguageEn)">@Str.English</option>
+				<option value="@Str.LanguagePtBr" selected="@(ViewBag.LoggedUser.LanguageId == Str.LanguagePtBr)">@Str.Portuguese</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="picture">@Str.NewProfileImage <small>(@Str.UpTo1MiB)</small></label>
+			<input id="picture" name="picture" class="form-control" type="file" accept="image/jpeg" />
+		</div>
+		<div class="divider-body"></div>
+		<p>@Str.InOrderToChangeCurrentPassword</p>
+		<div id="currentPass" class="form-group">
+			<label for="password">@Str.CurrentPassword</label>
+			<input id="password" name="password" maxlength="20" class="form-control upper" type="password" />
+		</div>
+		<div class="form-group">
+			<label for="newPassword">@Str.NewPassword</label>
+			<input id="newPassword" name="newPassword" maxlength="20" class="form-control upper" type="password" />
+		</div>
+		<div class="form-group">
+			<label for="newPassword2">@Str.ConfirmNewPassword</label>
+			<input id="newPassword2" name="newPassword2" maxlength="20" class="form-control upper" type="password" />
+		</div>
+	</div>
+	<div class="panel-footer">
+		<input value="@Str.SaveChanges" class="btn btn-primary btn-lg btn-block" type="submit" />
 	</div>
 </form>
 

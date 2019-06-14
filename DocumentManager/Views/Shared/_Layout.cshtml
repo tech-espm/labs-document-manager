@@ -11,11 +11,7 @@
 	<partial name="_NavBar.cshtml" />
 
 	<div id="page-wrapper">
-		<div class="row">
-			<div class="col-lg-12">
-				<h1 class="page-header">@(ViewBag.Title ?? Str.AppName)</h1>
-			</div>
-		</div>
+		<h1 class="page-header">@(ViewBag.Title ?? Str.AppName)</h1>
 
 		@RenderBody()
 	</div>

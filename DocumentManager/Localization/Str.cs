@@ -91,10 +91,14 @@ namespace DocumentManager.Localization {
 		public static string Yes => CurrentLanguage == LanguageEn ? "Yes" : "Sim";
 		public static string No => CurrentLanguage == LanguageEn ? "No" : "Não";
 		public static string OK => "OK";
+		public static string ID => "ID";
+		public static string Id => "Id";
 		public static string Close => CurrentLanguage == LanguageEn ? "Close" : "Fechar";
 		public static string Cancel => CurrentLanguage == LanguageEn ? "Cancel" : "Cancelar";
 		public static string Create => CurrentLanguage == LanguageEn ? "Create" : "Criar";
 		public static string Manage => CurrentLanguage == LanguageEn ? "Manage" : "Gerenciar";
+		public static string List => CurrentLanguage == LanguageEn ? "List" : "Listar";
+		public static string Search => CurrentLanguage == LanguageEn ? "Search" : "Buscar";
 		public static string Delete => CurrentLanguage == LanguageEn ? "Delete" : "Excluir";
 		public static string View => CurrentLanguage == LanguageEn ? "View" : "Visualizar";
 		public static string Edit => CurrentLanguage == LanguageEn ? "Edit" : "Editar";
@@ -135,6 +139,7 @@ namespace DocumentManager.Localization {
 		public static string Courses => CurrentLanguage == LanguageEn ? "Courses" : "Cursos";
 		public static string CoursesBasicInformation => CurrentLanguage == LanguageEn ? "Course's Basic Information" : "Informações Básicas do Curso";
 		public static string Name => CurrentLanguage == LanguageEn ? "Name" : "Nome";
+		public static string NAME => CurrentLanguage == LanguageEn ? "NAME" : "NOME";
 		public static string ShortName => CurrentLanguage == LanguageEn ? "Short Name" : "Apelido";
 		public static string Description => CurrentLanguage == LanguageEn ? "Description" : "Descrição";
 		public static string Optional => CurrentLanguage == LanguageEn ? "Optional" : "Opcional";

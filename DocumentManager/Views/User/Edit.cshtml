@@ -2,48 +2,44 @@
 	ViewBag.Title = Str.CreateUser;
 }
 
-<form class="row" action="." method="post" id="form">
-	<div class="col-lg-12">
-		<div class="panel panel-default">
-			<div class="panel-heading clearfix">
-				<div class="pull-left">
-					@Str.UsersBasicInformation
-				</div>
-				@if (Model != null && ViewBag.UserDelete == true) {
-					<div class="pull-right">
-						<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
-					</div>
-				}
-			</div>
-			<div class="panel-body no-bottom">
-				<div class="form-group">
-					<label for="userName">@Str.UserName</label>
-					<input id="userName" name="userName" maxlength="64" class="form-control lower" type="email" spellcheck="false" />
-				</div>
-				<div class="form-group">
-					<label for="fullName">@Str.FullName</label>
-					<input id="fullName" name="fullName" maxlength="64" class="form-control upper" type="text" spellcheck="false" />
-				</div>
-				<div class="form-group">
-					<label for="profileId">@Str.Profile</label>
-					<select id="profileId" name="profileId" class="form-control" size="1">
-						<option value="" selected="selected">@Str.SELECT</option>
-						@foreach (Profile profile in Profile.GetAll()) {
-						<option value="@profile.Id">@profile.Name</option>
-						}
-					</select>
-					<script type="text/javascript">
-						//<![CDATA[
-						"use strict";
-						prepareCbSearch(_("profileId"));
-						//]]>
-					</script>
-				</div>
-			</div>
-			<div class="panel-footer">
-				<input value="@Str.CreateUser" class="btn btn-primary btn-lg btn-block" type="submit" />
-			</div>
+<form class="panel panel-default" action="." method="post" id="form">
+	<div class="panel-heading clearfix">
+		<div class="pull-left">
+			@Str.UsersBasicInformation
 		</div>
+		@if (Model != null && ViewBag.UserDelete == true) {
+			<div class="pull-right">
+				<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
+			</div>
+		}
+	</div>
+	<div class="panel-body no-bottom">
+		<div class="form-group">
+			<label for="userName">@Str.UserName</label>
+			<input id="userName" name="userName" maxlength="64" class="form-control lower" type="email" spellcheck="false" />
+		</div>
+		<div class="form-group">
+			<label for="fullName">@Str.FullName</label>
+			<input id="fullName" name="fullName" maxlength="64" class="form-control upper" type="text" spellcheck="false" />
+		</div>
+		<div class="form-group">
+			<label for="profileId">@Str.Profile</label>
+			<select id="profileId" name="profileId" class="form-control" size="1">
+				<option value="" selected="selected">@Str.SELECT</option>
+				@foreach (Profile profile in Profile.GetAll()) {
+				<option value="@profile.Id">@profile.Name</option>
+				}
+			</select>
+			<script type="text/javascript">
+				//<![CDATA[
+				"use strict";
+				prepareCbSearch(_("profileId"));
+				//]]>
+			</script>
+		</div>
+	</div>
+	<div class="panel-footer">
+		<input value="@Str.CreateUser" class="btn btn-primary btn-lg btn-block" type="submit" />
 	</div>
 </form>
 
