@@ -36,7 +36,7 @@ namespace DocumentManager.Models {
 		public IdNamePair Unity, Course, PartitionType, DocumentType;
 		public List<IdValuePair> Tags;
 
-		public string SafeDownloadName => Storage.SafeFileName(Name.ToLower()) + "." + Extension.ToLower();
+		public string SafeDownloadName => Storage.SafeFileName(Name.ToLower()) + "." + Extension;
 
 		private static void Validate(Data data) {
 			if (data == null)
@@ -52,7 +52,7 @@ namespace DocumentManager.Models {
 
 			if (string.IsNullOrWhiteSpace(data.Extension))
 				throw new ValidationException(Str.InvalidFileExtension);
-			if ((data.Extension = data.Extension.Trim().ToUpper()).Length > 10)
+			if ((data.Extension = data.Extension.Trim().ToLower()).Length > 10)
 				throw new ValidationException(Str.FileExtensionTooLong);
 
 			if (data.Size < MinFileSizeInBytes)

@@ -69,8 +69,9 @@ namespace DocumentManager.Controllers {
 		}
 
 		[HttpGet]
+		[Route("Document/{id}/{fileName}")]
 		[AccessControl(Feature.DocumentList)]
-		public IActionResult View(int id) {
+		public IActionResult View(int id, string fileName) {
 			Document document = null;
 			try {
 				document = Document.GetById(id, false);
@@ -83,14 +84,15 @@ namespace DocumentManager.Controllers {
 		}
 
 		[HttpGet]
+		[Route("Document/Download/{id}/{fileName}")]
 		[AccessControl(Feature.DocumentList)]
-		public IActionResult Download(int id) {
+		public IActionResult Download(int id, string fileName) {
 			Document document = null;
 			try {
 				document = Document.GetById(id, false);
 				if (document == null)
 					return ErrorResult(Str.DocumentNotFound);
-				return DownloadResult(Storage.Document(document.Id, document.Extension), document.SafeDownloadName);
+				return DownloadResult(Storage.Document(document.Id, document.Extension), string.IsNullOrWhiteSpace(fileName) ? document.SafeDownloadName : fileName);
 			} catch (Exception ex) {
 				return ErrorResult(ex);
 			}

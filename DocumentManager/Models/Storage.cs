@@ -30,7 +30,6 @@ namespace DocumentManager.Models {
 			{ "3gpp", "audio/3gpp" },
 			{ "3ga", "audio/3ga" },
 			{ "3gpa", "audio/3ga" },
-			{ "mp4", "audio/mp4" },
 			{ "m4a", "audio/mp4" },
 			{ "aac", "audio/aac" },
 			{ "mp3", "audio/mpeg" },
@@ -93,8 +92,8 @@ namespace DocumentManager.Models {
 			{ "ppam", "application/vnd.ms-powerpoint.addin.macroEnabled.12" },
 			{ "pptm", "application/vnd.ms-powerpoint.presentation.macroEnabled.12" },
 			{ "potm", "application/vnd.ms-powerpoint.template.macroEnabled.12" },
-			{ ".ppsm", "application/vnd.ms-powerpoint.slideshow.macroEnabled.12" },
-			{ ".mdb", "application/vnd.ms-access" }
+			{ "ppsm", "application/vnd.ms-powerpoint.slideshow.macroEnabled.12" },
+			{ "mdb", "application/vnd.ms-access" }
 		};
 		#endregion
 

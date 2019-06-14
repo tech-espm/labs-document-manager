@@ -43,9 +43,13 @@
 				<div class="pull-left">
 					@Str.DocumentsBasicInformation
 				</div>
-				@if (Model != null && ViewBag.DocumentDelete == true) {
+				@if (Model != null) {
 					<div class="pull-right">
-						<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
+						<a target="_blank" href="~/Document/@Model.Id/@Model.SafeDownloadName" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-file-text-o"></i>@Str.View</a>
+						<a target="_blank" href="~/Document/Download/@Model.Id/@Model.SafeDownloadName" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-cloud-download"></i>@Str.Download</a>
+						@if (ViewBag.DocumentDelete == true) {
+							<button type="button" class="btn btn-outline btn-danger btn-xs" onclick="deleteItem(false)"><i class="fa fa-times"></i>@Str.Delete</button>
+						}
 					</div>
 				}
 			</div>
