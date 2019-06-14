@@ -34,13 +34,14 @@ namespace DocumentManager.Models {
 		}
 
 		public int Id, Size;
+		public long CreationTimeInt;
 		public string Name, Description, Extension, CreationTime;
 		public IdNamePair Unity, Course, PartitionType, DocumentType;
 		public List<IdValuePair> Tags;
 
 		public string SafeDownloadName => Storage.SafeFileName(Name.ToLower()) + "." + Extension;
 
-		public string FormattedSize => Storage.SafeFileName(Name.ToLower()) + "." + Extension;
+		public string FormattedSize => Storage.FormatSize(Size);
 
 		private static void Validate(Data data) {
 			if (data == null)
@@ -178,16 +179,20 @@ INNER JOIN partition_type pt ON pt.id = d.partition_type_id
 INNER JOIN document_type dt ON dt.id = d.document_type_id
 ORDER BY un.name{fieldSuffix} ASC, co.name{fieldSuffix} ASC, pt.name{fieldSuffix} ASC, dt.name{fieldSuffix} ASC, d.name ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
-						while (reader.Read())
+						while (reader.Read()) {
+							DateTime creation = reader.GetDateTime(5);
 							documents.Add(
 								new Document(
-									reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), reader.GetDateTime(5).ToString(dateTimeFormat),
+									reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), creation.ToString(dateTimeFormat),
 									new IdNamePair(reader.GetInt32(6), reader.GetString(7)),
 									new IdNamePair(reader.GetInt32(8), reader.GetString(9)),
 									new IdNamePair(reader.GetInt32(10), reader.GetString(11)),
 									new IdNamePair(reader.GetInt32(12), reader.GetString(13))
-								)
+								) {
+									CreationTimeInt = creation.ToBinary()
+								}
 							);
+						}
 					}
 				}
 			}
@@ -263,16 +268,20 @@ ORDER BY un.name{fieldSuffix} ASC, co.name{fieldSuffix} ASC, pt.name{fieldSuffix
 					cmd.CommandText = builder.ToString();
 
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
-						while (reader.Read())
+						while (reader.Read()) {
+							DateTime creation = reader.GetDateTime(5);
 							documents.Add(
 								new Document(
-									reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), reader.GetDateTime(5).ToString(dateTimeFormat),
+									reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetInt32(4), creation.ToString(dateTimeFormat),
 									new IdNamePair(reader.GetInt32(6), reader.GetString(7)),
 									new IdNamePair(reader.GetInt32(8), reader.GetString(9)),
 									new IdNamePair(reader.GetInt32(10), reader.GetString(11)),
 									new IdNamePair(reader.GetInt32(12), reader.GetString(13))
-								)
+								) {
+									CreationTimeInt = creation.ToBinary()
+								}
 							);
+						}
 					}
 				}
 			}

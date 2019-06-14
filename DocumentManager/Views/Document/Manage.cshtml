@@ -83,7 +83,9 @@
 							{ title: "@Str.DocumentType", render: encode, data: "documentType.name" },
 							{ title: "@Str.Name", render: encode, data: "name" },
 							{ title: "", data: "size", visible: false, searchable: false, orderable: false },
-							{ title: "@Str.FileSize", data: null, orderData: 5, render: function (v, type, row) { return formatSize(row.size); } },
+							{ title: "@Str.Size", "class": "col-min text-right", data: "formattedSize", orderData: 5 },
+							{ title: "", data: "creationTimeInt", visible: false, searchable: false, orderable: false },
+							{ title: "@Str.Creation", "class": "col-min text-right", data: "creationTime", orderData: 7 },
 							@if (ViewBag.DocumentEdit == true) {
 							<text>
 							{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return "<a target=\"_blank\" title=\"@Str.Edit\" href=\"@(Url.Action("Edit"))?id=" + row.id + "\" class=\"btn btn-outline btn-primary\"><i class=\"fa fa-nomargin fa-edit\"></i></a>"; } },

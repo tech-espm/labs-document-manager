@@ -163,6 +163,8 @@ namespace DocumentManager.Localization {
 		public static string ShortNameTooLong => CurrentLanguage == LanguageEn ? "Short name too long!" : "Apelido muito longo!";
 		public static string DescriptionTooLong => CurrentLanguage == LanguageEn ? "Description too long!" : "Descrição muito longa!";
 		public static string FileExtensionTooLong => CurrentLanguage == LanguageEn ? "File extension too long!" : "Extensão de arquivo muito longa!";
+		public static string Type => CurrentLanguage == LanguageEn ? "Type" : "Tipo";
+		public static string Size => CurrentLanguage == LanguageEn ? "Size" : "Tamanho";
 		public static string FileSize => CurrentLanguage == LanguageEn ? "File Size" : "Tamanho do Arquivo";
 		public static string FileSizeTooSmall => CurrentLanguage == LanguageEn ? "File size too small!" : "Tamanho de arquivo muito pequeno!";
 		public static string FileSizeTooLarge => CurrentLanguage == LanguageEn ? "File size too large!" : "Tamanho de arquivo muito grande!";

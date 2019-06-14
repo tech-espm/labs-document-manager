@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentManager.Localization;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -172,6 +173,29 @@ namespace DocumentManager.Models {
 				}
 			}
 			return builder.ToString();
+		}
+
+		public static string FormatSize(int size) {
+			//StringBuilder builder = new StringBuilder(16);
+			//string suffix;
+			//if (size < 16384) {
+			//	suffix = " bytes";
+			//} else {
+			//	size >>= 10;
+			//	suffix = " KB";
+			//}
+			//builder.Append(size);
+			//char thousands = (Str.CurrentLanguage == Str.LanguageEn ? ',' : '.');
+			//for (int i = builder.Length - 3; i > 0; i -= 3)
+			//	builder.Insert(i, thousands);
+			//builder.Append(suffix);
+			//return builder.ToString();
+			if (size > 0) {
+				size >>= 10;
+				if (size == 0)
+					size = 1;
+			}
+			return string.Format("{0:#,0} KB", size);
 		}
 	}
 }

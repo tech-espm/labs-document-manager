@@ -316,16 +316,28 @@ window.formatDuration = function (duration) {
 	return format2(m) + ":" + format2(s);
 };
 window.formatSize = (function () {
-	var expr = /\B(?=(\d{3})+(?!\d))/g;
+	var expr = /\B(?=(\d{3})+(?!\d))/g, thousands = (currentLanguageId === 1 ? "." : ",");
 	window.formatSizeLong = function (size) {
-		if (size < 16384)
-			return size + " bytes";
-		return ((size * 0.0009765625) | 0).toString().replace(expr, ".") + " KiB";
+		//if (size < 16384)
+		//	return size + " bytes";
+		//return ((size * 0.0009765625) | 0).toString().replace(expr, ".") + " KB";
+		if (size) {
+			size = (size * 0.0009765625) | 0;
+			if (size <= 0)
+				size = 1;
+		}
+		return size.toString().replace(expr, thousands) + " KB";
 	};
 	return function (size) {
-		if (size < 16384)
-			return size + " bytes";
-		return (size >>> 10).toString().replace(expr, ".") + " KiB";
+		//if (size < 16384)
+		//	return size + " bytes";
+		//return (size >>> 10).toString().replace(expr, ".") + " KB";
+		if (size) {
+			size >>>= 10;
+			if (size <= 0)
+				size = 1;
+		}
+		return size.toString().replace(expr, thousands) + " KB";
 	};
 })();
 window.formatNumber = (function () {
