@@ -3,6 +3,42 @@
 	ViewBag.RemoveLabelsFromUserPermissions = true;
 }
 
+<div class="modal fade" tabindex="-1" role="dialog" id="modalDelete">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Oops</h4>
+			</div>
+			<div class="modal-body">
+				<p>@Str.DoYouReallyWantToDelete <span class="col-h" id="lblDeleteContentCount"></span>? @Str.ThisOperationCannotBeUndone<br /><br />@Str.ToConfirmEnterYes<br /><br /></p>
+				<input type="text" id="txtDeleteContentConfirm" class="form-control upper" spellcheck="false" autocomplete="off" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" onclick="confirmDelete()"><i class="fa fa-check"></i>@Str.Delete</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modalDeleting">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Oops</h4>
+			</div>
+			<div class="modal-body">
+				<p class="no-margin-bottom" id="lblDeleteProgress"></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div class="panel panel-default">
 	<form class="panel-body no-bottom" action="." method="post" id="form">
 
@@ -38,6 +74,8 @@
 
 <div class="panel panel-default hidden" id="dataTablePanel">
 	<div class="panel-body">
+		<div id="divMultipleSelectionHelp" class="col-xs-space-bottom text-right"><small>@Str.HowToPerformAMultipleSelection</small> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="left" data-html="true" title="" data-title="@Html.Raw(Str.MultipleSelectionExplanation)" data-original-title=""></i></div>
+
 		<div id="dataTableMainPlaceholder" class="dataTable_wrapper"></div>
 	</div>
 </div>
@@ -47,13 +85,164 @@
 		//<![CDATA[
 		"use strict";
 
-		var dataTablePanel = _("dataTablePanel"), dataTableMainPlaceholder = _("dataTableMainPlaceholder");
+		var dataTablePanel = _("dataTablePanel"),
+			dataTableMainPlaceholder = _("dataTableMainPlaceholder"),
+			txtDeleteContentConfirm = _("txtDeleteContentConfirm"),
+			lblDeleteContentCount = _("lblDeleteContentCount"),
+			lblDeleteProgress = _("lblDeleteProgress"),
+			selId = [],
+			selTr = [],
+			proceedDeletion = false;
+
+		function updateDeleteProgress(i) {
+			lblDeleteProgress.textContent = "@Html.Raw(Str.DeletingDocument) " + (i + 1) + " @Str._de " + selId.length + ". @Html.Raw(Str.CloseThisMessageToStopDeleting)";
+		}
+
+		function deleteDocument(i) {
+			setTimeout(function () {
+				if (!proceedDeletion || i >= selId.length)
+					return;
+
+				updateDeleteProgress(i);
+
+				JsonWebApi.get("@Url.Action("Delete")", function (response) {
+					if (response.success) {
+						dataTableMain.row(selTr[i]).remove().draw();
+						i++;
+						if (i >= selId.length) {
+							Notification.hide();
+							$("#modalDeleting").modal("hide");
+						} else {
+							deleteDocument(i);
+						}
+					} else {
+						Notification.error(response.value, true);
+						$("#modalDeleting").modal("hide");
+					}
+				}, "id", selId[i]);
+			}, 500);
+		}
+
+		$("#modalDeleting").on("shown.bs.modal", function () {
+			if (!proceedDeletion || !selId.length)
+				return;
+
+			Notification.wait();
+
+			deleteDocument(0);
+		});
+
+		$("#modalDeleting").on("hide.bs.modal", function () {
+			Notification.hide();
+			selId = [];
+			selTr = [];
+			proceedDeletion = false;
+		});
+
+		$("#modalDelete").on("shown.bs.modal", function () {
+			txtDeleteContentConfirm.focus();
+		});
+
+		$("#modalDelete").on("hidden.bs.modal", function () {
+			if (!proceedDeletion || !selId.length)
+				return;
+
+			$("#modalDeleting").modal({
+				backdrop: true,
+				keyboard: true
+			});
+		});
+
+		function confirmDelete() {
+			if (txtDeleteContentConfirm.value.toUpperCase() !== "@Str.YES" || JsonWebApi.active)
+				return;
+
+			updateDeleteProgress(0);
+			proceedDeletion = true;
+			$("#modalDelete").modal("hide");
+		}
+
+		function fillSelected() {
+			var i, id, td, tds, input, tr, trs = _("dataTableMain").getElementsByTagName("tr");
+
+			selId = [];
+			selTr = [];
+			proceedDeletion = false;
+
+			for (i = 0; i < trs.length; i++) {
+				tr = trs[i];
+				if (!tr)
+					continue;
+				tds = tr.getElementsByTagName("td");
+				if (!tds || !tds.length || !(td = tds[0]) ||
+					!(tds = td.getElementsByTagName("input")) ||
+					!tds.length ||
+					!(input = tds[0]) ||
+					!input.checked ||
+					isNaN(id = parseInt(input.getAttribute("data-id"))) ||
+					id <= 0)
+					continue;
+				selId.push(id);
+				selTr.push(tr);
+			}
+
+			if (!selId.length) {
+				Notification.error("@Html.Raw(Str.NoDocumentsSelected)");
+				return false;
+			}
+
+			return true;
+		}
+
+		function showModalDeleteSelected() {
+			if (JsonWebApi.active || !fillSelected())
+				return;
+
+			if (selId.length > 50) {
+				Notification.error("@Html.Raw(Str.ForSecurityReasonsDeleteDocument)", true);
+				return;
+			}
+
+			txtDeleteContentConfirm.value = "";
+			lblDeleteContentCount.textContent = selId.length + (selId.length === 1 ? " @Str.document" : " @Str.documents");
+
+			$("#modalDelete").modal({
+				backdrop: true,
+				keyboard: true
+			});
+		}
+
+		function downloadSelected() {
+			if (JsonWebApi.active || !fillSelected())
+				return;
+
+			if (selId.length === 1) {
+				var i, a, as = selTr[0].getElementsByTagName("a");
+				for (i = 0; i < as.length; i++) {
+					a = as[i];
+					if (a.getAttribute("data-download") == "1") {
+						a.click();
+						return;
+					}
+				}
+			}
+
+			window.open("@Url.Action("DownloadSelected")/" + selId.join("|") + "/@(Str.SelectedDocuments).zip");
+		}
 
 		_("form").onsubmit = function (e) {
 			if (JsonWebApi.active)
-				return;			Notification.wait();
-			window.dataTableMain = undefined;			dataTablePanel.className = "panel panel-default hidden";			while (dataTableMainPlaceholder.firstChild)
-				dataTableMainPlaceholder.removeChild(dataTableMainPlaceholder.firstChild);
+				return;
+
+			Notification.wait();
+
+			resetMultipleSelection();
+
+			window.dataTableMain = undefined;
+			dataTablePanel.className = "panel panel-default hidden";
+			while (dataTableMainPlaceholder.firstChild)
+				dataTableMainPlaceholder.removeChild(dataTableMainPlaceholder.firstChild);
+
 			var formData = new FormData();
 
 			formData.append("unity", _("unity").value);
@@ -75,39 +264,41 @@
 					dataTablePanel.className = "panel panel-default";
 
 					window.dataTableMain = prepareDataTable("dataTableMain", {
-						order: [[0, "asc"]],
+						order: [[1, "asc"]],
 						columns: [
+							{ title: " ", "class": "col-min text-center", data: null, searchable: false, orderable: false, render: function (v, type, row) { return '<input type="checkbox" data-id="' + row.id + '" />'; } },
 							{ title: "@Str.Unity", render: encode, data: "unity.name" },
 							{ title: "@Str.Course", render: encode, data: "course.name" },
 							{ title: "@Str.PartitionType", render: encode, data: "partitionType.name" },
 							{ title: "@Str.DocumentType", render: encode, data: "documentType.name" },
 							{ title: "@Str.Name", render: encode, data: "name" },
-							{ title: "", data: "size", visible: false, searchable: false, orderable: false },
-							{ title: "@Str.Size", "class": "col-min text-right", data: "formattedSize", orderData: 5 },
-							{ title: "", data: "creationTimeInt", visible: false, searchable: false, orderable: false },
-							{ title: "@Str.Creation", "class": "col-min text-right", data: "creationTime", orderData: 7 },
-							@if (ViewBag.DocumentEdit == true) {
-							<text>
-							{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return "<a target=\"_blank\" title=\"@Str.Edit\" href=\"@(Url.Action("Edit"))?id=" + row.id + "\" class=\"btn btn-outline btn-primary\"><i class=\"fa fa-nomargin fa-edit\"></i></a>"; } },
-							</text>
-							} else {
-							<text>
-							{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return ""; } },
-							</text>
-							}
+							{ title: " ", data: "size", visible: false, searchable: false, orderable: false },
+							{ title: "@Str.Size", "class": "col-min text-right", data: "formattedSize", orderData: 6 },
+							{ title: " ", data: "creationTimeInt", visible: false, searchable: false, orderable: false },
+							{ title: "@Str.Creation", "class": "col-min text-right", data: "creationTime", orderData: 8 },
+							{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return '<div class="btn-group dropup"><button type="button" title="@Str.Optional" class="btn btn-outline btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-nomargin fa-ellipsis-v"></i></button><ul class="dropdown-menu dropdown-menu-right"><li><a target="_blank" href="@(Url.Action(""))/' + row.id + '/' + row.safeDownloadName + '"><i class="fa fa-fw fa-file-text-o"></i>@Str.View</a></li><li><a data-download="1" target="_blank" href="@(Url.Action(""))/Download/' + row.id + '/' + row.safeDownloadName + '"><i class="fa fa-fw fa-cloud-download"></i>@Str.Download</a></li>@if (ViewBag.DocumentEdit == true) {<li><a target="_blank" href="@(Url.Action("Edit"))?id=' + row.id + '" class=""><i class="fa fa-fw fa-edit"></i>@Str.Edit</a></li>}</ul></div>'; } }
 						],
 						data: response.value,
 						deferRender: true,
 						export: { title: "@Str.Documents" }
 					});
-					prepareDataTableMain();
-
+					prepareDataTableMain(true);
+					$("#dataTableMain > tbody").on("click", "input", toggleMultipleSelection);
+					@if (ViewBag.DocumentDelete == true) {
+						<text>
+						addFilterButton("dataTableMain_filter", "fa-nomargin fa-times", "", showModalDeleteSelected, "@Str.DeleteSelected", "btn-danger");
+						</text>
+					}
+					addFilterButton("dataTableMain_filter", "fa-nomargin fa-cloud-download", "", downloadSelected, "@Str.DownloadSelected", "btn-primary");
 				} else {
 					Notification.error(response.value, true);
 				}
-			});
+			});
+
 			return cancelEvent(e);
 		};
+
+		$("#divMultipleSelectionHelp i").tooltip();
 
 		//]]>
 	</script>

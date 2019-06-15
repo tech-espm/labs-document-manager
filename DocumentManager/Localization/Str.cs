@@ -66,6 +66,7 @@ namespace DocumentManager.Localization {
 		public static string _DateTimeFormat => CurrentLanguage == LanguageEn ? "MM/dd/yyyy HH:mm" : "dd/MM/yyyy HH:mm";
 		public static string _FieldSuffix => CurrentLanguage == LanguageEn ? "_en" : "_ptbr";
 		public static string _ValueProperty => CurrentLanguage == LanguageEn ? "valueEn" : "valuePtBr";
+		public static string _de => CurrentLanguage == LanguageEn ? "of" : "de";
 		public static string _o => CurrentLanguage == LanguageEn ? "the" : "o";
 		public static string _a => CurrentLanguage == LanguageEn ? "the" : "a";
 		public static string _os => CurrentLanguage == LanguageEn ? "the" : "os";
@@ -89,7 +90,9 @@ namespace DocumentManager.Localization {
 		public static string Portuguese => CurrentLanguage == LanguageEn ? "Portuguese" : "Português";
 		public static string English => CurrentLanguage == LanguageEn ? "English" : "Inglês";
 		public static string Yes => CurrentLanguage == LanguageEn ? "Yes" : "Sim";
+		public static string YES => CurrentLanguage == LanguageEn ? "YES" : "SIM";
 		public static string No => CurrentLanguage == LanguageEn ? "No" : "Não";
+		public static string NO => CurrentLanguage == LanguageEn ? "NO" : "NÃO";
 		public static string OK => "OK";
 		public static string ID => "ID";
 		public static string Id => "Id";
@@ -132,6 +135,8 @@ namespace DocumentManager.Localization {
 		public static string EditCourse => CurrentLanguage == LanguageEn ? "Edit Course" : "Editar Curso";
 		public static string ManageCourses => CurrentLanguage == LanguageEn ? "Manage Courses" : "Gerenciar Cursos";
 		public static string DoYouReallyWantToDeleteTheCourse => CurrentLanguage == LanguageEn ? "Do you really want to delete the course?" : "Tem certeza que deseja excluir o curso?";
+		public static string DoYouReallyWantToDelete => CurrentLanguage == LanguageEn ? "Do you really want to delete" : "Tem certeza que deseja excluir";
+		public static string ToConfirmEnterYes => CurrentLanguage == LanguageEn ? "To confirm, enter YES in the field below then click the DELETE button:" : "Para confirmar, digite SIM no campo abaixo e pressione o botão EXCLUIR:";
 		public static string ThisOperationCannotBeUndone => CurrentLanguage == LanguageEn ? "This operation cannot be undone!" : "Essa operação NÃO pode ser desfeita!";
 		public static string Course => CurrentLanguage == LanguageEn ? "Course" : "Curso";
 		public static string COURSE => CurrentLanguage == LanguageEn ? "COURSE" : "CURSO";
@@ -144,6 +149,9 @@ namespace DocumentManager.Localization {
 		public static string ShortName => CurrentLanguage == LanguageEn ? "Short Name" : "Apelido";
 		public static string Description => CurrentLanguage == LanguageEn ? "Description" : "Descrição";
 		public static string Optional => CurrentLanguage == LanguageEn ? "Optional" : "Opcional";
+		public static string Options => CurrentLanguage == LanguageEn ? "Options" : "Opções";
+		public static string DownloadSelected => CurrentLanguage == LanguageEn ? "Download Selected" : "Baixar Selecionados";
+		public static string DeleteSelected => CurrentLanguage == LanguageEn ? "Delete Selected" : "Excluir Selecionados";
 		public static string CourseSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Course successfully created! 😄" : "Curso criado com sucesso! 😄";
 		public static string CourseSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Course successfully changed! 😄" : "Curso alterado com sucesso! 😄";
 		public static string CourseNotFound => CurrentLanguage == LanguageEn ? "Course not found!" : "Curso não encontrado!";
@@ -223,7 +231,7 @@ namespace DocumentManager.Localization {
 		public static string Units => CurrentLanguage == LanguageEn ? "Units" : "Unidades";
 		public static string Unity => CurrentLanguage == LanguageEn ? "Unity" : "Unidade";
 		public static string UNITY => CurrentLanguage == LanguageEn ? "UNITY" : "UNIDADE";
-		public static string Download => CurrentLanguage == LanguageEn ? "Download" : "Download";
+		public static string Download => CurrentLanguage == LanguageEn ? "Download" : "Baixar";
         public static string CreateDocumentType => CurrentLanguage == LanguageEn ? "Create Document Type" : "Criar Tipo de Documento";
 		public static string DoYouReallyWantToDeleteTheDocumentType => CurrentLanguage == LanguageEn ? "Do you really want to delete the document type?" : "Tem certeza que deseja excluir o tipo de documento?";
 		public static string DocumentTypesBasicInformation => CurrentLanguage == LanguageEn ? "Document Type's Basic Information" : "Informações Básicas do Tipo de Documento";
@@ -290,8 +298,15 @@ namespace DocumentManager.Localization {
 		public static string DeleteValue => CurrentLanguage == LanguageEn ? "Delete Value" : "Excluir Valor";
 		public static string AtLeastOneValueNeedsToBeAddedToTheTag => CurrentLanguage == LanguageEn ? "At least one value needs to be added to the tag 😢" : "Pelo menos um valor precisa ser adicionado à etiqueta 😢";
 		public static string document => CurrentLanguage == LanguageEn ? "document" : "documento";
+		public static string documents => CurrentLanguage == LanguageEn ? "documents" : "documentos";
 		public static string theDocument => CurrentLanguage == LanguageEn ? "the document" : "o documento";
 		public static string DocumentNotFound => CurrentLanguage == LanguageEn ? "Document not found!" : "Documento não encontrado!";
+		public static string NoDocumentsSelected => CurrentLanguage == LanguageEn ? "No documents selected 😢" : "Nenhum documento selecionado 😢";
+		public static string Deleting => CurrentLanguage == LanguageEn ? "Deleting..." : "Excluindo...";
+		public static string DeletingDocument => CurrentLanguage == LanguageEn ? "Deleting document" : "Excluindo documento";
+		public static string ForSecurityReasonsDeleteDocument => CurrentLanguage == LanguageEn ? "For security reasons, a maximum of 50 documents can be deleted at a time 😢" : "Por questões de segurança, no máximo 50 documentos podem ser excluídos por vez 😢";
+		public static string CloseThisMessageToStopDeleting => CurrentLanguage == LanguageEn ? "Close this message to stop deleting next documents." : "Feche essa mensagem para cancelar as próximas exclusões.";
+		public static string SelectedDocuments => CurrentLanguage == LanguageEn ? "Selected Documents" : "Documentos Selecionados";
 		public static string CreateDocument => CurrentLanguage == LanguageEn ? "Create Document" : "Criar Documento";
 		public static string CreateDocuments => CurrentLanguage == LanguageEn ? "Create Documents" : "Criar Documentos";
 		public static string EditDocument => CurrentLanguage == LanguageEn ? "Edit Document" : "Editar Documento";
@@ -306,6 +321,8 @@ namespace DocumentManager.Localization {
 		public static string AddFiles => CurrentLanguage == LanguageEn ? "Add Files" : "Adicionar Arquivos";
 		public static string ClearFiles => CurrentLanguage == LanguageEn ? "Clear Files" : "Limpar Arquivos";
 		public static string YouCanAlsoDragAndDropFilesHere => CurrentLanguage == LanguageEn ? "You can also drag an drop files here" : "Você também pode arrastar e soltar arquivos aqui";
+		public static string HowToPerformAMultipleSelection => CurrentLanguage == LanguageEn ? "How to perform a multiple selection?" : "Como realizar uma seleção múltipla?";
+		public static string MultipleSelectionExplanation => CurrentLanguage == LanguageEn ? "- Press and hold the Shift key;<br/>- Click on the <i class='fa fa-check-square-o fa-nomargin'></i> mark of the first row you want to (un)select;<br/>- Click on the <i class='fa fa-check-square-o fa-nomargin'></i> mark of the last row you want to (un)select (the Shift key does not need to be held during the second click)." : "- Pressione e segure a tecla Shift;<br/>- Clique na marcação <i class='fa fa-check-square-o fa-nomargin'></i> da primeira linha que deseja (des)selecionar;<br/>- Clique na marcação <i class='fa fa-check-square-o fa-nomargin'></i> da última linha que deseja (des)selecionar (a tecla Shift não precisa estar pressionada durante o segundo clique).";
 
 		#endregion
 

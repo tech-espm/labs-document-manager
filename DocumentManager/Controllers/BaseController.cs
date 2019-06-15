@@ -10,6 +10,8 @@ using System.Text;
 using DocumentManager.Exceptions;
 using MySql.Data.MySqlClient;
 using DocumentManager.Localization;
+using System.IO;
+using System.IO.Compression;
 
 namespace DocumentManager.Controllers {
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -63,14 +65,25 @@ namespace DocumentManager.Controllers {
 
 		protected ActionResult FileResult(string path, string extensionOverride = null) {
 			if (extensionOverride == null)
-				extensionOverride = System.IO.Path.GetExtension(path).ToLowerInvariant().Substring(1);
+				extensionOverride = Path.GetExtension(path).ToLowerInvariant().Substring(1);
 			return new PhysicalFileResult(path, Storage.Mime(extensionOverride) ?? Storage.DefaultMime);
 		}
 
 		protected ActionResult DownloadResult(string path, string downloadName = null, string extensionOverride = null) {
 			ActionResult result = FileResult(path, extensionOverride);
-			Response.Headers.Add("Content-Disposition", "attachment; filename=" + (downloadName ?? System.IO.Path.GetFileName(path)));
+			Response.Headers.Add("Content-Disposition", "attachment; filename=" + (downloadName ?? Path.GetFileName(path)));
 			return result;
+		}
+
+		protected ActionResult DownloadZipResult(string[] path, string[] fileNames, string downloadName) {
+			MemoryStream memoryStream = new MemoryStream(512 * 1024);
+			using (ZipArchive zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true)) {
+				for (int i = 0; i < path.Length; i++)
+					zipArchive.CreateEntryFromFile(path[i], fileNames[i], CompressionLevel.Optimal);
+			}
+			memoryStream.Seek(0, SeekOrigin.Begin);
+			Response.Headers.Add("Content-Disposition", "attachment; filename=" + downloadName);
+			return new FileStreamResult(memoryStream, Storage.Mime("zip"));
 		}
 
 		public override void OnActionExecuting(ActionExecutingContext context) {

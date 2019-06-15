@@ -554,6 +554,50 @@ window.enableTableUIForMultipleSelection = function (id, enable) {
 			lis[0].removeAttribute("disabled");
 	}
 };
+window.toggleMultipleSelection = (function () {
+	var firstShift = null, firstShiftWasChecking = false;
+	window.resetMultipleSelection = function () {
+		firstShift = null;
+		firstShiftWasChecking = false;
+	};
+
+	return function (e) {
+		if (e.button || JsonWebApi.active)
+			return;
+		var i, row, dtrows, rows, first, last;
+		if (firstShift) {
+			enableTableUIForMultipleSelection("dataTableMain", true);
+			if (document.getSelection && (i = document.getSelection()).removeAllRanges)
+				i.removeAllRanges();
+			dtrows = dataTableMain.rows({ order: "current" });
+			rows = dtrows.nodes();
+			first = rows.indexOf(firstShift);
+			last = rows.indexOf(this.parentNode.parentNode);
+			if (first > last) {
+				i = first;
+				first = last;
+				last = i;
+			}
+			firstShift = null;
+			for (i = first; i <= last; i++) {
+				row = rows[i];
+				row.getElementsByTagName("input")[0].checked = firstShiftWasChecking;
+				selectRow(row, firstShiftWasChecking);
+			}
+			return;
+		}
+
+		selectRow(this.parentNode.parentNode, this.checked);
+
+		if (e.shiftKey) {
+			enableTableUIForMultipleSelection("dataTableMain", false);
+			if (document.getSelection && (i = document.getSelection()).removeAllRanges)
+				i.removeAllRanges();
+			firstShift = this.parentNode.parentNode;
+			firstShiftWasChecking = this.checked;
+		}
+	};
+})();
 window.prepareDataTableMain = (function () {
 	var lastUl = null, lastUlParent = null, wrapper = null, justShown = false, docOk = false,
 		lastBootstrap = null,
@@ -644,7 +688,7 @@ window.prepareDataTableMain = (function () {
 					docOk = true;
 				}
 				if (!wrapper)
-					wrapper = _("wrapper");
+					wrapper = document.body;//_("wrapper");
 				ul = this.getElementsByTagName("ul");
 				if (closeLastBootstrap())
 					return;

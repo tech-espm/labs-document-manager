@@ -18,6 +18,7 @@ namespace DocumentManager.Controllers {
 		[AccessControl(Feature.DocumentList)]
 		public IActionResult Manage() {
 			ViewBag.DocumentEdit = LoggedUser.HasFeature(Feature.DocumentEdit);
+			ViewBag.DocumentDelete = LoggedUser.HasFeature(Feature.DocumentDelete);
 			return View();
 		}
 
@@ -78,9 +79,8 @@ namespace DocumentManager.Controllers {
 		[Route("Document/{id}/{fileName}")]
 		[AccessControl(Feature.DocumentList)]
 		public IActionResult View(int id, string fileName) {
-			Document document = null;
 			try {
-				document = Document.GetById(id, false);
+				Document document = Document.GetById(id, false);
 				if (document == null)
 					return ErrorResult(Str.DocumentNotFound);
 				return FileResult(Storage.Document(document.Id, document.Extension));
@@ -93,12 +93,35 @@ namespace DocumentManager.Controllers {
 		[Route("Document/Download/{id}/{fileName}")]
 		[AccessControl(Feature.DocumentList)]
 		public IActionResult Download(int id, string fileName) {
-			Document document = null;
 			try {
-				document = Document.GetById(id, false);
+				Document document = Document.GetById(id, false);
 				if (document == null)
 					return ErrorResult(Str.DocumentNotFound);
 				return DownloadResult(Storage.Document(document.Id, document.Extension), string.IsNullOrWhiteSpace(fileName) ? document.SafeDownloadName : fileName);
+			} catch (Exception ex) {
+				return ErrorResult(ex);
+			}
+		}
+
+		[HttpGet]
+		[Route("Document/DownloadSelected/{ids}/{fileName}")]
+		[AccessControl(Feature.DocumentList)]
+		public IActionResult DownloadSelected(string ids, string fileName) {
+			try {
+				if (string.IsNullOrWhiteSpace(ids))
+					return ErrorResult(Str.DocumentNotFound);
+				string[] splitIds = ids.Split('|');
+				string[] names = new string[splitIds.Length];
+				for (int i = splitIds.Length - 1; i >= 0; i--) {
+					if (!int.TryParse(splitIds[i], out int id))
+						return ErrorResult(Str.DocumentNotFound);
+					Document document = Document.GetById(id, false);
+					if (document == null)
+						return ErrorResult(Str.DocumentNotFound);
+					splitIds[i] = Storage.Document(id, document.Extension);
+					names[i] = document.SafeDownloadName;
+				}
+				return DownloadZipResult(splitIds, names, string.IsNullOrWhiteSpace(fileName) ? (Str.SelectedDocuments + ".zip") : fileName);
 			} catch (Exception ex) {
 				return ErrorResult(ex);
 			}
