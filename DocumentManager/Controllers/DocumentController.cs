@@ -25,7 +25,11 @@ namespace DocumentManager.Controllers {
 		[HttpPost]
 		[AccessControl(Feature.DocumentList, true)]
 		public IActionResult GetAllByFilter(Document.Data documentData) {
-			return Json(Document.GetAllByFilter(documentData, LoggedUser));
+			try {
+				return Json(Document.GetAllByFilter(documentData, LoggedUser));
+			} catch (Exception ex) {
+				return ErrorResult(ex);
+			}
 		}
 
 		[HttpGet]

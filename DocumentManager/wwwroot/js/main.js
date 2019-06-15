@@ -791,6 +791,63 @@ if (window.currentLanguageId === 1) {
 		//return format2(tmp & 31) + months[(tmp >>> 5) & 15] + (tmp >>> 9);
 	};
 }
+window.parseDateInput = function (input, setAtEndOfDay) {
+	var date = trimValue(input).toUpperCase(), day, month, year, literalMonth = false, i;
+	if (!(new RegExp("[0-9][0-9]?/[0-9][0-9]?/[0-9][0-9][0-9][0-9]")).test(date)) {
+		literalMonth = true;
+		if (window.currentLanguageId === 1) {
+			if (!(new RegExp("[A-Z][A-Z][A-Z]/[0-9][0-9]?/[0-9][0-9][0-9][0-9]")).test(date))
+				return 0;
+		} else {
+			if (!(new RegExp("[0-9][0-9]?/[A-Z][A-Z][A-Z]/[0-9][0-9][0-9][0-9]")).test(date))
+				return 0;
+		}
+	}
+	date = date.split("/", 3);
+	if (window.currentLanguageId === 1) {
+		if (literalMonth) {
+			date[0] = monthsToInt[date[0]];
+			if (!date[0])
+				return 0;
+		}
+		month = parseInt(date[0]);
+		day = parseInt(date[1]);
+	} else {
+		if (literalMonth) {
+			date[1] = monthsToInt[date[1]];
+			if (!date[1])
+				return 0;
+		}
+		day = parseInt(date[0]);
+		month = parseInt(date[1]);
+	}
+	if (date.length !== 3 ||
+		isNaN(day) ||
+		isNaN(month) ||
+		isNaN(year = parseInt(date[2])) ||
+		day <= 0 ||
+		day > 31 ||
+		month <= 0 ||
+		month > 12 ||
+		year < 1900 ||
+		year > 2200)
+		return 0;
+	if ((month == 2 && day > 29) ||
+		((month == 4 ||
+			month == 6 ||
+			month == 9 ||
+			month == 11) && day > 30))
+		return 0;
+	//SQL server rounds to the following day when using 999 millis
+	//return (year * 67108864) + (month * 4194304) + (day * 131072) + (setAtEndOfDay ? 98043 : 0);
+	//return (setAtEndOfDay ? new Date(year, month - 1, day, 23, 59, 59, 0) : new Date(year, month - 1, day, 0, 0, 0, 0)).getTime();
+	return (setAtEndOfDay ? Date.UTC(year, month - 1, day, 23, 59, 59, 0) : Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+	//Date.UTC(year, month[, day[, hour[, minute[, second[, millisecond]]]]])
+	//returns the number of milliseconds in a Date object since January 1, 1970, 00:00:00, universal time
+	//Date.UTC() uses universal time instead of the local time.
+	//Date.UTC() returns a time value as a number instead of creating a Date object.
+	//return date;
+};
 window.parseNoNaN = function (str) {
 	var x = parseInt(trim(str));
 	return (isNaN(x) ? 0 : x);
@@ -941,106 +998,6 @@ window.cleanupFile = function (name) {
 		fullScreenFrame.style.background = "none";
 	}
 })();
-window.Validation = {
-	versionId: 0,
-	reset: function (lblId, divIds) {
-		Notification.hide();
-		//Validation.versionId++;
-		//_(lblId).className = "alert alert-danger hidden";
-		var i, d;
-		for (i = 1; i < arguments.length; i++) {
-			if ((d = _(arguments[i])))
-				$(d).removeClass("has-error");
-		}
-	},
-	success: function (lblId, message) {
-		Notification.success(message);
-		//Validation.versionId++;
-		//var vid = Validation.versionId;
-		//_(lblId).textContent = message;
-		//_(lblId).className = "alert alert-success";
-		//window.setTimeout(function () {
-		//	if (vid !== Validation.versionId)
-		//		return;
-		//	_(lblId).className = "alert alert-success fade";
-		//	window.setTimeout(function () {
-		//		if (vid !== Validation.versionId)
-		//			return;
-		//		_(lblId).className = "alert alert-danger hidden";
-		//	}, 150);
-		//}, 2000);
-	},
-	isInvalid: function (divId, invalid, inputId, lblId, message) {
-		if (invalid) {
-			if (divId)
-				$(_(divId)).addClass("has-error");
-			Notification.error(message);
-			//_(lblId).textContent = message;
-			//_(lblId).className = "alert alert-danger";
-			var c;
-			if ((c = _(inputId))) c.focus();
-			return true;
-		}
-		return false;
-	},
-	validateDateInput: function (input, setAtEndOfDay) {
-		var date = trimValue(input).toUpperCase(), day, month, year, literalMonth = false, i;
-		if (!(new RegExp("[0-9][0-9]?/[0-9][0-9]?/[0-9][0-9][0-9][0-9]")).test(date)) {
-			literalMonth = true;
-			if (window.currentLanguageId === 1) {
-				if (!(new RegExp("[A-Z][A-Z][A-Z]/[0-9][0-9]?/[0-9][0-9][0-9][0-9]")).test(date))
-					return 0;
-			} else {
-				if (!(new RegExp("[0-9][0-9]?/[A-Z][A-Z][A-Z]/[0-9][0-9][0-9][0-9]")).test(date))
-					return 0;
-			}
-		}
-		date = date.split("/", 3);
-		if (window.currentLanguageId === 1) {
-			if (literalMonth) {
-				date[0] = monthsToInt[date[0]];
-				if (!date[0])
-					return 0;
-			}
-			month = parseInt(date[0]);
-			day = parseInt(date[1]);
-		} else {
-			if (literalMonth) {
-				date[1] = monthsToInt[date[1]];
-				if (!date[1])
-					return 0;
-			}
-			day = parseInt(date[0]);
-			month = parseInt(date[1]);
-		}
-		if (date.length !== 3 ||
-			isNaN(day) ||
-			isNaN(month) ||
-			isNaN(year = parseInt(date[2])) ||
-			day <= 0 ||
-			day > 31 ||
-			month <= 0 ||
-			month > 12 ||
-			year < 1900 ||
-			year > 2200)
-			return 0;
-		if ((month == 2 && day > 29) ||
-			((month == 4 ||
-				month == 6 ||
-				month == 9 ||
-				month == 11) && day > 30))
-			return 0;
-		//SQL server rounds to the following day when using 999 millis
-		//return (year * 67108864) + (month * 4194304) + (day * 131072) + (setAtEndOfDay ? 98043 : 0);
-		//return (setAtEndOfDay ? new Date(year, month - 1, day, 23, 59, 59, 0) : new Date(year, month - 1, day, 0, 0, 0, 0)).getTime();
-		return (setAtEndOfDay ? Date.UTC(year, month - 1, day, 23, 59, 59, 0) : Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-		//Date.UTC(year, month[, day[, hour[, minute[, second[, millisecond]]]]])
-		//returns the number of milliseconds in a Date object since January 1, 1970, 00:00:00, universal time
-		//Date.UTC() uses universal time instead of the local time.
-		//Date.UTC() returns a time value as a number instead of creating a Date object.
-		//return date;
-	}
-};
 /*!
  JsonWebApi v1.0.0 is distributed under the FreeBSD License
 

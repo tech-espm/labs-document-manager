@@ -193,9 +193,13 @@ namespace DocumentManager.Localization {
 		public static string Users => CurrentLanguage == LanguageEn ? "Users" : "Usuários";
 		public static string User => CurrentLanguage == LanguageEn ? "User" : "Usuário";
 		public static string Creation => CurrentLanguage == LanguageEn ? "Creation" : "Criação";
+		public static string MinimumCreation => CurrentLanguage == LanguageEn ? "Minimum Creation" : "Criação Mínima";
+		public static string MaximumCreation => CurrentLanguage == LanguageEn ? "Maximum Creation" : "Criação Máxima";
 		public static string Listing => CurrentLanguage == LanguageEn ? "Listing" : "Listagem";
 		public static string Edition => CurrentLanguage == LanguageEn ? "Edition" : "Edição";
 		public static string Deletion => CurrentLanguage == LanguageEn ? "Deletion" : "Exclusão";
+		public static string Filter => CurrentLanguage == LanguageEn ? "Filter" : "Filtro";
+		public static string Filters => CurrentLanguage == LanguageEn ? "Filters" : "Filtros";
 		public static string InvalidPermission => CurrentLanguage == LanguageEn ? "Invalid permission!" : "Permissão inválida!";
 		public static string EditingProfileNotAllowed => CurrentLanguage == LanguageEn ? "Editing the profile \"ADMINISTRATOR\" is not allowed!" : "Não é permitido editar o perfil \"ADMINISTRADOR\"!";
 		public static string DeletingProfileNotAllowed => CurrentLanguage == LanguageEn ? "Deleting the profile \"ADMINISTRATOR\" is not allowed!" : "Não é permitido excluir o perfil \"ADMINISTRADOR\"!";

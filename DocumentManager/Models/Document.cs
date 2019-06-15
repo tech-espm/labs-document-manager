@@ -25,10 +25,10 @@ namespace DocumentManager.Models {
 			public int PartitionType { get; set; }
 			public int DocumentType { get; set; }
 			public string Name { get; set; }
-			public string NameEn { get; set; }
-			public string NamePtBr { get; set; }
 			public string Description { get; set; }
 			public string Extension { get; set; }
+			public long MinimumCreationTime { get; set; }
+			public long MaximumCreationTime { get; set; }
 			public int[] TagIds { get; set; }
 			public int[] TagValues { get; set; }
 		}
@@ -39,7 +39,7 @@ namespace DocumentManager.Models {
 		public IdNamePair Unity, Course, PartitionType, DocumentType;
 		public List<IdValuePair> Tags;
 
-		public string SafeDownloadName => Storage.SafeFileName(Name.ToLower()) + "." + Extension;
+		public string SafeDownloadName => (Storage.SafeFileName(Name) + "." + Extension).ToLower();
 
 		public string FormattedSize => Storage.FormatSize(Size);
 
@@ -57,7 +57,7 @@ namespace DocumentManager.Models {
 
 			if (string.IsNullOrWhiteSpace(data.Extension))
 				throw new ValidationException(Str.InvalidFileExtension);
-			if ((data.Extension = data.Extension.Trim().ToLower()).Length > 10)
+			if ((data.Extension = data.Extension.Trim().ToUpper()).Length > 10)
 				throw new ValidationException(Str.FileExtensionTooLong);
 
 			if (data.Size < MinFileSizeInBytes)
@@ -249,14 +249,19 @@ WHERE 1 = 1
 							cmd.Parameters.AddWithValue("@document_type_id", data.DocumentType);
 						}
 
-						if (!string.IsNullOrWhiteSpace(data.NameEn)) {
-							builder.Append($" AND d.name_en LIKE @name_en");
-							cmd.Parameters.AddWithValue("@name_en", $"%{data.NameEn.Trim().ToUpper()}%");
+						if (data.MinimumCreationTime > 0) {
+							builder.Append(" AND d.creation_time >= @minimum_creation_time");
+							cmd.Parameters.AddWithValue("@minimum_creation_time", JS.FromJS(data.MinimumCreationTime));
 						}
 
-						if (!string.IsNullOrWhiteSpace(data.NamePtBr)) {
-							builder.Append($" AND d.name_ptbr LIKE @name_ptbr");
-							cmd.Parameters.AddWithValue("@name_ptbr", $"%{data.NamePtBr.Trim().ToUpper()}%");
+						if (data.MaximumCreationTime > 0) {
+							builder.Append(" AND d.creation_time <= @maximum_creation_time");
+							cmd.Parameters.AddWithValue("@maximum_creation_time", JS.FromJS(data.MaximumCreationTime));
+						}
+
+						if (!string.IsNullOrWhiteSpace(data.Name)) {
+							builder.Append($" AND d.name LIKE @name");
+							cmd.Parameters.AddWithValue("@name", $"%{data.Name.Trim().ToUpper()}%");
 						}
 					}
 

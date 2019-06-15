@@ -1,6 +1,5 @@
 ﻿@{
 	ViewBag.Title = Str.Documents;
-	ViewBag.RemoveLabelsFromUserPermissions = true;
 }
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalDelete">
@@ -45,19 +44,28 @@
 		<partial name="_UserBasicPermissions" />
 
 		<div class="row">
-			<div class="col-sm-4">
+			<div class="col-sm-3">
 				<div class="form-group">
-					<input id="id" name="id" class="form-control upper" type="number" placeholder="@Str.Id">
+					<label for="id">@Str.Id</label>
+					<input id="id" name="id" class="form-control upper" type="number" placeholder="@Str.Optional">
 				</div>
 			</div>
-			<div class="col-sm-4">
+			<div class="col-sm-3">
 				<div class="form-group">
-					<input id="nameEn" name="nameEn" maxlength="128" class="form-control upper" type="text" placeholder="@Str.Name (@Str.English)">
+					<label for="name">@Str.Name</label>
+					<input id="name" name="name" maxlength="128" class="form-control upper" type="text" placeholder="@Str.Optional">
 				</div>
 			</div>
-			<div class="col-sm-4">
+			<div class="col-sm-3">
 				<div class="form-group">
-					<input id="namePtBr" name="namePtBr" maxlength="128" class="form-control upper" type="text" placeholder="@Str.Name (@Str.Portuguese)">
+					<label for="minimumCreationTime">@Str.MinimumCreation</label>
+					<input id="minimumCreationTime" name="minimumCreationTime" maxlength="16" class="form-control upper" type="text" spellcheck="false" placeholder="@Str.Optional">
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="form-group">
+					<label for="maximumCreationTime">@Str.MaximumCreation</label>
+					<input id="maximumCreationTime" name="maximumCreationTime" maxlength="16" class="form-control upper" type="text" spellcheck="false" placeholder="@Str.Optional">
 				</div>
 			</div>
 		</div>
@@ -250,8 +258,9 @@
 			formData.append("partitionType", _("partitionType").value);
 			formData.append("documentType", _("documentType").value);
 			formData.append("id", _("id").value);
-			formData.append("nameEn", _("nameEn").value);
-			formData.append("namePtBr", _("namePtBr").value);
+			formData.append("name", _("name").value);
+			formData.append("minimumCreationTime", parseDateInput("minimumCreationTime"));
+			formData.append("maximumCreationTime", parseDateInput("maximumCreationTime"));
 
 			JsonWebApi.postFormData("@Url.Action("GetAllByFilter")", formData, function (response) {
 				Notification.hide();
@@ -264,23 +273,29 @@
 					dataTablePanel.className = "panel panel-default";
 
 					window.dataTableMain = prepareDataTable("dataTableMain", {
-						order: [[1, "asc"]],
+						order: [[2, "asc"]],
 						columns: [
 							{ title: " ", "class": "col-min text-center", data: null, searchable: false, orderable: false, render: function (v, type, row) { return '<input type="checkbox" data-id="' + row.id + '" />'; } },
+							{ title: "@Str.Id", "class": "col-min text-right", data: "id" },
 							{ title: "@Str.Unity", render: encode, data: "unity.name" },
 							{ title: "@Str.Course", render: encode, data: "course.name" },
 							{ title: "@Str.PartitionType", render: encode, data: "partitionType.name" },
 							{ title: "@Str.DocumentType", render: encode, data: "documentType.name" },
 							{ title: "@Str.Name", render: encode, data: "name" },
+							{ title: "@Str.Type", "class": "col-min", render: encode, data: "extension" },
 							{ title: " ", data: "size", visible: false, searchable: false, orderable: false },
-							{ title: "@Str.Size", "class": "col-min text-right", data: "formattedSize", orderData: 6 },
+							{ title: "@Str.Size", "class": "col-min text-right", data: "formattedSize", orderData: 8 },
 							{ title: " ", data: "creationTimeInt", visible: false, searchable: false, orderable: false },
-							{ title: "@Str.Creation", "class": "col-min text-right", data: "creationTime", orderData: 8 },
+							{ title: "@Str.Creation", "class": "col-min text-right", data: "creationTime", orderData: 10 },
 							{ title: " ", "class": "col-min", data: null, searchable: false, orderable: false, render: function (v, type, row) { return '<div class="btn-group dropup"><button type="button" title="@Str.Optional" class="btn btn-outline btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-nomargin fa-ellipsis-v"></i></button><ul class="dropdown-menu dropdown-menu-right"><li><a target="_blank" href="@(Url.Action(""))/' + row.id + '/' + row.safeDownloadName + '"><i class="fa fa-fw fa-file-text-o"></i>@Str.View</a></li><li><a data-download="1" target="_blank" href="@(Url.Action(""))/Download/' + row.id + '/' + row.safeDownloadName + '"><i class="fa fa-fw fa-cloud-download"></i>@Str.Download</a></li>@if (ViewBag.DocumentEdit == true) {<li><a target="_blank" href="@(Url.Action("Edit"))?id=' + row.id + '" class=""><i class="fa fa-fw fa-edit"></i>@Str.Edit</a></li>}</ul></div>'; } }
 						],
 						data: response.value,
 						deferRender: true,
-						export: { title: "@Str.Documents" }
+						export: {
+							title: "@Str.Documents",
+							filterTitle: "@Str.Filter",
+							filters: $("#form").prepareFilters()
+						}
 					});
 					prepareDataTableMain(true);
 					$("#dataTableMain > tbody").on("click", "input", toggleMultipleSelection);
@@ -298,7 +313,61 @@
 			return cancelEvent(e);
 		};
 
-		$("#divMultipleSelectionHelp i").tooltip();
+		(function () {
+			$("#divMultipleSelectionHelp i").tooltip();
+			prepareDatePicker("#minimumCreationTime");
+			prepareDatePicker("#maximumCreationTime");
+
+			if (window.localStorage) {
+				var filterTimeout = 0;
+
+				function saveFilter() {
+					if (filterTimeout)
+						clearTimeout(filterTimeout);
+					filterTimeout = setTimeout(function () {
+						filterTimeout = 0;
+						localStorage.setItem("filter/document/manage", JSON.stringify({
+							unity: _("unity").value,
+							course: _("course").value,
+							partitionType: _("partitionType").value,
+							documentType: _("documentType").value,
+							id: _("id").value,
+							name: _("name").value,
+							minimumCreationTime: parseDateInput("minimumCreationTime"),
+							maximumCreationTime: parseDateInput("maximumCreationTime")
+						}));
+					}, 1000);
+				}
+
+				try {
+					var obj = localStorage.getItem("filter/document/manage");
+					if (obj && (obj = JSON.parse(obj))) {
+						setCbSearch(_("unity"), obj.unity);
+						setCbSearch(_("course"), obj.course);
+						setCbSearch(_("partitionType"), obj.partitionType);
+						setCbSearch(_("documentType"), obj.documentType);
+						_("id").value = obj.id;
+						_("name").value = obj.name;
+						if (obj.minimumCreationTime)
+							setDatePickerValue("#minimumCreationTime", formatDate(obj.minimumCreationTime));
+						if (obj.maximumCreationTime)
+							setDatePickerValue("#maximumCreationTime", formatDate(obj.maximumCreationTime));
+					}
+				} catch (e) {
+					// Just ignore...
+				}
+
+				_("unity").addEventListener("change", saveFilter);
+				_("course").addEventListener("change", saveFilter);
+				_("partitionType").addEventListener("change", saveFilter);
+				_("documentType").addEventListener("change", saveFilter);
+				_("id").addEventListener("change", saveFilter);
+				_("name").addEventListener("change", saveFilter);
+				_("minimumCreationTime").addEventListener("blur", saveFilter);
+				_("maximumCreationTime").addEventListener("blur", saveFilter);
+			}
+
+		})();
 
 		//]]>
 	</script>
