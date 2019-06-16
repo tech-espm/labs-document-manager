@@ -41,7 +41,118 @@ namespace DocumentManager.Controllers {
 			}
 		}
 
-		[HttpGet, HttpHead]
+        [HttpDelete]
+        public IActionResult DeletePartitionTypePermission(int id)
+        {
+            try
+            {
+                Models.User.PartitionTypePermission partitionTypePermission = new User.PartitionTypePermission();
+
+                var result = new
+                {
+                    success = partitionTypePermission.Delete(id)
+
+                };
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult(ex);
+            }
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteDocumentTypePermission(int id)
+        {
+            try
+            {
+                Models.User.DocumentTypePermission documentTypePermission = new User.DocumentTypePermission();
+
+                var result = new
+                {
+                    success = documentTypePermission.Delete(id)
+
+                };
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult(ex);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult AddDocumentTypePermission(int UserId, int UnityId, int CourseId, int DocumentTypeId, int FeaturePermissionId)
+        {
+            try
+            {
+                Models.User.DocumentTypePermission documentTypePermission = new User.DocumentTypePermission();
+
+                var result = new
+                {
+                    success = documentTypePermission.Add(UserId, UnityId, CourseId, DocumentTypeId, FeaturePermissionId)
+
+                };
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult(ex);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult AddPartitionTypePermission(int UserId, int UnityId, int CourseId, int PartitionTypeId, int FeaturePermissionId)
+        {
+            try
+            {
+                Models.User.PartitionTypePermission partitionTypePermission = new User.PartitionTypePermission();
+
+                var result = new
+                {
+                    success = partitionTypePermission.Add(UserId, UnityId, CourseId, PartitionTypeId, FeaturePermissionId)
+
+                };
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult(ex);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetPartitionTypePermission(int UserID)
+        {
+            try
+            {
+                return Json(Models.User.PartitionTypePermission.GetPermissions(UserID));
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult(ex);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetDocumentTypePermission(int UserID)
+        {
+            try
+            {
+                return Json(Models.User.DocumentTypePermission.GetPermissions(UserID));
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult(ex);
+            }
+        }
+
+
+        [HttpGet, HttpHead]
 		public IActionResult Picture(int id, int v) {
 			try {
 				return Models.User.Picture(HttpContext, id);

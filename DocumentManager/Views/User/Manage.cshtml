@@ -1,6 +1,7 @@
 ﻿@model List<User>
 @{
-	ViewBag.Title = Str.Users;
+    ViewBag.Title = Str.Users;
+    ViewBag.OnlyUnityAndCourseUserPermissions = true;
 }
 <div class="modal fade" tabindex="-1" role="dialog" id="modalPermissionId">
     <div class="modal-dialog" role="document">
@@ -12,7 +13,7 @@
             <div class="modal-body">
                 <div class="form-group">
 
-                     
+                    <partial name="_UserBasicPermissions" />
 
                     <ul class="nav nav-tabs">
                         <li role="presentation" class="active" data-toggle="tab" href="#nav-partition"><a href="#">@Str.partitionType</a></li>
@@ -30,18 +31,18 @@
                                 </thead>
                                 <tbody>
                                     @foreach (PartitionType partitionType in PartitionType.GetAll())
-            {
-                        <tr>
+                                    {
+                                        <tr>
 
-                            <td class="clickable col-max">@partitionType.Name</td>
-                            <td class="clickable col-min">
-                                <input type="checkbox" />
-                            </td>
-                            <td class="clickable col-min">
-                                <input type="checkbox" />
-                            </td>
-                        </tr>
-}
+                                            <td class="clickable col-max">@partitionType.Name</td>
+                                            <td class="clickable col-min">
+                                                <input type="checkbox" id="ckpartitionDelete" class="ckpartition"  data-feature="1" value="@partitionType.Id" />
+                                            </td>
+                                            <td class="clickable col-min">
+                                                <input type="checkbox" id="ckpartitionDownload" class="ckpartition"  data-feature="2" value="@partitionType.Id" />
+                                            </td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -57,18 +58,18 @@
                                 </thead>
                                 <tbody>
                                     @foreach (DocumentType documentType in DocumentType.GetAll())
-            {
-                        <tr>
+                                    {
+                                        <tr>
 
-                            <td class="clickable col-max">@documentType.Name</td>
-                            <td class="clickable col-min">
-                                <input type="checkbox" />
-                            </td>
-                            <td class="clickable col-min">
-                                <input type="checkbox" />
-                            </td>
-                        </tr>
-}
+                                            <td class="clickable col-max">@documentType.Name</td>
+                                            <td class="clickable col-min">
+                                                <input type="checkbox" id="ckpdocumentDelete" class="ckdocument" data-feature="1" value="@documentType.Id"/>
+                                            </td>
+                                            <td class="clickable col-min">
+                                                <input type="checkbox" id="ckpdocumentDelete" class="ckdocument" data-feature="2" value="@documentType.Id" />
+                                            </td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -80,91 +81,89 @@
                         prepareCbSearch(document.getElementById("profileId"));
                         //]]></script>
                 </div>
-                </div>
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="btnPermissionId"><i class="fa fa-check"></i>@Str.SaveChanges</button>
-                <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+                      <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Close</button>
             </div>
         </div>
     </div>
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalProfileId">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">@Str.ChangeProfile</h4>
-			</div>
-			<div class="modal-body">
-				<div class="form-group">
-					<label for="profileId">@Str.Profile</label>
-					<select id="profileId" name="profileId" size="1" class="form-control">
-						<option value="" selected="selected">@Str.SELECT</option>
-						@foreach (Profile profile in Profile.GetAll()) {
-							<option value="@profile.Id">@profile.Name</option>
-						}
-					</select>
-					<script type="text/javascript">
-						//<![CDATA[
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">@Str.ChangeProfile</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="profileId">@Str.Profile</label>
+                    <select id="profileId" name="profileId" size="1" class="form-control">
+                        <option value="" selected="selected">@Str.SELECT</option>
+                        @foreach (Profile profile in Profile.GetAll())
+                        {
+                            <option value="@profile.Id">@profile.Name</option>
+                        }
+                    </select>
+                    <script type="text/javascript">//<![CDATA[
 						"use strict";
 						prepareCbSearch(_("profileId"));
-						//]]>
-					</script>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" id="btnProfileId"><i class="fa fa-check"></i>@Str.ChangeProfile</button>
-				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
-			</div>
-		</div>
-	</div>
+						//]]></script>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnProfileId"><i class="fa fa-check"></i>@Str.ChangeProfile</button>
+                <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalActivation">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">@Str.Oops</h4>
-			</div>
-			<div class="modal-body">
-				<p class="no-margin-bottom" id="pActivation"></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" id="btnActivation"><i class="fa fa-check"></i>@Str.OK</button>
-				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">@Str.Oops</h4>
+            </div>
+            <div class="modal-body">
+                <p class="no-margin-bottom" id="pActivation"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnActivation"><i class="fa fa-check"></i>@Str.OK</button>
+                <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalResetPassword">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">@Str.Oops</h4>
-			</div>
-			<div class="modal-body">
-				<p class="no-margin-bottom" id="pResetPassword"></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" id="btnResetPassword"><i class="fa fa-check"></i>@Str.OK</button>
-				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">@Str.Oops</h4>
+            </div>
+            <div class="modal-body">
+                <p class="no-margin-bottom" id="pResetPassword"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnResetPassword"><i class="fa fa-check"></i>@Str.OK</button>
+                <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
-	<div class="col-lg-12">
-		<div class="panel panel-default">
-			<div class="panel-body dataTable_wrapper">
-				<table class="table table-striped table-hover" id="dataTableMain"></table>
-			</div>
-		</div>
-	</div>
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-body dataTable_wrapper">
+                <table class="table table-striped table-hover" id="dataTableMain"></table>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -199,33 +198,196 @@
 			deferRender: true,
 			export: { title: "@Str.Users" }
 		});
+        var userID = 0 ;
+        var PartitionTypePermission = null;
+        var DocumentTypePermission = null;
+
+        document.getElementById("course").addEventListener("change", function () {
+
+          console.log("course:change")
+
+          var curseID = $("#course").val()
+          var unityID = $("#unity").val()
+
+
+         $( ".ckpartition" ).each(function( index ) {
+            var element = $(this);
+            var checked = false ;
+
+          $.each(PartitionTypePermission, function (key, item) {
+                if(element.val() ==  item.partitionTypeID
+                    && element.attr( 'data-feature' ) == item.featurePermission
+                    && curseID == item.curseID
+                    && unityID == item.unitID)
+                    {
+                        checked = true;
+                    }
+            });
+
+            element.prop('checked',checked)
+          });
+
+
+        console.log(DocumentTypePermission)
+
+        $( ".ckdocument" ).each(function( index ) {
+            var element = $(this);
+            var checked = false ;
+
+          $.each(DocumentTypePermission, function (key, item) {
+                if(element.val() ==  item.documentTypeId
+                    && element.attr( 'data-feature' ) == item.featurePermission
+                    && curseID == item.curseID
+                    && unityID == item.unitID)
+                    {
+                        checked = true;
+                    }
+            });
+
+            element.prop('checked',checked)
+          });
+
+
+
+        });
+
+        $(".ckpartition").click(function() {
+            var curseID = $("#course").val()
+            var unityID = $("#unity").val()
+            var partitionTypeID= $(this).val()
+            var featurePermission = $(this).attr( 'data-feature' )
+
+            var addPermission = $(this).is(':checked')
+
+            if(unityID == '' || unityID ==0){
+                alert("TODO: TROCAR MENSAGEM -> selecione primeiro a unidade antes de adicionar uma permissão")
+                return false
+            }
+            if(curseID == '' || curseID ==0){
+                alert("TODO: TROCAR MENSAGEM -> selecione primeiro o curso antes de adicionar uma permissão")
+                return false
+            }
+
+            var query = "UserId=" + userID;
+                query += "&UnityId=" + unityID;
+                query += "&CourseId=" + curseID;
+                query += "&partitionTypeID=" + partitionTypeID;
+                query += "&FeaturePermissionId=" + featurePermission;
+
+            if(addPermission){
+                $.ajax({
+                    url: 'AddPartitionTypePermission?' + query,
+                    type: "post",
+                }).done(function (data) {
+                    GetPartitionTypePermission(userID);
+                })
+            }else{
+                 $.each(PartitionTypePermission, function (key, item) {
+                    if(partitionTypeID ==  item.partitionTypeID
+                        && featurePermission == item.featurePermission
+                        && curseID == item.curseID
+                        && unityID == item.unitID)
+                        {
+                            $.ajax({
+                                url: 'DeletePartitionTypePermission?id=' + item.id,
+                                type: "delete",
+                            }).done(function (data) {
+                                GetPartitionTypePermission(userID);
+                            })
+
+                        }
+                  });
+
+
+
+            }
+
+
+        });
+
+         $(".ckdocument").click(function() {
+            var curseID = $("#course").val()
+            var unityID = $("#unity").val()
+            var documentTypeId= $(this).val()
+            var featurePermission = $(this).attr( 'data-feature' )
+
+            var addPermission = $(this).is(':checked')
+
+            if(unityID == '' || unityID ==0){
+                alert("TODO: TROCAR MENSAGEM -> selecione primeiro a unidade antes de adicionar uma permissão")
+                return false
+            }
+            if(curseID == '' || curseID ==0){
+                alert("TODO: TROCAR MENSAGEM -> selecione primeiro o curso antes de adicionar uma permissão")
+                return false
+            }
+
+            var query = "UserId=" + userID;
+                query += "&UnityId=" + unityID;
+                query += "&CourseId=" + curseID;
+                query += "&DocumentTypeId=" + documentTypeId;
+                query += "&FeaturePermissionId=" + featurePermission;
+
+            if(addPermission){
+                $.ajax({
+                    url: 'AddDocumentTypePermission?' + query,
+                    type: "post",
+                }).done(function (data) {
+                    GetDocumentTypePermission(userID);
+                })
+            }else{
+                 $.each(DocumentTypePermission, function (key, item) {
+                    if(documentTypeId ==  item.documentTypeId
+                        && featurePermission == item.featurePermission
+                        && curseID == item.curseID
+                        && unityID == item.unitID)
+                        {
+                            $.ajax({
+                                url: 'DeleteDocumentTypePermission?id=' + item.id,
+                                type: "delete",
+                            }).done(function (data) {
+                                GetDocumentTypePermission(userID);
+
+                            })
+
+                        }
+                  });
+
+
+
+            }
+
+
+        });
+
+
+
+        function GetPartitionTypePermission(userID){
+                $.ajax({
+                    url: 'GetPartitionTypePermission?UserID=' + userID
+                }).done(function (data) {
+                   PartitionTypePermission = data
+                })
+        }
+
+        function GetDocumentTypePermission(userID){
+                $.ajax({
+                    url: 'GetDocumentTypePermission?UserID=' + userID
+                }).done(function (data) {
+                   DocumentTypePermission = data
+                })
+        }
+
 
         function changePermission(btn, userName, id) {
             if (JsonWebApi.active)
                 return;
 
-         /*     setCbSearch(_("permissionId"), "");
+            userID = id;
+            GetPartitionTypePermission(id);
+            GetDocumentTypePermission(id);
 
-          _("btnPermissionId").onclick = function () {
-                var cbPermissionId = _("permissionId"), permissionId = parseInt(cbPermissionId.value), permissionName;
 
-                if (JsonWebApi.active)
-                    return;
-
-                $("#modalPermissionId").modal("hide");
-
-                permissionName = cbPermissionId.options[cbPermissionId.options.selectedIndex].textContent;
-
-                Notification.wait();
-
-                JsonWebApi.get("@Url.Action("SetPermission")", function (response) {
-                    if (response.success)
-                        location.reload(true);
-                    else
-                        Notification.error(response.value, true);
-                }, "id", id, "permissionId", permissionId);
-            };
-    */
             $("#modalPermissionId").modal({
                 backdrop: true,
                 keyboard: true

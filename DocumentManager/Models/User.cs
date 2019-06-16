@@ -21,12 +21,128 @@ namespace DocumentManager.Models {
 			LoggedInButNoPermission = -1
 		}
 
-		public class DocumentTypePermission {
-			public readonly DocumentType DocumentType;
+        public enum FeaturePermissionResult
+        {
+            Edit = 1,
+            Download = 2
+        }
 
-			public DocumentTypePermission(DocumentType documentType) {
-				DocumentType = documentType;
-			}
+        public class DocumentTypePermission { 
+
+            public int ID { get; set; }
+            public int UserID { get; set; }
+            public int UnitID { get; set; }
+            public int CurseID { get; set; }
+            public int DocumentTypeId { get; set; }
+            public FeaturePermissionResult FeaturePermission { get; set; }
+            public DocumentType DocumentType { get; set; }
+
+            public bool Delete(int id)
+            {
+
+
+                using (MySqlConnection conn = Sql.OpenConnection())
+                {
+                    StringBuilder query = new StringBuilder();
+                    query.Append("DELETE FROM user_permission_document_type ");
+                    query.Append("WHERE id = @id ");
+
+
+                    using (MySqlCommand cmd = new MySqlCommand(query.ToString(), conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+                        int rows = cmd.ExecuteNonQuery();
+                        return rows > 0;
+
+                    }
+
+                }
+
+            }
+
+
+            public bool Add(int UserId, int UnityId, int CourseId, int DocumentTypeId, int FeaturePermissionId)
+            {
+
+
+                using (MySqlConnection conn = Sql.OpenConnection())
+                {
+                    StringBuilder query = new StringBuilder();
+                    query.Append("INSERT INTO user_permission_document_type ");
+                    query.Append("        (user_id, ");
+                    query.Append("         unity_id, ");
+                    query.Append("         course_id, ");
+                    query.Append("         document_type_id, ");
+                    query.Append("         feature_permission_id) ");
+                    query.Append("VALUES ( @user_id, ");
+                    query.Append("        @unity_id, ");
+                    query.Append("        @course_id, ");
+                    query.Append("        @document_type_id, ");
+                    query.Append("        @feature_permission_id)");
+
+                    using (MySqlCommand cmd = new MySqlCommand(query.ToString(), conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user_id", UserId);
+                        cmd.Parameters.AddWithValue("@unity_id", UnityId);
+                        cmd.Parameters.AddWithValue("@course_id", CourseId);
+                        cmd.Parameters.AddWithValue("@document_type_id", DocumentTypeId);
+                        cmd.Parameters.AddWithValue("@feature_permission_id", FeaturePermissionId);
+                        int rows = cmd.ExecuteNonQuery();
+
+                        return rows > 0;
+
+                    }
+
+                }
+
+            }
+
+            public static List<DocumentTypePermission> GetPermissions(int UserID)
+            {
+                List<DocumentTypePermission> documentTypePermissions = new List<DocumentTypePermission>();
+                using (MySqlConnection conn = Sql.OpenConnection())
+                {
+
+                    StringBuilder query = new StringBuilder();
+                    query.Append("SELECT updt.id,");
+                    query.Append("            updt.user_id, ");
+                    query.Append("            updt.unity_id, ");
+                    query.Append("            updt.course_id, ");
+                    query.Append("            updt.document_type_id, ");
+                    query.Append("            updt.feature_permission_id, ");
+                    query.Append("            dt.name_en, ");
+                    query.Append("            dt.name_ptbr");
+                    query.Append("       FROM user_permission_document_type updt");
+                    query.Append(" INNER JOIN document_type dt");
+                    query.Append("         ON updt.document_type_id = dt.id");
+                    query.Append("      WHERE updt.user_id = " + UserID);
+
+                    using (MySqlCommand cmd = new MySqlCommand(query.ToString(), conn))
+                    {
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                                documentTypePermissions.Add(new DocumentTypePermission
+                                {
+                                    ID = reader.GetInt32(0),
+                                    UserID = reader.GetInt32(1),
+                                    UnitID = reader.GetInt32(2),
+                                    CurseID = reader.GetInt32(3),
+                                    DocumentTypeId = reader.GetInt32(4),
+                                    FeaturePermission = (FeaturePermissionResult)reader.GetInt32(5),
+                                    DocumentType = new DocumentType
+                                    {
+                                        Id = reader.GetInt32(4),
+                                        Name = new Str(reader.GetString(6), reader.GetString(7))
+                                    }
+                                });
+
+                        }
+                    }
+                }
+                return documentTypePermissions;
+            }
+
 
 			public override string ToString() {
 				return DocumentType.ToString();
@@ -34,13 +150,122 @@ namespace DocumentManager.Models {
 		}
 
 		public class PartitionTypePermission {
-			public readonly PartitionType PartitionType;
+            public int ID { get; set; }
+            public int UserID { get; set; }
+            public int UnitID { get; set; }
+            public int CurseID { get; set; }
+            public int PartitionTypeID { get; set; }
+            public FeaturePermissionResult FeaturePermission { get; set; }
+            public PartitionType PartitionType { get; set; }
 
-			public PartitionTypePermission(PartitionType partitionType) {
-				PartitionType = partitionType;
-			}
+            public bool Delete(int id)
+            {
 
-			public override string ToString() {
+
+                using (MySqlConnection conn = Sql.OpenConnection())
+                {
+                    StringBuilder query = new StringBuilder();
+                    query.Append("DELETE FROM user_permission_partition_type ");
+                    query.Append("WHERE id = @id ");
+
+
+                    using (MySqlCommand cmd = new MySqlCommand(query.ToString(), conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id); 
+                        int rows = cmd.ExecuteNonQuery(); 
+                        return rows > 0;
+
+                    }
+
+                }
+
+            }
+
+
+            public bool Add(int UserId, int UnityId, int CourseId, int PartitionTypeId, int FeaturePermissionId)
+            {
+            
+
+                using (MySqlConnection conn = Sql.OpenConnection())
+                {
+                    StringBuilder query = new StringBuilder();
+                    query.Append("INSERT INTO user_permission_partition_type ");
+                    query.Append("        (user_id, ");
+                    query.Append("         unity_id, ");
+                    query.Append("         course_id, ");
+                    query.Append("         partition_type_id, ");
+                    query.Append("         feature_permission_id) ");
+                    query.Append("VALUES ( @user_id, ");
+                    query.Append("        @unity_id, ");
+                    query.Append("        @course_id, ");
+                    query.Append("        @partition_type_id, ");
+                    query.Append("        @feature_permission_id)");
+
+                    using (MySqlCommand cmd = new MySqlCommand(query.ToString(), conn))
+                    { 
+                        cmd.Parameters.AddWithValue("@user_id", UserId);
+                        cmd.Parameters.AddWithValue("@unity_id", UnityId);
+                        cmd.Parameters.AddWithValue("@course_id", CourseId);
+                        cmd.Parameters.AddWithValue("@partition_type_id", PartitionTypeId);
+                        cmd.Parameters.AddWithValue("@feature_permission_id", FeaturePermissionId);
+                        int rows = cmd.ExecuteNonQuery();
+
+                        return rows > 0;
+
+                    } 
+
+                }
+ 
+            }
+
+
+            public static List<PartitionTypePermission> GetPermissions(int UserID)
+            {
+                List<PartitionTypePermission>  partitionTypePermissions = new List<PartitionTypePermission>();
+                using (MySqlConnection conn = Sql.OpenConnection())
+                { 
+
+                    StringBuilder query = new StringBuilder();
+                    query.Append("SELECT uppt.id,");
+                    query.Append("            uppt.user_id, ");
+                    query.Append("            uppt.unity_id, ");
+                    query.Append("            uppt.course_id, ");
+                    query.Append("            uppt.partition_type_id, ");
+                    query.Append("            uppt.feature_permission_id, ");
+                    query.Append("            pt.name_en, ");
+                    query.Append("            pt.name_ptbr");
+                    query.Append("       FROM user_permission_partition_type uppt");
+                    query.Append(" INNER JOIN partition_type pt");
+                    query.Append("         ON uppt.partition_type_id = pt.id");
+                    query.Append("      WHERE uppt.user_id = " + UserID);
+
+                    using (MySqlCommand cmd = new MySqlCommand(query.ToString(), conn))
+                    {
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                                partitionTypePermissions.Add(new PartitionTypePermission
+                                {
+                                    ID = reader.GetInt32(0),
+                                    UserID = reader.GetInt32(1),
+                                    UnitID = reader.GetInt32(2),
+                                    CurseID = reader.GetInt32(3),
+                                    PartitionTypeID = reader.GetInt32(4),
+                                    FeaturePermission = (FeaturePermissionResult)reader.GetInt32(5),
+                                    PartitionType = new PartitionType
+                                    {
+                                        Id = reader.GetInt32(4), 
+                                        Name = new Str(reader.GetString(6), reader.GetString(7))
+                                    }
+                                });
+
+                        }
+                    }
+                }
+                return partitionTypePermissions;
+            }
+ 
+            public override string ToString() {
 				return PartitionType.ToString();
 			}
 		}
@@ -469,17 +694,10 @@ namespace DocumentManager.Models {
 			get {
 				// TODO: Placeholder
 				if (UnityPermissions == null) {
-					PartitionType[] partitionTypes = PartitionType.GetAll();
-					List<PartitionTypePermission> partitionTypePermissions = new List<PartitionTypePermission>();
-					foreach (PartitionType partitionType in partitionTypes)
-						partitionTypePermissions.Add(new PartitionTypePermission(partitionType));
-					PartitionTypePermission[] partitionTypePermissionsArray = partitionTypePermissions.ToArray();
+					
+                    PartitionTypePermission[] partitionTypePermissionsArray = PartitionTypePermission.GetPermissions(this.Id).ToArray();
 
-					DocumentType[] documentTypes = DocumentType.GetAll();
-					List<DocumentTypePermission> documentTypePermissions = new List<DocumentTypePermission>();
-					foreach (DocumentType documentType in documentTypes)
-						documentTypePermissions.Add(new DocumentTypePermission(documentType));
-					DocumentTypePermission[] documentTypePermissionsArray = documentTypePermissions.ToArray();
+					DocumentTypePermission[] documentTypePermissionsArray = DocumentTypePermission.GetPermissions(this.Id).ToArray();
 
 					Course[] courses = Course.GetAll();
 					List<CoursePermission> coursePermissions = new List<CoursePermission>();
