@@ -202,51 +202,56 @@
         var PartitionTypePermission = null;
         var DocumentTypePermission = null;
 
+        function LoadPermissionsCks(){
+
+             console.log("course:change")
+
+                  var curseID = $("#course").val()
+                  var unityID = $("#unity").val()
+
+
+                 $( ".ckpartition" ).each(function( index ) {
+                    var element = $(this);
+                    var checked = false ;
+
+                  $.each(PartitionTypePermission, function (key, item) {
+                        if(element.val() ==  item.partitionTypeID
+                            && element.attr( 'data-feature' ) == item.featurePermission
+                            && curseID == item.curseID
+                            && unityID == item.unitID)
+                            {
+                                checked = true;
+                            }
+                    });
+
+                    element.prop('checked',checked)
+                  });
+
+
+                console.log(DocumentTypePermission)
+
+                $( ".ckdocument" ).each(function( index ) {
+                    var element = $(this);
+                    var checked = false ;
+
+                  $.each(DocumentTypePermission, function (key, item) {
+                        if(element.val() ==  item.documentTypeId
+                            && element.attr( 'data-feature' ) == item.featurePermission
+                            && curseID == item.curseID
+                            && unityID == item.unitID)
+                            {
+                                checked = true;
+                            }
+                    });
+
+                    element.prop('checked',checked)
+                  });
+
+        }
         document.getElementById("course").addEventListener("change", function () {
 
-          console.log("course:change")
 
-          var curseID = $("#course").val()
-          var unityID = $("#unity").val()
-
-
-         $( ".ckpartition" ).each(function( index ) {
-            var element = $(this);
-            var checked = false ;
-
-          $.each(PartitionTypePermission, function (key, item) {
-                if(element.val() ==  item.partitionTypeID
-                    && element.attr( 'data-feature' ) == item.featurePermission
-                    && curseID == item.curseID
-                    && unityID == item.unitID)
-                    {
-                        checked = true;
-                    }
-            });
-
-            element.prop('checked',checked)
-          });
-
-
-        console.log(DocumentTypePermission)
-
-        $( ".ckdocument" ).each(function( index ) {
-            var element = $(this);
-            var checked = false ;
-
-          $.each(DocumentTypePermission, function (key, item) {
-                if(element.val() ==  item.documentTypeId
-                    && element.attr( 'data-feature' ) == item.featurePermission
-                    && curseID == item.curseID
-                    && unityID == item.unitID)
-                    {
-                        checked = true;
-                    }
-            });
-
-            element.prop('checked',checked)
-          });
-
+            LoadPermissionsCks();
 
 
         });
@@ -306,6 +311,7 @@
         });
 
          $(".ckdocument").click(function() {
+
             var curseID = $("#course").val()
             var unityID = $("#unity").val()
             var documentTypeId= $(this).val()
@@ -367,6 +373,7 @@
                     url: 'GetPartitionTypePermission?UserID=' + userID
                 }).done(function (data) {
                    PartitionTypePermission = data
+                   LoadPermissionsCks();
                 })
         }
 
@@ -375,6 +382,7 @@
                     url: 'GetDocumentTypePermission?UserID=' + userID
                 }).done(function (data) {
                    DocumentTypePermission = data
+                   LoadPermissionsCks();
                 })
         }
 
@@ -384,6 +392,14 @@
                 return;
 
             userID = id;
+            var PartitionTypePermission = [];
+            var DocumentTypePermission = [];
+            console.log("changePermission");
+
+
+
+
+
             GetPartitionTypePermission(id);
             GetDocumentTypePermission(id);
 
