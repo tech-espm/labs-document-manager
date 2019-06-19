@@ -469,7 +469,7 @@ namespace DocumentManager.Models {
 				Expires = DateTime.UtcNow.AddYears(1),
 				HttpOnly = false,
 				Path = "/",
-				Secure = true // Must be set to false if we stop using HTTPS
+				Secure = false // Must be set to false if we stop using HTTPS
 			});
 
 			try {

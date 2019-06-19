@@ -21,11 +21,11 @@ namespace DocumentManager {
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services) {
 
-            var appSetting = Configuration.Get<AppSetting>();
+			var appSetting = Configuration.Get<AppSetting>();
 
-            services.AddSingleton(instance => appSetting);
+			services.AddSingleton(instance => appSetting);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,7 +38,7 @@ namespace DocumentManager {
 			//}
 
 			app.UseHsts();
-			app.UseHttpsRedirection();
+			//app.UseHttpsRedirection();
 			app.UseStaticFiles(new StaticFileOptions() {
 				// Max-age is 30 days (in seconds)
 				OnPrepareResponse = context => context.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + (30 * 24 * 60 * 60)
