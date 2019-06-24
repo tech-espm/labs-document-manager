@@ -287,6 +287,18 @@ window.customFilterHandler = function (table, input) {
 	input.onchange = handler;
 	input.onkeyup = handler;
 };
+window.customFilterHandlerPlain = function (table, input) {
+	var lastSearch = "", handler = function () {
+		var s = input.value;
+		if (lastSearch !== s) {
+			lastSearch = s;
+			table.search(s).draw();
+		}
+		return true;
+	};
+	input.onchange = handler;
+	input.onkeyup = handler;
+};
 window.prepareCustomFilter = function (table, tableId, customFilterLabel, placeholder) {
 	var label, input, parent = _(tableId + "_filter");
 	if (parent) {
@@ -295,7 +307,10 @@ window.prepareCustomFilter = function (table, tableId, customFilterLabel, placeh
 		label = document.createElement("label");
 		label.appendChild(document.createTextNode((customFilterLabel === null || customFilterLabel === undefined) ? "Filtro:" : customFilterLabel));
 		input = document.createElement("input");
-		customFilterHandler(table, input);
+		if (window.prepareCustomFilterPlain)
+			customFilterHandlerPlain(table, input);
+		else
+			customFilterHandler(table, input);
 		input.className = "form-control input-sm upper";
 		input.setAttribute("type", "search");
 		input.setAttribute("placeholder", placeholder || "");
@@ -385,16 +400,20 @@ window.addFilterButton = function (parent, icon, text, handler, title, btnClass)
 	return btn;
 };
 window.prepareCbTheme = function (cbTheme, cbShow, callback) {
-	var i, j, tmp, shows;
+	var i, j, tmp, shows, opt;
 	for (i = 0; i < cbTheme.options.length; i++) {
-		tmp = cbTheme.options[i].getAttribute("data-shows");
-		cbTheme.options[i].removeAttribute("data-shows");
+		tmp = (opt = cbTheme.options[i]).getAttribute("data-shows");
+		opt.removeAttribute("data-shows");
 		if (tmp && tmp.length) {
 			tmp = tmp.split("|");
 			if (tmp.length >= 3) {
 				shows = [];
 				for (j = 0; j < tmp.length; j += 3)
 					shows.push([tmp[j], tmp[j + 1], tmp[j + 2]]);
+				if (opt.value == "0") {
+					opt.value = "-2";
+					shows[0][2] = "-2";
+				}
 				cbTheme.options[i].dataShows = shows;
 			} else {
 				cbTheme.options[i].dataShows = [];
@@ -730,8 +749,12 @@ window.prepareDataTableMain = (function () {
 				a = this.getElementsByTagName("a");
 				if (!a || !a.length)
 					a = this.getElementsByTagName("button");
-				if (a && a.length)
-					a[a.length - 1].click();
+				if (a && a.length) {
+					x = a.length - 1;
+					if (x && a[x].getAttribute("data-delete") == "1")
+						x--;
+					a[x].click();
+				}
 			}
 		});
 	};
@@ -1664,7 +1687,8 @@ window.mergeLists = function (destination, listB) {
 	}
 
 	// since destination.length >= listB.length, skip >= 1.0
-	var skip = destination.length / listB.length;
+	// another special case: when the lengths differ only by 1 element
+	var skip = ((destination.length - listB.length) <= 1 ? 1 : (destination.length / listB.length));
 	var currentDestination = 0.0;
 	for (var i = 0; i < listB.length; i++) {
 		currentDestination += skip;
