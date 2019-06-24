@@ -331,7 +331,7 @@ window.formatDuration = function (duration) {
 	return format2(m) + ":" + format2(s);
 };
 window.formatSize = (function () {
-	var expr = /\B(?=(\d{3})+(?!\d))/g, thousands = (currentLanguageId === 1 ? "." : ",");
+	var expr = /\B(?=(\d{3})+(?!\d))/g, thousands = (window.currentLanguageId === 1 ? "." : ",");
 	window.formatSizeLong = function (size) {
 		//if (size < 16384)
 		//	return size + " bytes";
