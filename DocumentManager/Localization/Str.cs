@@ -296,6 +296,7 @@ namespace DocumentManager.Localization {
 		public static string TagsBasicInformation => CurrentLanguage == LanguageEn ? "Tag's Basic Information" : "Informações Básicas da Etiqueta";
 		public static string TagSuccessfullyCreated => CurrentLanguage == LanguageEn ? "Tag successfully created! 😄" : "Etiqueta criada com sucesso! 😄";
 		public static string TagSuccessfullyChanged => CurrentLanguage == LanguageEn ? "Tag successfully changed! 😄" : "Etiqueta alterada com sucesso! 😄";
+		public static string InvalidTag => CurrentLanguage == LanguageEn ? "Invalid tag!" : "Etiqueta inválida!";
 		public static string InvalidValue => CurrentLanguage == LanguageEn ? "Invalid value!" : "Valor inválido!";
 		public static string ValueTooLong => CurrentLanguage == LanguageEn ? "Value too long!" : "Valor muito longo!";
 		public static string AddValue => CurrentLanguage == LanguageEn ? "Add Value" : "Adicionar Valor";
@@ -306,6 +307,7 @@ namespace DocumentManager.Localization {
 		public static string theDocument => CurrentLanguage == LanguageEn ? "the document" : "o documento";
 		public static string DocumentNotFound => CurrentLanguage == LanguageEn ? "Document not found!" : "Documento não encontrado!";
 		public static string NoDocumentsSelected => CurrentLanguage == LanguageEn ? "No documents selected 😢" : "Nenhum documento selecionado 😢";
+		public static string RepeatedTags => CurrentLanguage == LanguageEn ? "Repeated tags 😢" : "Etiquetas repetidas 😢";
 		public static string Deleting => CurrentLanguage == LanguageEn ? "Deleting..." : "Excluindo...";
 		public static string DeletingDocument => CurrentLanguage == LanguageEn ? "Deleting document" : "Excluindo documento";
 		public static string ForSecurityReasonsDeleteDocument => CurrentLanguage == LanguageEn ? "For security reasons, a maximum of 50 documents can be deleted at a time 😢" : "Por questões de segurança, no máximo 50 documentos podem ser excluídos por vez 😢";

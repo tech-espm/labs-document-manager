@@ -19,7 +19,7 @@ namespace DocumentManager.Models {
 
 		public int Id;
 		public Str Name;
-		public List<Value> Values;
+		public Value[] Values;
 
 		private static void Validate(ref string nameEn, ref string namePtBr, Value[] existingValues, Value[] newValues, out List<Value> valuesToCreate, out List<Value> valuesToUpdate, out List<Value> valuesToDelete) {
 			if (string.IsNullOrWhiteSpace(nameEn) ||
@@ -214,7 +214,7 @@ namespace DocumentManager.Models {
 			CachedTags.Refresh();
 
 			return new Tag(id, new Str(nameEn, namePtBr)) {
-				Values = existingValues
+				Values = existingValues.ToArray()
 			};
 		}
 
@@ -224,20 +224,24 @@ namespace DocumentManager.Models {
 				using (MySqlCommand cmd = new MySqlCommand($"SELECT t.id, t.name_en, t.name_ptbr, v.id, v.position, v.name_en, v.name_ptbr FROM tag t INNER JOIN tag_value v ON v.tag_id = t.id ORDER BY t.id ASC, v.position ASC", conn)) {
 					using (MySqlDataReader reader = cmd.ExecuteReader()) {
 						Tag lastTag = new Tag();
+						List<Value> values = new List<Value>();
 						while (reader.Read()) {
 							int id = reader.GetInt32(0);
 							if (id != lastTag.Id) {
-								lastTag = new Tag(id, new Str(reader.GetString(1), reader.GetString(2))) {
-									Values = new List<Value>()
-								};
+								if (lastTag.Id > 0)
+									lastTag.Values = values.ToArray();
+								values.Clear();
+								lastTag = new Tag(id, new Str(reader.GetString(1), reader.GetString(2)));
 								tags.Add(lastTag);
 							}
-							lastTag.Values.Add(new Value() {
+							values.Add(new Value() {
 								Id = reader.GetInt32(3),
 								Position = reader.GetInt32(4),
 								Name = new Str(reader.GetString(5), reader.GetString(6))
 							});
 						}
+						if (lastTag.Id > 0)
+							lastTag.Values = values.ToArray();
 					}
 				}
 			}
@@ -289,8 +293,8 @@ namespace DocumentManager.Models {
 		public override string ToString() => Name.ToString();
 
 		public void Update(string nameEn, string namePtBr, Value[] values) {
-			// ToArray() because Validate() changes the array
-			Validate(ref nameEn, ref namePtBr, Values.ToArray(), values, out List<Value> valuesToCreate, out List<Value> valuesToUpdate, out List<Value> valuesToDelete);
+			// Clone() because Validate() changes the array
+			Validate(ref nameEn, ref namePtBr, Values.Clone() as Value[], values, out List<Value> valuesToCreate, out List<Value> valuesToUpdate, out List<Value> valuesToDelete);
 
 			using (MySqlConnection conn = Sql.OpenConnection()) {
 				using (MySqlTransaction tran = conn.BeginTransaction()) {
@@ -302,7 +306,9 @@ namespace DocumentManager.Models {
 							cmd.ExecuteNonQuery();
 							Name = new Str(nameEn, namePtBr);
 						}
-						SyncValues(conn, tran, Id, Values, valuesToCreate, valuesToUpdate, valuesToDelete);
+						List<Value> list = new List<Value>(Values);
+						SyncValues(conn, tran, Id, list, valuesToCreate, valuesToUpdate, valuesToDelete);
+						Values = list.ToArray();
 					} catch {
 						tran.Rollback();
 						throw;
@@ -323,6 +329,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedTags.Refresh();
+			DocumentType.CachedDocumentTypes.Refresh();
 		}
 	}
 }

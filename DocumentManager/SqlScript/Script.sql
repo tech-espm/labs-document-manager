@@ -101,6 +101,23 @@ CREATE TABLE tag_value (
 		ON UPDATE CASCADE
 );
 
+CREATE TABLE document_type_default_tags (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	document_type_id INT NOT NULL,
+	tag_id INT NOT NULL,
+	position INT NOT NULL,
+	CONSTRAINT document_type_default_tags_document_type_id_fk
+		FOREIGN KEY (document_type_id)
+		REFERENCES document_type (id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT document_type_default_tags_tag_id_fk
+		FOREIGN KEY (tag_id)
+		REFERENCES tag (id)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+);
+
 CREATE TABLE user_permission_partition_type (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	user_id INT NOT NULL,

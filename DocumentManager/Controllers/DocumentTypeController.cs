@@ -31,9 +31,9 @@ namespace DocumentManager.Controllers {
 
 		[HttpPost]
 		[AccessControl(Feature.DocumentTypeCreate, true)]
-		public IActionResult Create(string nameEn, string namePtBr) {
+		public IActionResult Create(string nameEn, string namePtBr, [FromBody]int[] defaultTagIds) {
 			try {
-				return Json(DocumentType.Create(nameEn, namePtBr));
+				return Json(DocumentType.Create(nameEn, namePtBr, defaultTagIds));
 			} catch (Exception ex) {
 				return ErrorResult(ex, Str._O, Str._um_a, Str.documentType, $"{nameEn} / {namePtBr}");
 			}
@@ -41,12 +41,12 @@ namespace DocumentManager.Controllers {
 
 		[HttpPost]
 		[AccessControl(Feature.DocumentTypeEdit, true)]
-		public IActionResult Update(int id, string nameEn, string namePtBr) {
+		public IActionResult Update(int id, string nameEn, string namePtBr, [FromBody]int[] defaultTagIds) {
 			try {
 				DocumentType documentType = DocumentType.GetById(id);
 				if (documentType == null)
 					return ErrorResult(Str.DocumentTypeNotFound);
-				documentType.Update(nameEn, namePtBr);
+				documentType.Update(nameEn, namePtBr, defaultTagIds);
 				return Json(documentType);
 			} catch (Exception ex) {
 				return ErrorResult(ex, Str._O, Str._um_a, Str.documentType, $"{nameEn} / {namePtBr}");
