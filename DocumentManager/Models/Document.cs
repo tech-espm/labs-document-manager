@@ -263,6 +263,17 @@ WHERE 1 = 1
 							builder.Append($" AND d.name LIKE @name");
 							cmd.Parameters.AddWithValue("@name", $"%{data.Name.Trim().ToUpper()}%");
 						}
+
+						if (data.TagIds != null && data.TagValues != null && data.TagIds.Length > 0 && data.TagIds.Length == data.TagValues.Length) {
+							for (int i = 0; i < data.TagIds.Length; i++) {
+								int tagId, tagValue;
+								if ((tagId = data.TagIds[i]) <= 0 ||
+									(tagValue = data.TagValues[i]) <= 0)
+									continue;
+
+								builder.Append($" AND EXISTS (SELECT 1 FROM document_tag dt WHERE dt.document_id = d.id AND dt.tag_id = {tagId} AND dt.tag_value_id = {tagValue})");
+							}
+						}
 					}
 
 					builder.Append($@"

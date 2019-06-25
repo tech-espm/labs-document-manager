@@ -2,6 +2,27 @@
 	ViewBag.Title = Str.Documents;
 }
 
+@section Styles {
+	<style type="text/css">
+		.content-section {
+			counter-reset: content-section;
+		}
+
+		.content-enum::before {
+			counter-increment: content-section;
+			content: counter(content-section);
+		}
+
+		div.form-group i.fa-asterisk {
+			display: none;
+		}
+
+		div.form-group.col-h2 i.fa-asterisk {
+			display: inline-block;
+		}
+	</style>
+}
+
 <div class="modal fade" tabindex="-1" role="dialog" id="modalDelete">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -70,6 +91,30 @@
 			</div>
 		</div>
 
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-sm-6 col-md-8 col-sm-space-bottom">
+						<select id="cbNewTag" class="form-control" size="1">
+							@foreach (Tag t in Tag.GetAll()) {
+								<option value="@t.Id">@t.Name.ToString()</option>
+							}
+						</select>
+						<script type="text/javascript">
+							//<![CDATA[
+							"use strict";
+							prepareCbSearch(_("cbNewTag"));
+							//]]>
+						</script>
+					</div>
+					<div class="col-sm-6 col-md-4">
+						<button class="btn btn-outline btn-success btn-block" type="button" onclick="addTag()"><i class="fa fa-tag"></i>@Str.AddTag</button>
+					</div>
+				</div>
+			</div>
+			<div id="divTagsBody" class="panel-body no-bottom hidden"></div>
+		</div>
+
 		<div class="row">
 			<div class="col-sm-3 col-sm-offset-9">
 				<div class="form-group">
@@ -93,14 +138,116 @@
 		//<![CDATA[
 		"use strict";
 
-		var dataTablePanel = _("dataTablePanel"),
+		var valueProp = "@Str._ValueProperty",
+			dataTablePanel = _("dataTablePanel"),
 			dataTableMainPlaceholder = _("dataTableMainPlaceholder"),
 			txtDeleteContentConfirm = _("txtDeleteContentConfirm"),
 			lblDeleteContentCount = _("lblDeleteContentCount"),
 			lblDeleteProgress = _("lblDeleteProgress"),
+			tags = @Json.Serialize(Tag.GetAll()),
+			tagsById = {},
 			selId = [],
 			selTr = [],
-			proceedDeletion = false;
+			proceedDeletion = false,
+			cbNewTag = _("cbNewTag"),
+			divTagsBody = _("divTagsBody"),
+			cbCourse = _("course"),
+			cbDocumentType = _("documentType");
+
+		$(divTagsBody).on("click", "button", function () {
+			divTagsBody.removeChild(this.parentNode);
+			//saveFilter();
+			if (!divTagsBody.childNodes.length)
+				divTagsBody.className = "panel-body no-bottom hidden";
+		});
+
+		cbDocumentType.addEventListener("change", function () {
+			var i, div, documentTypeId = parseInt(cbDocumentType.value), course = cbCourse.course, documentTypePermissions, documentType, existingTags = {};
+
+			for (i = divTagsBody.childNodes.length - 1; i >= 0; i--) {
+				(div = divTagsBody.childNodes[i]).className = "form-group";
+				existingTags[div.getAttribute("data-id")] = div;
+			}
+
+			if (!documentTypeId || !course || !(documentTypePermissions = course.documentTypes))
+				return;
+
+			for (i = documentTypePermissions.length - 1; i >= 0; i--) {
+				if ((documentType = documentTypePermissions[i].documentType).id !== documentTypeId)
+					continue;
+
+				for (i = documentType.defaultTagIds.length - 1; i >= 0; i--) {
+					if ((div = existingTags[documentType.defaultTagIds[i]]))
+						div.className = "form-group col-h2";
+				}
+
+				return;
+			}
+		});
+
+		function addTag(id, valueId) {
+			if (JsonWebApi.active)
+				return;
+
+			//var save = false;
+
+			if (!id) {
+				//save = true;
+				id = parseInt(cbNewTag.value);
+				if (!id)
+					return;
+			}
+
+			var tag = tagsById[id], div, i, v, className = "form-group", select, documentTypeId = parseInt(cbDocumentType.value), course = cbCourse.course, documentTypePermissions, documentType;
+			if (!tag)
+				return;
+
+			for (i = divTagsBody.childNodes.length - 1; i >= 0; i--) {
+				if (parseInt(divTagsBody.childNodes[i].getAttribute("data-id")) === id)
+					return;
+			}
+
+			if (documentTypeId && course && (documentTypePermissions = course.documentTypes)) {
+				for (i = documentTypePermissions.length - 1; i >= 0; i--) {
+					if ((documentType = documentTypePermissions[i].documentType).id !== documentTypeId)
+						continue;
+
+					for (i = documentType.defaultTagIds.length - 1; i >= 0; i--) {
+						if (id === documentType.defaultTagIds[i]) {
+							className += " col-h2";
+							break;
+						}
+					}
+
+					break;
+				}
+			}
+
+			div = $('<div data-id="' + id + '" class="' + className + '"><button type="button" class="btn btn-outline btn-xs btn-danger" title="@Str.Delete"><i class="fa fa-nomargin fa-times"></i></button> <label for="cbTag' + id + '">' + encode(tag.name[valueProp]) + '</label> <i class="fa fa-asterisk fa-nomargin" title="@Str._Obrigatoria"></i><select size="1" class="form-control upper"></select></div>')[0];
+			select = $(div.getElementsByTagName("select")[0]);
+			select.append('<option value="">@Str.SELECT</option>');
+			for (i = 0; i < tag.values.length; i++) {
+				v = tag.values[i];
+				select.append('<option value="' + v.id + '">' + encode(v.name[valueProp]) + '</option>');
+			}
+			prepareCbSearch(select[0]);
+			if (valueId)
+				setCbSearch(select[0], valueId);
+			divTagsBody.appendChild(div);
+
+			divTagsBody.className = "panel-body no-bottom";
+
+			//if (save)
+			//	saveFilter();
+
+			return div;
+		}
+
+		(function () {
+			var i;
+			for (i = tags.length - 1; i >= 0; i--)
+				tagsById[tags[i].id] = tags[i];
+		})();
 
 		function updateDeleteProgress(i) {
 			lblDeleteProgress.textContent = "@Html.Raw(Str.DeletingDocument) " + (i + 1) + " @Str._de " + selId.length + ". @Html.Raw(Str.CloseThisMessageToStopDeleting)";
@@ -242,6 +389,8 @@
 			if (JsonWebApi.active)
 				return;
 
+			saveFilter();
+
 			Notification.wait();
 
 			resetMultipleSelection();
@@ -251,7 +400,7 @@
 			while (dataTableMainPlaceholder.firstChild)
 				dataTableMainPlaceholder.removeChild(dataTableMainPlaceholder.firstChild);
 
-			var formData = new FormData();
+			var i, div, value, formData = new FormData();
 
 			formData.append("unity", _("unity").value);
 			formData.append("course", _("course").value);
@@ -261,6 +410,14 @@
 			formData.append("name", _("name").value);
 			formData.append("minimumCreationTime", parseDateInput("minimumCreationTime"));
 			formData.append("maximumCreationTime", parseDateInput("maximumCreationTime"));
+
+			for (i = 0; i < divTagsBody.childNodes.length; i++) {
+				div = divTagsBody.childNodes[i];
+				if (isNaN(value = parseInt(div.getElementsByTagName("select")[0].value)) || !value)
+					continue;
+				formData.append("tagIds", div.getAttribute("data-id"));
+				formData.append("tagValues", value);
+			}
 
 			JsonWebApi.postFormData("@Url.Action("GetAllByFilter")", formData, function (response) {
 				Notification.hide();
@@ -321,11 +478,16 @@
 			if (window.localStorage) {
 				var filterTimeout = 0;
 
-				function saveFilter() {
+				window.saveFilter = function () {
 					if (filterTimeout)
 						clearTimeout(filterTimeout);
 					filterTimeout = setTimeout(function () {
 						filterTimeout = 0;
+						var i, div, tagIds = [], tagValues = [];
+						for (i = 0; i < divTagsBody.childNodes.length; i++) {
+							tagIds.push(parseInt((div = divTagsBody.childNodes[i]).getAttribute("data-id")));
+							tagValues.push(parseInt(div.getElementsByTagName("select")[0].value) || 0);
+						}
 						localStorage.setItem("filter/document/manage", JSON.stringify({
 							unity: _("unity").value,
 							course: _("course").value,
@@ -334,13 +496,15 @@
 							id: _("id").value,
 							name: _("name").value,
 							minimumCreationTime: parseDateInput("minimumCreationTime"),
-							maximumCreationTime: parseDateInput("maximumCreationTime")
+							maximumCreationTime: parseDateInput("maximumCreationTime"),
+							tagIds: tagIds,
+							tagValues: tagValues
 						}));
 					}, 1000);
 				}
 
 				try {
-					var obj = localStorage.getItem("filter/document/manage");
+					var i, obj = localStorage.getItem("filter/document/manage");
 					if (obj && (obj = JSON.parse(obj))) {
 						setCbSearch(_("unity"), obj.unity);
 						setCbSearch(_("course"), obj.course);
@@ -352,19 +516,23 @@
 							setDatePickerValue("#minimumCreationTime", formatDate(obj.minimumCreationTime));
 						if (obj.maximumCreationTime)
 							setDatePickerValue("#maximumCreationTime", formatDate(obj.maximumCreationTime));
+						if (obj.tagIds && obj.tagValues && obj.tagIds.length && obj.tagIds.length === obj.tagValues.length) {
+							for (i = 0; i < obj.tagIds.length; i++)
+								addTag(obj.tagIds[i], obj.tagValues[i]);
+						}
 					}
 				} catch (e) {
 					// Just ignore...
 				}
 
-				_("unity").addEventListener("change", saveFilter);
-				_("course").addEventListener("change", saveFilter);
-				_("partitionType").addEventListener("change", saveFilter);
-				_("documentType").addEventListener("change", saveFilter);
-				_("id").addEventListener("change", saveFilter);
-				_("name").addEventListener("change", saveFilter);
-				_("minimumCreationTime").addEventListener("blur", saveFilter);
-				_("maximumCreationTime").addEventListener("blur", saveFilter);
+				//_("unity").addEventListener("change", saveFilter);
+				//_("course").addEventListener("change", saveFilter);
+				//_("partitionType").addEventListener("change", saveFilter);
+				//_("documentType").addEventListener("change", saveFilter);
+				//_("id").addEventListener("change", saveFilter);
+				//_("name").addEventListener("change", saveFilter);
+				//_("minimumCreationTime").addEventListener("blur", saveFilter);
+				//_("maximumCreationTime").addEventListener("blur", saveFilter);
 			}
 
 		})();

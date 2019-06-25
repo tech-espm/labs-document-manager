@@ -83,6 +83,8 @@ namespace DocumentManager.Localization {
 		public static string _Todas => CurrentLanguage == LanguageEn ? "All" : "Todas";
 		public static string _Nenhum => CurrentLanguage == LanguageEn ? "None" : "Nenhum";
 		public static string _Nenhuma => CurrentLanguage == LanguageEn ? "None" : "Nenhuma";
+		public static string _Obrigatoria => CurrentLanguage == LanguageEn ? "Mandatory" : "Obrigatória";
+		public static string _Obrigatorio => CurrentLanguage == LanguageEn ? "Mandatory" : "Obrigatório";
 
 		public static string AppName => CurrentLanguage == LanguageEn ? "Repository of Academic Documents" : "Repositório de Documentos Acadêmicos";
 		public static string Language => CurrentLanguage == LanguageEn ? "Language" : "Idioma";
@@ -166,6 +168,7 @@ namespace DocumentManager.Localization {
 		public static string InvalidFileName => CurrentLanguage == LanguageEn ? "Invalid file name 😢" : "Nome de arquivo inválido 😢";
 		public static string InvalidFileExtension => CurrentLanguage == LanguageEn ? "Invalid file extension 😢" : "Extensão de arquivo inválida 😢";
 		public static string InvalidFileSize => CurrentLanguage == LanguageEn ? "Invalid file size!" : "Tamanho de arquivo inválido!";
+		public static string PleaseFillAllTags => CurrentLanguage == LanguageEn ? "Please, fill in all tags' value before proceeding 😢" : "Por favor, preencha o valor de todas as etiquetas antes de prosseguir 😢";
 		public static string NoFilesWereAdded => CurrentLanguage == LanguageEn ? "No files were added 😢" : "Nenhum arquivo foi adicionado 😢";
 		public static string NameTooLong => CurrentLanguage == LanguageEn ? "Name too long!" : "Nome muito longo!";
 		public static string ShortNameTooLong => CurrentLanguage == LanguageEn ? "Short name too long!" : "Apelido muito longo!";

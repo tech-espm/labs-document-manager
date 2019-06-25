@@ -17,7 +17,15 @@
 		}
 
 		tr.col-h2 button.btn-danger {
-			visibility: hidden;
+			display: none;
+		}
+
+		tr i.fa-asterisk {
+			display: none;
+		}
+
+		tr.col-h2 i.fa-asterisk {
+			display: inline-block;
 		}
 	</style>
 }
@@ -236,7 +244,7 @@
 					if ((documentType = documentTypePermissions[i].documentType).id !== documentTypeId)
 						continue;
 
-					for (i = 0; i < documentType.defaultTagIds.length; i++) {
+					for (i = documentType.defaultTagIds.length - 1; i >= 0; i--) {
 						if (id === documentType.defaultTagIds[i]) {
 							className += " col-h2";
 							break;
@@ -247,8 +255,9 @@
 				}
 			}
 
-			tr = $('<tr data-id="' + id + '" class="' + className + '"><td class="col-min content-enum"></td><td class="col-50">' + encode(tag.name[valueProp]) + '</td><td class="col-50"><select size="1" class="form-control upper"></select></td><td class="col-min"><button type="button" title="@Str.Delete" class="btn btn-outline btn-danger"><i class="fa fa-nomargin fa-trash-o"></i></button></td></tr>')[0];
+			tr = $('<tr data-id="' + id + '" class="' + className + '"><td class="col-min content-enum"></td><td class="col-50">' + encode(tag.name[valueProp]) + '</td><td class="col-50"><select size="1" class="form-control upper"></select></td><td class="col-min text-center"><i class="fa fa-asterisk fa-nomargin" title="@Str._Obrigatoria"></i><button type="button" title="@Str.Delete" class="btn btn-outline btn-danger"><i class="fa fa-nomargin fa-trash-o"></i></button></td></tr>')[0];
 			select = $(tr.getElementsByTagName("select")[0]);
+			select.append('<option value="">@Str.SELECT</option>');
 			for (i = 0; i < tag.values.length; i++) {
 				v = tag.values[i];
 				select.append('<option value="' + v.id + '">' + encode(v.name[valueProp]) + '</option>');
@@ -504,7 +513,15 @@
 				if (JsonWebApi.active)
 					return;
 
-				var i, file, name, extension, files = [];
+				var i, file, name, extension, files = [], tagValues;
+
+				tagValues = tableTagsBody.getElementsByTagName("select");
+				for (i = tagValues.length - 1; i >= 0; i--) {
+					if (!tagValues[i].value) {
+						Notification.error("@Html.Raw(Str.PleaseFillAllTags)");
+						return;
+					}
+				}
 
 				if (tableFilesBody) {
 					for (i = 0; i < tableFilesBody.childNodes.length; i++) {
@@ -522,7 +539,7 @@
 					}
 
 					if (!files.length) {
-						Notification.error("@Str.NoFilesWereAdded");
+						Notification.error("@Html.Raw(Str.NoFilesWereAdded)");
 						return;
 					}
 				}
