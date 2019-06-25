@@ -140,6 +140,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedCourses.Refresh();
+			User.PurgeAllCachedUsers();
 		}
 	}
 }

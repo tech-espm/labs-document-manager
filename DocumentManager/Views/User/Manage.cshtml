@@ -1,506 +1,527 @@
 ﻿@model List<User>
 @{
-    ViewBag.Title = Str.Users;
-    ViewBag.OnlyUnityAndCourseUserPermissions = true;
+	ViewBag.Title = Str.Users;
+	ViewBag.OnlyUnityAndCourseUserPermissions = true;
 }
 <div class="modal fade" tabindex="-1" role="dialog" id="modalPermissionId">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">@Str.Permissions</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Permissions</h4>
+			</div>
+			<div class="modal-body">
+				<partial name="_UserBasicPermissions" />
 
-                    <partial name="_UserBasicPermissions" />
+				<ul id="nav-tabs" class="nav nav-tabs hidden">
+					<li role="presentation" class="active" data-toggle="tab" href="#nav-partition"><a href="#">@Str.PartitionTypes</a></li>
+					<li role="presentation" data-toggle="tab" href="#nav-documents"><a href="#">@Str.DocumentTypes</a></li>
+				</ul>
+				<div id="nav-tabContent" class="tab-content hidden">
+					<div class="tab-pane active" id="nav-partition">
+						<table class="table table-striped table-hover no-margin-bottom">
+							<thead>
+								<tr>
+									<th>@Str.PartitionType</th>
+									<th class="col-min text-center">@Str.Create</th>
+									<th class="col-min text-center">@Str.Edit</th>
+									<th class="col-min text-center">@Str.Download</th>
+									<th class="col-min text-center">@Str.Delete</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (PartitionType partitionType in PartitionType.GetAll()) {
+								<tr>
+									<td class="col-max">@partitionType.Name</td>
+									<td class="clickable col-min text-center">
+										<input type="checkbox" class="ckpartition" data-feature="@((int)DocumentManager.Models.User.FeaturePermissionResult.Create)" value="@partitionType.Id" />
+									</td>
+									<td class="clickable col-min text-center">
+										<input type="checkbox" class="ckpartition" data-feature="@((int)DocumentManager.Models.User.FeaturePermissionResult.Edit)" value="@partitionType.Id" />
+									</td>
+									<td class="clickable col-min text-center">
+										<input type="checkbox" class="ckpartition" data-feature="@((int)DocumentManager.Models.User.FeaturePermissionResult.Download)" value="@partitionType.Id" />
+									</td>
+									<td class="clickable col-min text-center">
+										<input type="checkbox" class="ckpartition" data-feature="@((int)DocumentManager.Models.User.FeaturePermissionResult.Delete)" value="@partitionType.Id" />
+									</td>
+								</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+					<div id="nav-documents" class="tab-pane">
+						<table class="table table-striped table-hover no-margin-bottom">
+							<thead>
+								<tr>
+									<th>@Str.DocumentType</th>
+									<th class="col-min text-center">@Str.Create</th>
+									<th class="col-min text-center">@Str.Edit</th>
+									<th class="col-min text-center">@Str.Download</th>
+									<th class="col-min text-center">@Str.Delete</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (DocumentType documentType in DocumentType.GetAll()) {
+								<tr>
+									<td class="col-max">@documentType.Name</td>
+									<td class="clickable col-min text-center">
+										<input type="checkbox" class="ckdocument" data-feature="@((int)DocumentManager.Models.User.FeaturePermissionResult.Create)" value="@documentType.Id" />
+									</td>
+									<td class="clickable col-min text-center">
+										<input type="checkbox" class="ckdocument" data-feature="@((int)DocumentManager.Models.User.FeaturePermissionResult.Edit)" value="@documentType.Id" />
+									</td>
+									<td class="clickable col-min text-center">
+										<input type="checkbox" class="ckdocument" data-feature="@((int)DocumentManager.Models.User.FeaturePermissionResult.Download)" value="@documentType.Id" />
+									</td>
+									<td class="clickable col-min text-center">
+										<input type="checkbox" class="ckdocument" data-feature="@((int)DocumentManager.Models.User.FeaturePermissionResult.Delete)" value="@documentType.Id" />
+									</td>
+								</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				</div>
 
-                    <ul class="nav nav-tabs">
-                        <li role="presentation" class="active" data-toggle="tab" href="#nav-partition"><a href="#">@Str.partitionType</a></li>
-                        <li role="presentation" data-toggle="tab" href="#nav-documents"><a href="#">@Str.Documents</a></li>
-                    </ul>
-                    <div class="tab-content " id="nav-tabContent">
-                        <div class="tab-pane active" id="nav-partition">
-                            <table class="table table-striped table-hover no-margin-bottom">
-                                <thead>
-                                    <tr>
-                                        <td>@Str.partitionType</td>
-                                        <td>@Str.Delete</td>
-                                        <td>@Str.Download</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (PartitionType partitionType in PartitionType.GetAll())
-                                    {
-                                        <tr>
-
-                                            <td class="clickable col-max">@partitionType.Name</td>
-                                            <td class="clickable col-min">
-                                                <input type="checkbox" id="ckpartitionDelete" class="ckpartition"  data-feature="1" value="@partitionType.Id" />
-                                            </td>
-                                            <td class="clickable col-min">
-                                                <input type="checkbox" id="ckpartitionDownload" class="ckpartition"  data-feature="2" value="@partitionType.Id" />
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane" id="nav-documents">
-
-                            <table class="table table-striped table-hover no-margin-bottom">
-                                <thead>
-                                    <tr>
-                                        <td>@Str.DocumentType</td>
-                                        <td>@Str.Delete</td>
-                                        <td>@Str.Download</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (DocumentType documentType in DocumentType.GetAll())
-                                    {
-                                        <tr>
-
-                                            <td class="clickable col-max">@documentType.Name</td>
-                                            <td class="clickable col-min">
-                                                <input type="checkbox" id="ckpdocumentDelete" class="ckdocument" data-feature="1" value="@documentType.Id"/>
-                                            </td>
-                                            <td class="clickable col-min">
-                                                <input type="checkbox" id="ckpdocumentDelete" class="ckdocument" data-feature="2" value="@documentType.Id" />
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <script type="text/javascript">
-//<![CDATA[
-                        "use strict";
-                        prepareCbSearch(document.getElementById("profileId"));
-                        //]]></script>
-                </div>
-            </div>
-            <div class="modal-footer">
-                      <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Close</button>
-            </div>
-        </div>
-    </div>
+				<script type="text/javascript">
+					//<![CDATA[
+					"use strict";
+					prepareCbSearch(document.getElementById("profileId"));
+					//]]>
+				</script>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Close</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalProfileId">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">@Str.ChangeProfile</h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="profileId">@Str.Profile</label>
-                    <select id="profileId" name="profileId" size="1" class="form-control">
-                        <option value="" selected="selected">@Str.SELECT</option>
-                        @foreach (Profile profile in Profile.GetAll())
-                        {
-                            <option value="@profile.Id">@profile.Name</option>
-                        }
-                    </select>
-                    <script type="text/javascript">//<![CDATA[
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.ChangeProfile</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<label for="profileId">@Str.Profile</label>
+					<select id="profileId" name="profileId" size="1" class="form-control">
+						<option value="" selected="selected">@Str.SELECT</option>
+						@foreach (Profile profile in Profile.GetAll()) {
+							<option value="@profile.Id">@profile.Name</option>
+						}
+					</select>
+					<script type="text/javascript">
+						//<![CDATA[
 						"use strict";
 						prepareCbSearch(_("profileId"));
-						//]]></script>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="btnProfileId"><i class="fa fa-check"></i>@Str.ChangeProfile</button>
-                <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
-            </div>
-        </div>
-    </div>
+						//]]>
+					</script>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" id="btnProfileId"><i class="fa fa-check"></i>@Str.ChangeProfile</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalActivation">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">@Str.Oops</h4>
-            </div>
-            <div class="modal-body">
-                <p class="no-margin-bottom" id="pActivation"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="btnActivation"><i class="fa fa-check"></i>@Str.OK</button>
-                <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Oops</h4>
+			</div>
+			<div class="modal-body">
+				<p class="no-margin-bottom" id="pActivation"></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" id="btnActivation"><i class="fa fa-check"></i>@Str.OK</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="modalResetPassword">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">@Str.Oops</h4>
-            </div>
-            <div class="modal-body">
-                <p class="no-margin-bottom" id="pResetPassword"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="btnResetPassword"><i class="fa fa-check"></i>@Str.OK</button>
-                <button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="@Str.Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">@Str.Oops</h4>
+			</div>
+			<div class="modal-body">
+				<p class="no-margin-bottom" id="pResetPassword"></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" id="btnResetPassword"><i class="fa fa-check"></i>@Str.OK</button>
+				<button type="button" class="btn btn-outline btn-default" data-dismiss="modal"><i class="fa fa-times"></i>@Str.Cancel</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="row">
-    <div class="col-lg-12">
-        <div class="panel panel-default">
-            <div class="panel-body dataTable_wrapper">
-                <table class="table table-striped table-hover" id="dataTableMain"></table>
-            </div>
-        </div>
-    </div>
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-body dataTable_wrapper">
+				<table class="table table-striped table-hover" id="dataTableMain"></table>
+			</div>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
 <script type="text/javascript">
-		//<![CDATA[
-		"use strict";
+	//<![CDATA[
+	"use strict";
 
-		window.dataTableMain = prepareDataTable("dataTableMain", {
-			order: [[0, "asc"]],
-			columns: [
-				{ title: "@Str.UserName", "class": "col-min" },
-				{ title: "@Str.FullName", "class": "col-max", render: encode },
-                { title: "@Str.Permission", "class": "col-min text-center" },
-				{ title: "@Str.Profile", "class": "col-min text-center" },
-				{ title: "@Str.Activation", "class": "col-min text-center" },
-				{ title: " ", "class": "col-min", searchable: false, orderable: false }
+	window.dataTableMain = prepareDataTable("dataTableMain", {
+		order: [[0, "asc"]],
+		columns: [
+			{ title: "@Str.UserName", "class": "col-min" },
+			{ title: "@Str.FullName", "class": "col-max", render: encode },
+            { title: "@Str.Permission", "class": "col-min text-center" },
+			{ title: "@Str.Profile", "class": "col-min text-center" },
+			{ title: "@Str.Activation", "class": "col-min text-center" },
+			{ title: " ", "class": "col-min", searchable: false, orderable: false }
+		],
+		data: [
+			@foreach (User user in Model) {
+				<text>
+			[
+				"<img class=\"profile-img\" alt=\"Perfil\" src=\"/User/Picture?id=@(user.Id)&v=@(user.PictureVersion)\" width=\"40\" height=\"40\" />" + encode("@user.UserName"),
+				"@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.FullName))",
+                "<button id=\"btnPermission@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changePermission(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Str.EditPermission))") + "</button>",
+                "<button id=\"btnProfile@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changeProfile(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.ProfileName))") + "</button>",
+				"@Html.Raw(user.Active ? "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-danger btn-block\\\" onclick=\\\"activateUser(0, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-times\\\"></i> " + Str.Deactivate + "</button>" : "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-success btn-block\\\" onclick=\\\"activateUser(1, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-check\\\"></i> " + Str.Activate + "</button>")",
+				"<button type=\"button\" class=\"btn btn-outline btn-primary\" onclick=\"resetPassword('@user.UserName', @user.Id)\"><i class=\"fa fa-refresh\"></i>@Str.ResetPassword</button>"
 			],
-			data: [
-				@foreach (User user in Model) {
-					<text>
-				[
-					"<img class=\"profile-img\" alt=\"Perfil\" src=\"/User/Picture?id=@(user.Id)&v=@(user.PictureVersion)\" width=\"40\" height=\"40\" />" + encode("@user.UserName"),
-					"@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.FullName))",
-                    "<button id=\"btnPermission@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changePermission(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Str.EditPermission))") + "</button>",
-                    "<button id=\"btnProfile@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changeProfile(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.ProfileName))") + "</button>",
-					"@Html.Raw(user.Active ? "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-danger btn-block\\\" onclick=\\\"activateUser(0, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-times\\\"></i> " + Str.Deactivate + "</button>" : "<button type=\\\"button\\\" class=\\\"btn btn-outline btn-success btn-block\\\" onclick=\\\"activateUser(1, '" + user.UserName + "', " + user.Id + ");\\\"><i class=\\\"fa fa-check\\\"></i> " + Str.Activate + "</button>")",
-					"<button type=\"button\" class=\"btn btn-outline btn-primary\" onclick=\"resetPassword('@user.UserName', @user.Id)\"><i class=\"fa fa-refresh\"></i>@Str.ResetPassword</button>"
-				],
-					</text>
+				</text>
+			}
+		],
+		deferRender: true,
+		export: { title: "@Str.Users" }
+	});
+
+	var userID = 0;
+	var PartitionTypePermission = null;
+	var DocumentTypePermission = null;
+
+	function showDefaultErrorMessage() {
+		Notification.error("...", true);
+	}
+
+	function LoadPermissionsCks() {
+		var courseID = parseInt($("#course").val());
+		var unityID = parseInt($("#unity").val());
+
+		if (isNaN(courseID) || !courseID ||
+			isNaN(unityID) || !unityID) {
+			_("nav-tabs").className = "nav nav-tabs hidden";
+			_("nav-tabContent").className = "tab-content hidden";
+			return;
+		}
+
+		_("nav-tabs").className = "nav nav-tabs";
+		_("nav-tabContent").className = "tab-content";
+
+		$(".ckpartition").each(function (index) {
+			var element = $(this);
+			var checked = false;
+
+			element.prop('checked', false);
+
+			$.each(PartitionTypePermission, function (key, item) {
+				if (element.val() == item.partitionTypeID
+					&& element.attr('data-feature') == item.featurePermission
+					&& courseID == item.courseID
+					&& unityID == item.unityID) {
+					checked = true;
+					return false;
 				}
-			],
-			deferRender: true,
-			export: { title: "@Str.Users" }
+			});
+
+			element.prop('checked', checked);
 		});
-        var userID = 0 ;
-        var PartitionTypePermission = null;
-        var DocumentTypePermission = null;
 
-        function LoadPermissionsCks(){
-
-             console.log("course:change")
-
-                  var curseID = $("#course").val()
-                  var unityID = $("#unity").val()
-
-
-                 $( ".ckpartition" ).each(function( index ) {
-                    var element = $(this);
-                    var checked = false ;
-
-                  $.each(PartitionTypePermission, function (key, item) {
-                        if(element.val() ==  item.partitionTypeID
-                            && element.attr( 'data-feature' ) == item.featurePermission
-                            && curseID == item.curseID
-                            && unityID == item.unitID)
-                            {
-                                checked = true;
-                            }
-                    });
-
-                    element.prop('checked',checked)
-                  });
-
-
-                console.log(DocumentTypePermission)
-
-                $( ".ckdocument" ).each(function( index ) {
-                    var element = $(this);
-                    var checked = false ;
-
-                  $.each(DocumentTypePermission, function (key, item) {
-                        if(element.val() ==  item.documentTypeId
-                            && element.attr( 'data-feature' ) == item.featurePermission
-                            && curseID == item.curseID
-                            && unityID == item.unitID)
-                            {
-                                checked = true;
-                            }
-                    });
-
-                    element.prop('checked',checked)
-                  });
-
-        }
-        document.getElementById("course").addEventListener("change", function () {
-
-
-            LoadPermissionsCks();
-
-
-        });
-
-        $(".ckpartition").click(function() {
-            var curseID = $("#course").val()
-            var unityID = $("#unity").val()
-            var partitionTypeID= $(this).val()
-            var featurePermission = $(this).attr( 'data-feature' )
-
-            var addPermission = $(this).is(':checked')
-
-            if(unityID == '' || unityID ==0){
-                alert("TODO: TROCAR MENSAGEM -> selecione primeiro a unidade antes de adicionar uma permissão")
-                return false
-            }
-            if(curseID == '' || curseID ==0){
-                alert("TODO: TROCAR MENSAGEM -> selecione primeiro o curso antes de adicionar uma permissão")
-                return false
-            }
-
-            var query = "UserId=" + userID;
-                query += "&UnityId=" + unityID;
-                query += "&CourseId=" + curseID;
-                query += "&partitionTypeID=" + partitionTypeID;
-                query += "&FeaturePermissionId=" + featurePermission;
-
-            if(addPermission){
-                $.ajax({
-                    url: 'AddPartitionTypePermission?' + query,
-                    type: "post",
-                }).done(function (data) {
-                    GetPartitionTypePermission(userID);
-                })
-            }else{
-                 $.each(PartitionTypePermission, function (key, item) {
-                    if(partitionTypeID ==  item.partitionTypeID
-                        && featurePermission == item.featurePermission
-                        && curseID == item.curseID
-                        && unityID == item.unitID)
-                        {
-                            $.ajax({
-                                url: 'DeletePartitionTypePermission?id=' + item.id,
-                                type: "delete",
-                            }).done(function (data) {
-                                GetPartitionTypePermission(userID);
-                            })
-
-                        }
-                  });
-
-
-
-            }
-
-
-        });
-
-         $(".ckdocument").click(function() {
-
-            var curseID = $("#course").val()
-            var unityID = $("#unity").val()
-            var documentTypeId= $(this).val()
-            var featurePermission = $(this).attr( 'data-feature' )
-
-            var addPermission = $(this).is(':checked')
-
-            if(unityID == '' || unityID ==0){
-                alert("TODO: TROCAR MENSAGEM -> selecione primeiro a unidade antes de adicionar uma permissão")
-                return false
-            }
-            if(curseID == '' || curseID ==0){
-                alert("TODO: TROCAR MENSAGEM -> selecione primeiro o curso antes de adicionar uma permissão")
-                return false
-            }
-
-            var query = "UserId=" + userID;
-                query += "&UnityId=" + unityID;
-                query += "&CourseId=" + curseID;
-                query += "&DocumentTypeId=" + documentTypeId;
-                query += "&FeaturePermissionId=" + featurePermission;
-
-            if(addPermission){
-                $.ajax({
-                    url: 'AddDocumentTypePermission?' + query,
-                    type: "post",
-                }).done(function (data) {
-                    GetDocumentTypePermission(userID);
-                })
-            }else{
-                 $.each(DocumentTypePermission, function (key, item) {
-                    if(documentTypeId ==  item.documentTypeId
-                        && featurePermission == item.featurePermission
-                        && curseID == item.curseID
-                        && unityID == item.unitID)
-                        {
-                            $.ajax({
-                                url: 'DeleteDocumentTypePermission?id=' + item.id,
-                                type: "delete",
-                            }).done(function (data) {
-                                GetDocumentTypePermission(userID);
-
-                            })
-
-                        }
-                  });
-
-
-
-            }
-
-
-        });
-
-
-
-        function GetPartitionTypePermission(userID){
-                $.ajax({
-                    url: 'GetPartitionTypePermission?UserID=' + userID
-                }).done(function (data) {
-                   PartitionTypePermission = data
-                   LoadPermissionsCks();
-                })
-        }
-
-        function GetDocumentTypePermission(userID){
-                $.ajax({
-                    url: 'GetDocumentTypePermission?UserID=' + userID
-                }).done(function (data) {
-                   DocumentTypePermission = data
-                   LoadPermissionsCks();
-                })
-        }
-
-
-        function changePermission(btn, userName, id) {
-            if (JsonWebApi.active)
-                return;
-
-            userID = id;
-            var PartitionTypePermission = [];
-            var DocumentTypePermission = [];
-            console.log("changePermission");
-
-
-
-
-
-            GetPartitionTypePermission(id);
-            GetDocumentTypePermission(id);
-
-
-            $("#modalPermissionId").modal({
-                backdrop: true,
-                keyboard: true
-            });
-        }
-
-		function changeProfile(btn, userName, id) {
-			if (JsonWebApi.active)
-				return;
-
-			setCbSearch(_("profileId"), "");
-
-			_("btnProfileId").onclick = function () {
-				var cbProfileId = _("profileId"), profileId = parseInt(cbProfileId.value), profileName;
-
-				if (JsonWebApi.active)
-					return;
-
-				$("#modalProfileId").modal("hide");
-
-				profileName = cbProfileId.options[cbProfileId.options.selectedIndex].textContent;
-
-				Notification.wait();
-
-				JsonWebApi.get("@Url.Action("SetProfile")", function (response) {
-					if (response.success)
-						location.reload(true);
-					else
-						Notification.error(response.value, true);
-				}, "id", id, "profileId", profileId);
-			};
-
-			$("#modalProfileId").modal({
-				backdrop: true,
-				keyboard: true
+		$(".ckdocument").each(function (index) {
+			var element = $(this);
+			var checked = false;
+
+			$.each(DocumentTypePermission, function (key, item) {
+				if (element.val() == item.documentTypeId
+					&& element.attr('data-feature') == item.featurePermission
+					&& courseID == item.courseID
+					&& unityID == item.unityID) {
+					checked = true;
+					return false;
+				}
+			});
+
+			element.prop('checked', checked);
+		});
+	}
+
+	document.getElementById("course").addEventListener("change", function () {
+		LoadPermissionsCks();
+	});
+
+	$("#nav-tabContent td.clickable").click(function (e) {
+		var input = e.target.getElementsByTagName("input");
+		if (input && (input = input[0]))
+			input.click();
+	});
+
+	$(".ckpartition").click(function () {
+		if (JsonWebApi.active || $.active)
+			return false;
+
+		var courseID = parseInt($("#course").val());
+		var unityID = parseInt($("#unity").val());
+		var partitionTypeID = parseInt($(this).val());
+		var featurePermission = parseInt($(this).attr('data-feature'));
+
+		var addPermission = $(this).is(':checked');
+
+		if (isNaN(courseID) || !courseID || isNaN(unityID) || !unityID)
+			return false;
+
+		var query = "UserId=" + userID;
+		query += "&UnityId=" + unityID;
+		query += "&CourseId=" + courseID;
+		query += "&partitionTypeID=" + partitionTypeID;
+		query += "&FeaturePermissionId=" + featurePermission;
+
+		Notification.wait();
+
+		if (addPermission) {
+			$.ajax({
+				url: 'AddPartitionTypePermission?' + query,
+				type: "post",
+				success: function () {
+					GetPartitionTypePermission();
+				},
+				error: showDefaultErrorMessage
+			});
+		} else {
+			$.each(PartitionTypePermission, function (key, item) {
+				if (partitionTypeID == item.partitionTypeID
+					&& featurePermission == item.featurePermission
+					&& courseID == item.courseID
+					&& unityID == item.unityID) {
+					$.ajax({
+						url: 'DeletePartitionTypePermission?id=' + item.id,
+						type: "delete",
+						success: function () {
+							GetPartitionTypePermission();
+						},
+						error: showDefaultErrorMessage
+					});
+					return false;
+				}
 			});
 		}
+	});
 
-		function activateUser(how, userName, id) {
-			if (JsonWebApi.active)
-				return;
+	$(".ckdocument").click(function () {
+		if (JsonWebApi.active || $.active)
+			return false;
 
-			_("pActivation").textContent = (how ? "@Html.Raw(Str.DoYouReallyWantToActivateUser) \"" + userName + "\"?" : "@Html.Raw(Str.DoYouReallyWantToDeactivateUser) \"" + userName + "\"?");
+		var courseID = parseInt($("#course").val());
+		var unityID = parseInt($("#unity").val());
+		var documentTypeId = parseInt($(this).val());
+		var featurePermission = parseInt($(this).attr('data-feature'));
 
-			_("btnActivation").onclick = function () {
-				if (JsonWebApi.active)
-					return;
+		var addPermission = $(this).is(':checked');
 
-				$("#modalActivation").modal("hide");
+		if (isNaN(courseID) || !courseID || isNaN(unityID) || !unityID)
+			return false;
 
-				Notification.wait();
+		var query = "UserId=" + userID;
+		query += "&UnityId=" + unityID;
+		query += "&CourseId=" + courseID;
+		query += "&DocumentTypeId=" + documentTypeId;
+		query += "&FeaturePermissionId=" + featurePermission;
 
-				JsonWebApi.get(how ? "@Url.Action("Activate")" : "@Url.Action("Deactivate")", function (response) {
-					Notification.hide();
+		Notification.wait();
 
-					if (response.success)
-						location.reload(true);
-					else
-						Notification.error(response.value, true);
-				}, "id", id);
-			};
-
-			$("#modalActivation").modal({
-				backdrop: true,
-				keyboard: true
+		if (addPermission) {
+			$.ajax({
+				url: 'AddDocumentTypePermission?' + query,
+				type: "post",
+				success: function () {
+					GetDocumentTypePermission();
+				},
+				error: showDefaultErrorMessage
+			});
+		} else {
+			$.each(DocumentTypePermission, function (key, item) {
+				if (documentTypeId == item.documentTypeId
+					&& featurePermission == item.featurePermission
+					&& courseID == item.courseID
+					&& unityID == item.unityID) {
+					$.ajax({
+						url: 'DeleteDocumentTypePermission?id=' + item.id,
+						type: "delete",
+						success: function () {
+							GetDocumentTypePermission();
+						},
+						error: showDefaultErrorMessage
+					});
+					return false;
+				}
 			});
 		}
+	});
 
-		function resetPassword(userName, id) {
-			if (JsonWebApi.active)
+	function GetPartitionTypePermission(callback) {
+		Notification.wait();
+
+		$.ajax({
+			url: 'GetPartitionTypePermission?UserID=' + userID,
+			success: function (data) {
+				Notification.hide();
+				PartitionTypePermission = data;
+				if (callback)
+					callback();
+			},
+			error: showDefaultErrorMessage
+		});
+	}
+
+	function GetDocumentTypePermission(callback) {
+		Notification.wait();
+
+		$.ajax({
+			url: 'GetDocumentTypePermission?UserID=' + userID,
+			success: function (data) {
+				Notification.hide();
+				DocumentTypePermission = data;
+				if (callback)
+					callback();
+			},
+			error: showDefaultErrorMessage
+		});
+	}
+
+	function changePermission(btn, userName, id) {
+		if (JsonWebApi.active || $.active)
+			return;
+
+		userID = id;
+
+		GetPartitionTypePermission(function () {
+			GetDocumentTypePermission(function () {
+				setCbSearch(_("unity"), "");
+				setCbSearch(_("course"), "");
+				_("nav-tabs").className = "nav nav-tabs hidden";
+				_("nav-tabContent").className = "tab-content hidden";
+
+				$("#modalPermissionId").modal({
+					backdrop: true,
+					keyboard: true
+				});
+			});
+		});
+	}
+
+	function changeProfile(btn, userName, id) {
+		if (JsonWebApi.active || $.active)
+			return;
+
+		setCbSearch(_("profileId"), "");
+
+		_("btnProfileId").onclick = function () {
+			var cbProfileId = _("profileId"), profileId = parseInt(cbProfileId.value), profileName;
+
+			if (JsonWebApi.active || $.active)
 				return;
 
-			_("pResetPassword").textContent = "@Html.Raw(@Str.DoYouReallyWantToResetUsersPassword)\"" + userName + "\"@Html.Raw(Str.DoYouReallyWantToResetUsersPasswordEnd)";
+			$("#modalProfileId").modal("hide");
 
-			_("btnResetPassword").onclick = function () {
-				if (JsonWebApi.active)
-					return;
+			profileName = cbProfileId.options[cbProfileId.options.selectedIndex].textContent;
 
-				$("#modalResetPassword").modal("hide");
+			Notification.wait();
 
-				Notification.wait();
+			JsonWebApi.get("@Url.Action("SetProfile")", function (response) {
+				if (response.success)
+					location.reload(true);
+				else
+					Notification.error(response.value, true);
+			}, "id", id, "profileId", profileId);
+		};
 
-				JsonWebApi.get("@Url.Action("ResetPassword")", function (response) {
-					Notification.hide();
+		$("#modalProfileId").modal({
+			backdrop: true,
+			keyboard: true
+		});
+	}
 
-					if (response.success)
-						Notification.success("@Html.Raw(Str.PasswordSuccessfullyResetTo1234)");
-					else
-						Notification.error(response.value, true);
-				}, "id", id);
-			};
+	function activateUser(how, userName, id) {
+		if (JsonWebApi.active || $.active)
+			return;
 
-			$("#modalResetPassword").modal({
-				backdrop: true,
-				keyboard: true
-			});
-		}
-		//]]>
-</script>
+		_("pActivation").textContent = (how ? "@Html.Raw(Str.DoYouReallyWantToActivateUser) \"" + userName + "\"?" : "@Html.Raw(Str.DoYouReallyWantToDeactivateUser) \"" + userName + "\"?");
+
+		_("btnActivation").onclick = function () {
+			if (JsonWebApi.active || $.active)
+				return;
+
+			$("#modalActivation").modal("hide");
+
+			Notification.wait();
+
+			JsonWebApi.get(how ? "@Url.Action("Activate")" : "@Url.Action("Deactivate")", function (response) {
+				Notification.hide();
+
+				if (response.success)
+					location.reload(true);
+				else
+					Notification.error(response.value, true);
+			}, "id", id);
+		};
+
+		$("#modalActivation").modal({
+			backdrop: true,
+			keyboard: true
+		});
+	}
+
+	function resetPassword(userName, id) {
+		if (JsonWebApi.active || $.active)
+			return;
+
+		_("pResetPassword").textContent = "@Html.Raw(@Str.DoYouReallyWantToResetUsersPassword)\"" + userName + "\"@Html.Raw(Str.DoYouReallyWantToResetUsersPasswordEnd)";
+
+		_("btnResetPassword").onclick = function () {
+			if (JsonWebApi.active || $.active)
+				return;
+
+			$("#modalResetPassword").modal("hide");
+
+			Notification.wait();
+
+			JsonWebApi.get("@Url.Action("ResetPassword")", function (response) {
+				Notification.hide();
+
+				if (response.success)
+					Notification.success("@Html.Raw(Str.PasswordSuccessfullyResetTo1234)");
+				else
+					Notification.error(response.value, true);
+			}, "id", id);
+		};
+
+		$("#modalResetPassword").modal({
+			backdrop: true,
+			keyboard: true
+		});
+	}
+	//]]>
+	</script>
 }

@@ -127,6 +127,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedPartitionTypes.Refresh();
+			User.PurgeAllCachedUsers();
 		}
 	}
 }

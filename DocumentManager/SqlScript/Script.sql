@@ -125,6 +125,7 @@ CREATE TABLE user_permission_partition_type (
 	course_id INT NOT NULL,
 	partition_type_id INT NOT NULL,
 	feature_permission_id INT NOT NULL,
+	UNIQUE KEY user_permission_partition_type_UN (user_id, unity_id, course_id, partition_type_id, feature_permission_id),
 	CONSTRAINT user_permission_partition_type_partition_type_id_fk
 		FOREIGN KEY (partition_type_id)
 		REFERENCES partition_type (id)
@@ -139,6 +140,7 @@ CREATE TABLE user_permission_document_type (
 	course_id INT NOT NULL,
 	document_type_id INT NOT NULL,
 	feature_permission_id INT NOT NULL,
+	UNIQUE KEY user_permission_document_type_UN (user_id, unity_id, course_id, document_type_id, feature_permission_id),
 	CONSTRAINT user_permission_document_type_document_type_id_fk
 		FOREIGN KEY (document_type_id)
 		REFERENCES document_type (id)

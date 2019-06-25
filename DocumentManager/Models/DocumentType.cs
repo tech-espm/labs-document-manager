@@ -214,6 +214,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedDocumentTypes.Refresh();
+			User.PurgeAllCachedUsers();
 		}
 	}
 }
