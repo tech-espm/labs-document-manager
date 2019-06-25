@@ -15,6 +15,10 @@
 			counter-increment: content-section;
 			content: counter(content-section);
 		}
+
+		tr.col-h2 button.btn-danger {
+			visibility: hidden;
+		}
 	</style>
 }
 
@@ -164,7 +168,35 @@
 			tableFilesBody = _("tableFilesBody"),
 			btnSave = _("btnSave"),
 			txtFile = _("txtFile"),
-			tableTagsBody = _("tableTagsBody");
+			tableTagsBody = _("tableTagsBody"),
+			cbCourse = _("course"),
+			cbDocumentType = _("documentType");
+
+		cbDocumentType.addEventListener("change", function () {
+			var i, tr, documentTypeId = parseInt(cbDocumentType.value), course = cbCourse.course, documentTypePermissions, documentType, existingTags = {}, tagId;
+
+			for (i = tableTagsBody.childNodes.length - 1; i >= 0; i--) {
+				(tr = tableTagsBody.childNodes[i]).className = "ui-sortable-handle";
+				existingTags[tr.getAttribute("data-id")] = tr;
+			}
+
+			if (!documentTypeId || !course || !(documentTypePermissions = course.documentTypes))
+				return;
+
+			for (i = documentTypePermissions.length - 1; i >= 0; i--) {
+				if ((documentType = documentTypePermissions[i].documentType).id !== documentTypeId)
+					continue;
+
+				for (i = 0; i < documentType.defaultTagIds.length; i++) {
+					tagId = documentType.defaultTagIds[i];
+					if (!(tr = existingTags[tagId]))
+						tr = addTag(tagId);
+					tr.className = "ui-sortable-handle col-h2";
+				}
+
+				return;
+			}
+		});
 
 		$(tableTagsBody).sortable().disableSelection();
 
@@ -190,11 +222,32 @@
 					return;
 			}
 
-			var tag = tagsById[id], tr, i, v, select;
+			var tag = tagsById[id], tr, i, v, className = "ui-sortable-handle", select, documentTypeId = parseInt(cbDocumentType.value), course = cbCourse.course, documentTypePermissions, documentType;
 			if (!tag)
 				return;
 
-			tr = $('<tr data-id="' + id + '" class="ui-sortable-handle"><td class="col-min content-enum"></td><td class="col-50">' + encode(tag.name[valueProp]) + '</td><td class="col-50"><select size="1" class="form-control upper"></select></td><td class="col-min"><button type="button" title="@Str.Delete" class="btn btn-outline btn-danger"><i class="fa fa-nomargin fa-trash-o"></i></button></td></tr>')[0];
+			for (i = tableTagsBody.childNodes.length - 1; i >= 0; i--) {
+				if (parseInt(tableTagsBody.childNodes[i].getAttribute("data-id")) === id)
+					return;
+			}
+
+			if (documentTypeId && course && (documentTypePermissions = course.documentTypes)) {
+				for (i = documentTypePermissions.length - 1; i >= 0; i--) {
+					if ((documentType = documentTypePermissions[i].documentType).id !== documentTypeId)
+						continue;
+
+					for (i = 0; i < documentType.defaultTagIds.length; i++) {
+						if (id === documentType.defaultTagIds[i]) {
+							className += " col-h2";
+							break;
+						}
+					}
+
+					break;
+				}
+			}
+
+			tr = $('<tr data-id="' + id + '" class="' + className + '"><td class="col-min content-enum"></td><td class="col-50">' + encode(tag.name[valueProp]) + '</td><td class="col-50"><select size="1" class="form-control upper"></select></td><td class="col-min"><button type="button" title="@Str.Delete" class="btn btn-outline btn-danger"><i class="fa fa-nomargin fa-trash-o"></i></button></td></tr>')[0];
 			select = $(tr.getElementsByTagName("select")[0]);
 			for (i = 0; i < tag.values.length; i++) {
 				v = tag.values[i];
@@ -204,6 +257,8 @@
 			if (valueId)
 				setCbSearch(select[0], valueId);
 			tableTagsBody.appendChild(tr);
+
+			return tr;
 		}
 
 		(function () {
