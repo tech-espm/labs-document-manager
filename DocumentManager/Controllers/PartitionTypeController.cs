@@ -35,7 +35,7 @@ namespace DocumentManager.Controllers {
 			try {
 				return Json(PartitionType.Create(nameEn, namePtBr));
 			} catch (Exception ex) {
-				return ErrorResult(ex, Str._O, Str._um_a, Str.partitionType, $"{nameEn} / {namePtBr}");
+				return ErrorResult(ex, Str._A, Str._uma_a, Str.partitionType, $"{nameEn} / {namePtBr}");
 			}
 		}
 
@@ -49,7 +49,7 @@ namespace DocumentManager.Controllers {
 				partitionType.Update(nameEn, namePtBr);
 				return Json(partitionType);
 			} catch (Exception ex) {
-				return ErrorResult(ex, Str._O, Str._um_a, Str.partitionType, $"{nameEn} / {namePtBr}");
+				return ErrorResult(ex, Str._A, Str._uma_a, Str.partitionType, $"{nameEn} / {namePtBr}");
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace DocumentManager.Controllers {
 				partitionType.Delete();
 				return VoidResult();
 			} catch (Exception ex) {
-				return ErrorResult(ex, Str._O, Str._um_a, Str.partitionType, partitionType?.Name.ToString());
+				return ErrorResult(ex, Str._A, Str._uma_a, Str.partitionType, partitionType?.Name.ToString());
 			}
 		}
 	}
