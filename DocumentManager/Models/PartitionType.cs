@@ -41,6 +41,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedPartitionTypes.Refresh();
+			User.PurgeAllCachedUsers();
 
 			return new PartitionType(id, new Str(nameEn, namePtBr));
 		}
@@ -116,6 +117,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedPartitionTypes.Refresh();
+			User.PurgeAllCachedUsers();
 		}
 
 		public void Delete() {

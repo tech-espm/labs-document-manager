@@ -102,6 +102,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedDocumentTypes.Refresh();
+			User.PurgeAllCachedUsers();
 
 			return new DocumentType(id, new Str(nameEn, namePtBr)) {
 				DefaultTagIds = defaultTagIds
@@ -203,6 +204,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedDocumentTypes.Refresh();
+			User.PurgeAllCachedUsers();
 		}
 
 		public void Delete() {

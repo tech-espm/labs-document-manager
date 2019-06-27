@@ -50,6 +50,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedUnits.Refresh();
+			User.PurgeAllCachedUsers();
 
 			return new Unity(id, new Str(nameEn, namePtBr), new Str(shortNameEn, shortNamePtBr));
 		}
@@ -129,6 +130,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedUnits.Refresh();
+			User.PurgeAllCachedUsers();
 		}
 
 		public void Delete() {

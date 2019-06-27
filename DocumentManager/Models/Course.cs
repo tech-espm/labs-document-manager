@@ -50,6 +50,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedCourses.Refresh();
+			User.PurgeAllCachedUsers();
 
 			return new Course(id, new Str(nameEn, namePtBr), new Str(shortNameEn, shortNamePtBr));
 		}
@@ -129,6 +130,7 @@ namespace DocumentManager.Models {
 			}
 
 			CachedCourses.Refresh();
+			User.PurgeAllCachedUsers();
 		}
 
 		public void Delete() {
