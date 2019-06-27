@@ -101,7 +101,7 @@ namespace DocumentManager.Controllers {
 				Document document = Document.GetById(id, false);
 				if (document == null)
 					return ErrorResult(Str.DocumentNotFound);
-				return DownloadResult(Storage.Document(document.Id, document.Extension), string.IsNullOrWhiteSpace(fileName) ? document.SafeDownloadName : fileName);
+				return DownloadResult(Storage.Document(document.Id, document.Extension));
 			} catch (Exception ex) {
 				return ErrorResult(ex);
 			}
@@ -125,7 +125,7 @@ namespace DocumentManager.Controllers {
 					splitIds[i] = Storage.Document(id, document.Extension);
 					names[i] = document.SafeDownloadName;
 				}
-				return DownloadZipResult(splitIds, names, string.IsNullOrWhiteSpace(fileName) ? (Str.SelectedDocuments + ".zip") : fileName);
+				return DownloadZipResult(splitIds, names);
 			} catch (Exception ex) {
 				return ErrorResult(ex);
 			}
