@@ -1953,8 +1953,8 @@ window.BlobDownloader = {
 
 		parent.removeChild(select);
 		select.style.borderColor = "transparent";
-		select.style.webkitBoxShadow = "0 0 0";
-		select.style.boxShadow = "0 0 0";
+		select.style.webkitBoxShadow = "none";
+		select.style.boxShadow = "none";
 
 		outerdiv.appendChild(select);
 		outerdiv.appendChild(groupdiv);
