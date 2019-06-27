@@ -69,19 +69,13 @@
 				<span class="label label-default">Id @Model.Id</span>
 			</div>
 		}
-		<div class="row" id="divNameDescription">
-			<div class="col-sm-6">
-				<div class="form-group">
-					<label for="name">@Str.Name</label>
-					<input id="name" name="name" maxlength="128" class="form-control upper" type="text" placeholder="@(Model == null ? Str.Optional : "")" value="@(Model == null ? "" : Model.Name)" />
-				</div>
-			</div>
-			<div class="col-sm-6">
-				<div class="form-group">
-					<label for="description">@Str.Description</label>
-					<input id="description" name="description" maxlength="255" class="form-control upper" type="text" placeholder="@Str.Optional" value="@(Model == null ? "" : Model.Description)" />
-				</div>
-			</div>
+		<div class="form-group" id="divName">
+			<label for="name">@Str.Name</label>
+			<input id="name" name="name" maxlength="128" class="form-control upper" type="text" placeholder="@(Model == null ? Str.Optional : "")" value="@(Model == null ? "" : Model.Name)" />
+		</div>
+		<div class="form-group">
+			<label for="description">@Str.Description</label>
+			<textarea id="description" name="description" rows="3" maxlength="1000" class="form-control upper" placeholder="@Str.Optional">@(Model == null ? "" : Model.Description)</textarea>
 		</div>
 
 		<partial name="_UserBasicPermissions" />
@@ -170,7 +164,7 @@
 			tagsById = {},
 			modelTags = @Json.Serialize(Model?.Tags),
 			cbNewTag = _("cbNewTag"),
-			divNameDescription = _("divNameDescription"),
+			divName = _("divName"),
 			divFileTitle = _("divFileTitle"),
 			tableFiles = _("tableFiles"),
 			tableFilesBody = _("tableFilesBody"),
@@ -286,7 +280,7 @@
 				totalSize += tableFilesBody.childNodes[i].file.size;
 			divFileTitle.textContent = count + ((count === 1) ? " @Str.file" : " @Str.files") + " (@Str.Total: " + formatSize(totalSize) + ")";
 			tableFiles.className = (count ? "table table-striped table-hover no-margin-bottom" : "table table-striped table-hover no-margin-bottom hidden");
-			divNameDescription.className = ((count > 1) ? "row hidden" : "row");
+			divName.className = ((count > 1) ? "form-group hidden" : "form-group");
 			btnSave.value = ((count <= 1) ? "@Str.CreateDocument" : "@Str.CreateDocuments");
 		}
 
@@ -494,7 +488,7 @@
 					required: @(Model == null ? "false" : "true"),
 				},
 				description: {
-					maxlength: 255
+					maxlength: 1000
 				},
 				unity: {
 					required: true
@@ -558,8 +552,6 @@
 
 				@if (Model == null) {
 					<text>
-					if (files.length > 1)
-						d.description = "";
 					createFile(d, files.length > 1 || !d.name, files, 0);
 					</text>
 				} else {

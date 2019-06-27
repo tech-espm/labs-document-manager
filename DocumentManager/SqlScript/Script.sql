@@ -151,7 +151,7 @@ CREATE TABLE user_permission_document_type (
 CREATE TABLE document (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	name VARCHAR(128) NOT NULL,
-	description VARCHAR(255) NOT NULL,
+	description VARCHAR(1000) NOT NULL,
 	extension VARCHAR(10) NOT NULL,
 	size INT NOT NULL,
 	unity_id INT NOT NULL,

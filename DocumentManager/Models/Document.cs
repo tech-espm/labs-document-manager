@@ -52,7 +52,7 @@ namespace DocumentManager.Models {
 			if ((data.Name = data.Name.Trim().ToUpper()).Length > 128)
 				throw new ValidationException(Str.NameTooLong);
 
-			if ((data.Description = (data.Description ?? "").Trim().ToUpper()).Length > 255)
+			if ((data.Description = (data.Description ?? "").Trim().ToUpper()).Length > 1000)
 				throw new ValidationException(Str.DescriptionTooLong);
 
 			if (string.IsNullOrWhiteSpace(data.Extension))
