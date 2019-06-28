@@ -191,10 +191,12 @@
 	.sidebar-fake-bg {
 		display: none;
 	}
+}
 
-	.sidebar {
-		background: #333;
-	}
+/* workaround to avoid blurry fonts in Chrome, because they are rendered on top of a fixed element (sidebar-fake-bg) */
+.sidebar {
+	background: #333;
+	backface-visibility: hidden;
 }
 
 @media(min-width:768px) {
