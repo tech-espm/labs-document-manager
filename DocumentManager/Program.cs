@@ -13,7 +13,20 @@ namespace DocumentManager {
 		}
 
 		public static IWebHostBuilder CreateWebHostBuilder(string[] args) {
+			// https://github.com/aspnet/AspNetCore.Docs/blob/master/aspnetcore/host-and-deploy/linux-apache.md
+			// https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-apache?view=aspnetcore-2.1
+			// https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-2.1
+			// https://github.com/aspnet/MetaPackages/blob/master/src/Microsoft.AspNetCore/WebHost.cs#L161
 			return WebHost.CreateDefaultBuilder(args)
+				.ConfigureAppConfiguration((hostingContext, config) => {
+					var env = hostingContext.HostingEnvironment;
+
+					config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+						  .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+				})
+				.UseKestrel((builderContext, options) => {
+					options.Configure(builderContext.Configuration.GetSection("Kestrel"));
+				})
 				.UseStartup<Startup>();
 		}
 	}
