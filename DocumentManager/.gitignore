@@ -1,2 +1,4 @@
 App_Data/
 appsettings.Development.json
+appsettings.Production.json
+Production.json

@@ -772,6 +772,10 @@ namespace DocumentManager.Models {
 					buffer = Convert.FromBase64String(picture);
 
 					using (MemoryStream stream = new MemoryStream(buffer, false)) {
+						// Should an exception "The type initializer for 'Gdip' threw an exception."
+						// happen when trying to use any classes from assembly System.Drawing.Common
+						// on a Linux machine, it is necessary to install the package libgdiplus:
+						// sudo yum install libgdiplus (on CentOS 7, for example)
 						using (Bitmap bmp = Image.FromStream(stream) as Bitmap) {
 							if (bmp.Width == bmp.Height && bmp.Width <= 150) {
 								buffer = ImageManipulation.SaveJpeg(bmp, 90);

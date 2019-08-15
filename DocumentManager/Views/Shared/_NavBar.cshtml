@@ -42,7 +42,7 @@
 
 				@{
 					bool found = false;
-					string url = Context.Request.Path;
+					string url = Context.Request.PathBase + Context.Request.Path;
 					if (url.EndsWith("/Edit")) {
 						url = url.Substring(0, url.Length - 4) + "Manage";
 					}

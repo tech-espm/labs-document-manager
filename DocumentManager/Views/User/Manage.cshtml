@@ -195,7 +195,7 @@
 			@foreach (User user in Model) {
 				<text>
 			[
-				"<img class=\"profile-img\" alt=\"Perfil\" src=\"/User/Picture?id=@(user.Id)&v=@(user.PictureVersion)\" width=\"40\" height=\"40\" />" + encode("@user.UserName"),
+				"<img class=\"profile-img\" alt=\"Perfil\" src=\"@Url.Content("~/")User/Picture?id=@(user.Id)&v=@(user.PictureVersion)\" width=\"40\" height=\"40\" />" + encode("@user.UserName"),
 				"@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.FullName))",
                 "<button id=\"btnPermission@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changePermission(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(Str.EditPermission))") + "</button>",
                 "<button id=\"btnProfile@(user.Id)\" type=\"button\" class=\"btn btn-outline btn-primary btn-block\" onclick=\"changeProfile(this, '@user.UserName', @user.Id)\">" + encode("@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(user.ProfileName))") + "</button>",

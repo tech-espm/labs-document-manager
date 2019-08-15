@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +22,7 @@ namespace DocumentManager {
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services) {
 
-			var appSetting = Configuration.Get<AppSetting>();
+			var appSetting = AppSetting.GetAppSetting();
 
 			services.AddSingleton(instance => appSetting);
 
@@ -30,9 +31,18 @@ namespace DocumentManager {
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+
+			var appSetting = AppSetting.GetAppSetting();
+
+			app.UsePathBase(appSetting.PathBase);
+
+			app.UseForwardedHeaders(new ForwardedHeadersOptions {
+				ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+			});
+
 			// Show this message even from production environment only during the initial development phase
 			//if (env.IsDevelopment()) {
-				app.UseDeveloperExceptionPage();
+			app.UseDeveloperExceptionPage();
 			//} else {
 			//	app.UseExceptionHandler("/Home/Error");
 			//}

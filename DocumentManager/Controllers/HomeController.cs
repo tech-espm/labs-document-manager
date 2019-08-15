@@ -16,7 +16,7 @@ namespace DocumentManager.Controllers {
 		[AccessControl(true)]
 		public IActionResult Login() {
 			if (LoggedUser != null)
-				return Redirect("/");
+				return Redirect("~/");
 			return View();
 		}
 
@@ -24,13 +24,13 @@ namespace DocumentManager.Controllers {
 		[AccessControl(true)]
 		public IActionResult Login(string userName, string password) {
 			if (LoggedUser != null)
-				return Redirect("/");
+				return Redirect("~/");
 			try {
 				LoggedUser = Models.User.Login(HttpContext, userName, password);
 				if (LoggedUser == null)
 					ViewBag.Message = Str.UserOrPasswordIsInvalid;
 				else
-					return Redirect("/");
+					return Redirect("~/");
 			} catch (Exception ex) {
 				ViewBag.Message = Str.AnErrorOccurredDuringTheLoginProcess + ex.Message;
 			}
@@ -41,7 +41,7 @@ namespace DocumentManager.Controllers {
 		public IActionResult Logout() {
 			if (LoggedUser != null)
 				LoggedUser.Logout(HttpContext);
-			return Redirect("/");
+			return Redirect("~/");
 		}
 
 		public IActionResult NoPermission() {

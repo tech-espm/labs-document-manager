@@ -13,10 +13,20 @@ namespace DocumentManager.Models {
 	public class Menu {
 		private static readonly Dictionary<int, Dictionary<int, List<Menu>>> MenusByProfileIdAndLanguageId = new Dictionary<int, Dictionary<int, List<Menu>>>(16);
 		private static readonly CommonReadRareWriteLock Lock = new CommonReadRareWriteLock();
+		private static readonly string PathBase;
 
 		public readonly string Link, IconClass, Text, ExtraAttributes;
 		public readonly List<Menu> SubMenus;
 		public readonly bool Spacer;
+
+		static Menu() {
+			string pathBase = AppSetting.GetAppSetting().PathBase;
+			if (string.IsNullOrWhiteSpace(pathBase))
+				pathBase = "/";
+			else if ((pathBase = pathBase.Trim())[pathBase.Length - 1] != '/')
+				pathBase += "/";
+			PathBase = pathBase;
+		}
 
 		private static bool HasFeature(int[] features, int featureCount, Feature requestedFeature) {
 			int r = (int)requestedFeature, s = 0, e = featureCount - 1, a;
@@ -65,9 +75,9 @@ namespace DocumentManager.Models {
 				if (create || list) {
 					sub = new List<Menu>();
 					if (create)
-						sub.Add(new Menu("/Document/Create", "fa fa-plus fa-fw", Str.Create));
+						sub.Add(new Menu(PathBase + "Document/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
-						sub.Add(new Menu("/Document/Manage", "fa fa-tasks fa-fw", Str.View));
+						sub.Add(new Menu(PathBase + "Document/Manage", "fa fa-tasks fa-fw", Str.View));
 					menus.Add(new Menu("#", "fa fa-file-text-o fa-fw", Str.Documents, sub));
 				}
 				#endregion
@@ -83,9 +93,9 @@ namespace DocumentManager.Models {
 				if (create || list) {
 					sub = new List<Menu>();
 					if (create)
-						sub.Add(new Menu("/Unity/Create", "fa fa-plus fa-fw", Str.Create));
+						sub.Add(new Menu(PathBase + "Unity/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
-						sub.Add(new Menu("/Unity/Manage", "fa fa-tasks fa-fw", Str.View));
+						sub.Add(new Menu(PathBase + "Unity/Manage", "fa fa-tasks fa-fw", Str.View));
 					menus.Add(new Menu("#", "fa fa-university fa-fw", Str.Units, sub));
 				}
 				#endregion
@@ -96,9 +106,9 @@ namespace DocumentManager.Models {
 				if (create || list) {
 					sub = new List<Menu>();
 					if (create)
-						sub.Add(new Menu("/Course/Create", "fa fa-plus fa-fw", Str.Create));
+						sub.Add(new Menu(PathBase + "Course/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
-						sub.Add(new Menu("/Course/Manage", "fa fa-tasks fa-fw", Str.View));
+						sub.Add(new Menu(PathBase + "Course/Manage", "fa fa-tasks fa-fw", Str.View));
 					menus.Add(new Menu("#", "fa fa-graduation-cap fa-fw", Str.Courses, sub));
 				}
 				#endregion
@@ -109,9 +119,9 @@ namespace DocumentManager.Models {
 				if (create || list) {
 					sub = new List<Menu>();
 					if (create)
-						sub.Add(new Menu("/PartitionType/Create", "fa fa-plus fa-fw", Str.Create));
+						sub.Add(new Menu(PathBase + "PartitionType/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
-						sub.Add(new Menu("/PartitionType/Manage", "fa fa-tasks fa-fw", Str.View));
+						sub.Add(new Menu(PathBase + "PartitionType/Manage", "fa fa-tasks fa-fw", Str.View));
 					menus.Add(new Menu("#", "fa fa-cubes fa-fw", Str.PartitionTypes, sub));
 				}
 				#endregion
@@ -122,9 +132,9 @@ namespace DocumentManager.Models {
 				if (create || list) {
 					sub = new List<Menu>();
 					if (create)
-						sub.Add(new Menu("/DocumentType/Create", "fa fa-plus fa-fw", Str.Create));
+						sub.Add(new Menu(PathBase + "DocumentType/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
-						sub.Add(new Menu("/DocumentType/Manage", "fa fa-tasks fa-fw", Str.View));
+						sub.Add(new Menu(PathBase + "DocumentType/Manage", "fa fa-tasks fa-fw", Str.View));
 					menus.Add(new Menu("#", "fa fa-files-o fa-fw", Str.DocumentTypes, sub));
 				}
 				#endregion
@@ -135,9 +145,9 @@ namespace DocumentManager.Models {
 				if (create || list) {
 					sub = new List<Menu>();
 					if (create)
-						sub.Add(new Menu("/Tag/Create", "fa fa-plus fa-fw", Str.Create));
+						sub.Add(new Menu(PathBase + "Tag/Create", "fa fa-plus fa-fw", Str.Create));
 					if (list)
-						sub.Add(new Menu("/Tag/Manage", "fa fa-tasks fa-fw", Str.View));
+						sub.Add(new Menu(PathBase + "Tag/Manage", "fa fa-tasks fa-fw", Str.View));
 					menus.Add(new Menu("#", "fa fa-tag fa-fw", Str.Tags, sub));
 				}
 				#endregion
@@ -151,12 +161,12 @@ namespace DocumentManager.Models {
 				// administrators can work with them!
 				if (profileId == Profile.ADMIN_ID) {
 					menus.Add(new Menu("#", "fa fa-users fa-fw", Str.Profiles, new List<Menu>() {
-						new Menu("/Profile/Create", "fa fa-plus fa-fw", Str.Create),
-						new Menu("/Profile/Manage", "fa fa-tasks fa-fw", Str.View)
+						new Menu(PathBase + "Profile/Create", "fa fa-plus fa-fw", Str.Create),
+						new Menu(PathBase + "Profile/Manage", "fa fa-tasks fa-fw", Str.View)
 					}));
 					menus.Add(new Menu("#", "fa fa-user fa-fw", Str.Users, new List<Menu>() {
-						new Menu("/User/Create", "fa fa-plus fa-fw", Str.Create),
-						new Menu("/User/Manage", "fa fa-tasks fa-fw", Str.View)
+						new Menu(PathBase + "User/Create", "fa fa-plus fa-fw", Str.Create),
+						new Menu(PathBase + "User/Manage", "fa fa-tasks fa-fw", Str.View)
 					}));
 
 					menus.Add(new Menu());
