@@ -1,4 +1,6 @@
 App_Data/
+.env
+.env-prod
 appsettings.Development.json
 appsettings.Production.json
 Production.json
