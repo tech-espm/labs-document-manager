@@ -1328,10 +1328,10 @@ window.Notification = {
 	timeoutVisible: 0,
 	timeoutGone: 0,
 	isVisible: false,
-	pathBase: "",
+	pathBase: "/",
 	wait: function (msg) {
 		var div = document.createElement("div");
-		div.innerHTML = "<img alt=\"Aguarde\" src=\"" + (Notification.pathBase || "/") + "images/loading-grey-t.gif\"> " + (msg || "Por favor, aguarde...");
+		div.innerHTML = "<img alt=\"Aguarde\" src=\"" + Notification.pathBase + "images/loading-grey-t.gif\"> " + (msg || "Por favor, aguarde...");
 		return Notification.show(div, "default", -1);
 	},
 	success: function (message, important) {
